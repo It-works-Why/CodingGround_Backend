@@ -8,8 +8,10 @@ import org.springframework.http.HttpStatus;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ErrorCode {
 
-    // SIGN UP
+    // ACCOUNT
     SIGN_UP_EMAIL_DUPLICATE(HttpStatus.BAD_REQUEST, "이미 가입된 이메일 주소입니다. 다른 이메일을 입력하여 주세요."),
+    NEED_LOGIN(HttpStatus.FORBIDDEN, "로그인이 필요한 기능입니다."),
+    INVALID_INPUT_ACCOUNT_INFO(HttpStatus.BAD_REQUEST, "로그인 정보가 틀렸습니다."),
 
     // Common
     REQUIRED_REQUEST_NO_PARAMETER(HttpStatus.BAD_REQUEST, "필수 값이 존재하지 않습니다."),
@@ -21,11 +23,7 @@ public enum ErrorCode {
     HANDLE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
 
     // File Upload
-    FILE_UPLOAD_DENIED_EXTENSION_ERROR(HttpStatus.BAD_REQUEST, "파일 확장자가 올바르지 않습니다."),
-
-    // EXAM_ADD
-    NO_MATCH_OPTION_CNT_ERROR(HttpStatus.BAD_REQUEST, "선지갯수가 모두 일치하지 않습니다.");
-
+    FILE_UPLOAD_DENIED_EXTENSION_ERROR(HttpStatus.BAD_REQUEST, "파일 확장자가 올바르지 않습니다.");
 
     private final HttpStatus status;
     private final String message;

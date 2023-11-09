@@ -33,8 +33,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
-            // 유효하지 않은 토큰인 경우 처리 (예: 로그인 필요)
-            // 여기에서는 단순히 로그 출력 예시
             System.out.println("Invalid token or token not provided.");
         }
 

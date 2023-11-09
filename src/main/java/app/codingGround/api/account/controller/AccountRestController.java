@@ -20,16 +20,14 @@ public class AccountRestController {
 
     @GetMapping("/register")
     public ResponseEntity<ApiResponse<DefaultResultDto>> register() {
-        System.out.println("register돌입");
         return ResponseEntity.ok(new ApiResponse<>(accountService.register()));
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenInfo>> login(@RequestBody UserLoginRequestDto userLoginRequestDto) {
-        System.out.println("로그인 컨트롤러");
         String userId = userLoginRequestDto.getUserId();
         String password = userLoginRequestDto.getPassword();
-        TokenInfo tokenInfo =accountService.login(userId, password);
+        TokenInfo tokenInfo = accountService.login(userId, password);
         return ResponseEntity.ok(new ApiResponse<>(tokenInfo));
     }
 

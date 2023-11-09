@@ -21,7 +21,6 @@ public class UserRestController {
 
     @GetMapping("/test")
     public ResponseEntity<ApiResponse<DefaultResultDto>> emailDuplicationCheck() {
-        System.out.println("오셨군요 하하하");
         return ResponseEntity.ok(new ApiResponse<>(null));
     }
 

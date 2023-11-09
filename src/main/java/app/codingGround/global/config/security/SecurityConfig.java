@@ -1,5 +1,7 @@
 package app.codingGround.global.config.security;
 
+import app.codingGround.global.config.exception.JwtAccessDeniedHandler;
+import app.codingGround.global.config.exception.JwtAuthenticationEntryPoint;
 import app.codingGround.global.filter.JwtAuthenticationFilter;
 import app.codingGround.global.utils.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -23,17 +25,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .httpBasic().disable()
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeRequests()
-            .antMatchers("/api/users/login").permitAll()
-            .antMatchers("/api/users/register").permitAll()
-            .antMatchers("/api/users/test").hasRole("USER")
-            .anyRequest().authenticated()
-            .and()
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .httpBasic().disable()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                .antMatchers("/api/users/login").permitAll()
+                .antMatchers("/api/users/register").permitAll()
+                .antMatchers("/api/users/test").hasRole("USER")
+                .anyRequest().authenticated()
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                .accessDeniedHandler(new JwtAccessDeniedHandler());
         return http.build();
     }
 
