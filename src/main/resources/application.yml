@@ -1,0 +1,61 @@
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  web:
+    resources:
+      static-locations: file:src/main/resources/static/
+  servlet:
+    multipart:
+      max-file-size: 3MB     # 단일 파일 최대 용량, default: 1MB
+      max-request-size: 10MB # 여러 파일 최대 용량, default: 10MB
+  devtools:
+    livereload:
+      enabled: true
+  freemarker:
+    cache: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/coding-ground?characterEncoding=UTF-8&useTimezone=true&serverTimezone=Asia/Seoul
+    username: root
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        #        show_sql: true
+        format_sql: true
+server:
+  port: 8090
+# mybatis sql 경로
+mybatis:
+  mapper-locations: mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true # snake case(user_name) to camel case(userName)
+  type-aliases-package: app.codingGround.api.*.dto.*, app.codingGround.domain.*.dto.*
+
+# logback 설정 경로
+logging:
+  config: classpath:logback/logback-local.xml
+
+
+# swagger config
+swagger:
+  base-package: app.codingGround
+  path: /api/**
+  title: 코딩그라운드 API 문서
+  description: API에 대해서 설명해주는 문서입니다.
+  version: 1.0
+# 파일 업로드 경로
+file:
+  #  directory: /Users/(macName)/Desktop/upload/
+  directory: C:/upload/
+
+
+# jwt
+jwt:
+  secret: VlwEyVBsYt9V7zq57TejaaMnVUyzblYcfPQye08f7MGVA9XkHa
+
+
+# jpa
