@@ -35,4 +35,5 @@ public class AccountRestController {
     public ResponseEntity<ApiResponse<DefaultResultDto>> checkToken() {
         return ResponseEntity.ok(new ApiResponse<DefaultResultDto>(accountService.checkToken()));
     }
+
 }

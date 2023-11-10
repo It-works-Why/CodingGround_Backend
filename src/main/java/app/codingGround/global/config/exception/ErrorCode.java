@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ErrorCode {
 
+    // TEST
+    TEST_ERROR(HttpStatus.BAD_REQUEST, "테스트 에러 발생"),
+
     // ACCOUNT
     SIGN_UP_EMAIL_DUPLICATE(HttpStatus.BAD_REQUEST, "이미 가입된 이메일 주소입니다. 다른 이메일을 입력하여 주세요."),
     NEED_LOGIN(HttpStatus.FORBIDDEN, "로그인이 필요한 기능입니다."),
