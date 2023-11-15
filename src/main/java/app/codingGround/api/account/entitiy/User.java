@@ -2,11 +2,13 @@ package app.codingGround.api.account.entitiy;
 
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 @Getter
@@ -23,16 +25,16 @@ public class User implements UserDetails {
     @Column(name = "USER_NUM")
     private Long userNum;
 
-    @Column(name = "USER_ID", length = 20, nullable = false)
+    @Column(unique = true, name = "USER_ID", length = 20, nullable = false)
     private String userId;
 
     @Column(name = "USER_PASSWORD", length = 100, nullable = false)
     private String userPassword;
 
-    @Column(name = "USER_NAME", length = 20, nullable = false)
-    private String userName;
+    @Column(unique = true, name = "USER_NICKNAME", length = 20, nullable = false)
+    private String userNickname;
 
-    @Column(name = "USER_EMAIL", length = 100, nullable = false)
+    @Column(unique = true, name = "USER_EMAIL", length = 100, nullable = false)
     private String userEmail;
 
     @Column(name = "USER_AFFILIATION", length = 30, nullable = false)
@@ -55,18 +57,14 @@ public class User implements UserDetails {
 
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
     public String getPassword() {
         return userPassword;
     }
 
+    // 우리는 userName을 쓰지않음 사용되지 않는 메서드
     @Override
     public String getUsername() {
-        return userName;
+        return null;
     }
 
     @Override
@@ -88,9 +86,15 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
     @PrePersist
     protected void onCreate() {
         userRegDate = new Timestamp(new Date().getTime());
         userStatus = "ACTIVE";
+        userRole = "USER";
+    }
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + userRole));
     }
 }

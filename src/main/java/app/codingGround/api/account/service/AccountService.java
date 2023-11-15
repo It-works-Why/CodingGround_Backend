@@ -1,5 +1,6 @@
 package app.codingGround.api.account.service;
 
+import app.codingGround.api.account.dto.request.UserRegisterDto;
 import app.codingGround.api.account.entitiy.TokenInfo;
 import app.codingGround.api.account.entitiy.User;
 import app.codingGround.api.account.repository.AccountRepository;
@@ -14,6 +15,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -51,18 +54,26 @@ public class AccountService {
                 .build();
     }
     @Transactional
-    public DefaultResultDto register() {
-        User user = new User();
-        user.setUserId("hhun6840");
-        user.setUserPassword("1234");
-        user.setUserName("황정민");
-        user.setUserEmail("hhun6840@naver.com");
-        user.setUserAffiliation("메가존클라우드");
-        user.setUserAffiliationDetail("교육생");
-        user.setUserProfileImg("url");
-        user.setUserRole("USER");
-
-        accountRepository.save(user);
+    public DefaultResultDto register(UserRegisterDto userRegisterDto) {
+            // 아이디, 이메일, 닉네임 중복 체크
+            if (accountRepository.existsByUserId(userRegisterDto.getUserId())) {
+                throw new CustomException("아이디가 이미 존재합니다.", ErrorCode.SIGN_UP_ID_DUPLICATE);
+            }
+            if (accountRepository.existsByUserEmail(userRegisterDto.getUserEmail())) {
+                throw new CustomException("이메일이 이미 존재합니다.", ErrorCode.SIGN_UP_EMAIL_DUPLICATE);
+            }
+            if (accountRepository.existsByUserNickname(userRegisterDto.getUserNickname())) {
+                throw new CustomException("닉네임이 이미 존재합니다.", ErrorCode.SIGN_UP_NICKNAME_DUPLICATE);
+            }
+            User user = new User();
+            user.setUserId(userRegisterDto.getUserId());
+            user.setUserPassword(userRegisterDto.getUserPassword());
+            user.setUserNickname(userRegisterDto.getUserNickname());
+            user.setUserEmail(userRegisterDto.getUserEmail());
+            user.setUserAffiliation(userRegisterDto.getUserAffiliation());
+            user.setUserAffiliationDetail(userRegisterDto.getUserAffiliationDetail());
+            user.setUserProfileImg(userRegisterDto.getUserProfileImg());
+            accountRepository.save(user);
         return DefaultResultDto.builder().success(true).message("성공").build();
     }
 }

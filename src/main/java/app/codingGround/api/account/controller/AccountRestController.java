@@ -1,6 +1,7 @@
 package app.codingGround.api.account.controller;
 
 import app.codingGround.api.account.dto.request.UserLoginRequestDto;
+import app.codingGround.api.account.dto.request.UserRegisterDto;
 import app.codingGround.api.account.entitiy.TokenInfo;
 import app.codingGround.api.account.service.AccountService;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
@@ -8,6 +9,7 @@ import app.codingGround.global.config.model.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -18,9 +20,9 @@ public class AccountRestController {
 
     private final AccountService accountService;
 
-    @GetMapping("/register")
-    public ResponseEntity<ApiResponse<DefaultResultDto>> register() {
-        return ResponseEntity.ok(new ApiResponse<>(accountService.register()));
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> register(@RequestBody @Validated UserRegisterDto userRegisterDto) {
+        return ResponseEntity.ok(new ApiResponse<>(accountService.register(userRegisterDto)));
     }
 
     @PostMapping("/login")

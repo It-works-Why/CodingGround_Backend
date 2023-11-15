@@ -15,6 +15,8 @@ public enum ErrorCode {
     SIGN_UP_EMAIL_DUPLICATE(HttpStatus.BAD_REQUEST, "이미 가입된 이메일 주소입니다. 다른 이메일을 입력하여 주세요."),
     NEED_LOGIN(HttpStatus.FORBIDDEN, "로그인이 필요한 기능입니다."),
     INVALID_INPUT_ACCOUNT_INFO(HttpStatus.BAD_REQUEST, "로그인 정보가 틀렸습니다."),
+    SIGN_UP_ID_DUPLICATE(HttpStatus.BAD_REQUEST, "이미 존재하는 아이디 입니다."),
+    SIGN_UP_NICKNAME_DUPLICATE(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임 입니다."),
 
     // Common
     REQUIRED_REQUEST_NO_PARAMETER(HttpStatus.BAD_REQUEST, "필수 값이 존재하지 않습니다."),
@@ -27,6 +29,7 @@ public enum ErrorCode {
 
     // File Upload
     FILE_UPLOAD_DENIED_EXTENSION_ERROR(HttpStatus.BAD_REQUEST, "파일 확장자가 올바르지 않습니다.");
+
 
     private final HttpStatus status;
     private final String message;
