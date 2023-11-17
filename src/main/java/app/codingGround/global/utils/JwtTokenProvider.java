@@ -35,6 +35,8 @@ public class JwtTokenProvider {
 
     // 유저 정보를 가지고 AccessToken, RefreshToken 을 생성하는 메서드
     public TokenInfo generateToken(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String userId = userDetails.getUsername(); // 이 부분에서 사용자의 ID나 식별자를 가져옵니다.
         // 권한 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -45,7 +47,7 @@ public class JwtTokenProvider {
         // Access Token 생성
         Date accessTokenExpiresIn = new Date(now + 86400000); // 1일
         String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())
+                .setSubject(userId) // 사용자의 ID를 Subject로 설정합니다.
                 .claim("auth", authorities)
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -58,10 +60,25 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
+        // 토큰 검증
+//        System.out.println("Access Token Validation:");
+//        if (validateToken(accessToken)) {
+//            System.out.println("Access Token is valid");
+//        } else {
+//            System.out.println("Access Token is not valid");
+//        }
+
+        // 토큰의 클레임 확인
+//        Claims claims = parseClaims(accessToken);
+//        System.out.println("Subject: " + claims.getSubject());
+//        System.out.println("ID: " + claims.getId());
+
         return TokenInfo.builder()
                 .grantType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .userId(userDetails.getUsername())
+                .userRole(authorities)
                 .build();
     }
 
@@ -69,11 +86,13 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String accessToken) {
         // 토큰 복호화
         Claims claims = parseClaims(accessToken);
-
         if (claims.get("auth") == null) {
             throw new RuntimeException("토큰에 권한 정보가 없습니다.");
         }
-
+        String subject = claims.getSubject();
+        if (subject == null) {
+            throw new RuntimeException("토큰에 사용자 정보가 없습니다.");
+        }
         // 클레임에서 권한 정보 가져오기
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get("auth").toString().split(","))
@@ -81,9 +100,10 @@ public class JwtTokenProvider {
                         .collect(Collectors.toList());
 
         // UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        UserDetails principal = new User(subject, "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
+
 
     // 토큰 정보를 검증하는 메서드
     public boolean validateToken(String token) {

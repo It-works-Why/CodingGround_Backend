@@ -6,6 +6,8 @@ import app.codingGround.api.account.entitiy.TokenInfo;
 import app.codingGround.api.account.service.AccountService;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.model.ApiResponse;
+import app.codingGround.global.utils.JwtTokenProvider;
+import app.codingGround.global.utils.SHA256Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users")
+@RequestMapping("/api/account")
 public class AccountRestController {
 
     private final AccountService accountService;
@@ -28,13 +30,14 @@ public class AccountRestController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenInfo>> login(@RequestBody UserLoginRequestDto userLoginRequestDto) {
         String userId = userLoginRequestDto.getUserId();
-        String password = userLoginRequestDto.getPassword();
-        TokenInfo tokenInfo = accountService.login(userId, password);
+        String password = userLoginRequestDto.getUserPassword();
+        TokenInfo tokenInfo = accountService.login(userId, SHA256Util.encrypt(password));
         return ResponseEntity.ok(new ApiResponse<>(tokenInfo));
     }
 
     @GetMapping("/check/token")
-    public ResponseEntity<ApiResponse<DefaultResultDto>> checkToken() {
+    public ResponseEntity<ApiResponse<DefaultResultDto>> checkToken(@RequestHeader("Authorization") String accessToken) {
+        System.out.println(accessToken);
         return ResponseEntity.ok(new ApiResponse<DefaultResultDto>(accountService.checkToken()));
     }
 

@@ -8,6 +8,7 @@ import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.exception.CustomException;
 import app.codingGround.global.config.exception.ErrorCode;
 import app.codingGround.global.utils.JwtTokenProvider;
+import app.codingGround.global.utils.SHA256Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,8 +41,6 @@ public class AccountService {
 
             return tokenInfo;
         } catch (BadCredentialsException e) {
-            // 로그인 정보가 잘못된 경우 예외 처리
-            // 예를 들어, 클라이언트에게 로그인 실패 메시지를 반환하거나 로그를 남길 수 있습니다.
             throw new CustomException("로그인 정보가 올바르지 않습니다.", ErrorCode.INVALID_INPUT_ACCOUNT_INFO);
         }
     }
@@ -49,7 +48,7 @@ public class AccountService {
 
     public DefaultResultDto checkToken() {
         return DefaultResultDto.builder()
-                .message("")
+                .message("헬로!")
                 .success(true)
                 .build();
     }
@@ -67,7 +66,7 @@ public class AccountService {
             }
             User user = new User();
             user.setUserId(userRegisterDto.getUserId());
-            user.setUserPassword(userRegisterDto.getUserPassword());
+            user.setUserPassword(SHA256Util.encrypt(userRegisterDto.getUserPassword()));
             user.setUserNickname(userRegisterDto.getUserNickname());
             user.setUserEmail(userRegisterDto.getUserEmail());
             user.setUserAffiliation(userRegisterDto.getUserAffiliation());
