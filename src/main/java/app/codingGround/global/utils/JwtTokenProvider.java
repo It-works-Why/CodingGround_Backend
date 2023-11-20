@@ -26,11 +26,13 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     private final Key key;
+    private static Key staticKey = null;
 
     @Autowired
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.staticKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
     // 유저 정보를 가지고 AccessToken, RefreshToken 을 생성하는 메서드
@@ -73,11 +75,11 @@ public class JwtTokenProvider {
 //        System.out.println("Subject: " + claims.getSubject());
 //        System.out.println("ID: " + claims.getId());
 
+
         return TokenInfo.builder()
                 .grantType("Bearer")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .userId(userDetails.getUsername())
                 .userRole(authorities)
                 .build();
     }
@@ -127,6 +129,27 @@ public class JwtTokenProvider {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
+        }
+    }
+    private static Claims getClaims(String accessToken) {
+        try {
+            return Jwts.parserBuilder().setSigningKey(staticKey).build().parseClaimsJws(accessToken).getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
+    }
+
+    public static String getUserId(String accessToken) {
+        try {
+            accessToken = accessToken.replace("Bearer", "").trim();
+            Claims claims = getClaims(accessToken);
+            return claims.getSubject();
+        } catch (ExpiredJwtException e) {
+            e.printStackTrace();
+            return e.getClaims().getSubject();
+        } catch (JwtException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

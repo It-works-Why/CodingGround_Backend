@@ -34,6 +34,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         } else {
 //            System.out.println("잘못된 토큰입니다.");
         }
+
         chain.doFilter(request, response);
     }
 

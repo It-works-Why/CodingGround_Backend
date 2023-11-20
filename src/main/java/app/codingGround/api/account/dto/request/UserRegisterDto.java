@@ -33,12 +33,12 @@ public class UserRegisterDto {
     @Length(max = 20,min = 5, message = "닉네임은 20자 이하, 5자이상 으로 작성 해주세요.")
     private String userNickname;
 
-    @Email(message = "이메일 형태가 아닙니다.")
-    @NotBlank(message = "이메일 형태가 아닙니다.")
-    @NotNull(message = "이메일 형태가 아닙니다.")
+    @Email(message = "이메일을 다시 입력해 주십시오.")
+    @NotBlank(message = "이메일을 다시 입력해 주십시오.")
+    @NotNull(message = "이메일을 다시 입력해 주십시오.")
     private String userEmail;
 
-    @NotNull(message = "소속을 선택해 주십시오")
+    @NotNull(message = "소속을 선택해 주십시오.")
     private String userAffiliation;
 
     @NotNull(message = "소속 상세는 입력해 주십시오.")

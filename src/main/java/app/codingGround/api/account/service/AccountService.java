@@ -3,7 +3,6 @@ package app.codingGround.api.account.service;
 import app.codingGround.api.account.dto.request.UserRegisterDto;
 import app.codingGround.api.account.entitiy.TokenInfo;
 import app.codingGround.api.account.entitiy.User;
-import app.codingGround.api.account.mapper.AccountMapper;
 import app.codingGround.api.account.repository.AccountRepository;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.exception.CustomException;
@@ -17,8 +16,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -47,9 +44,10 @@ public class AccountService {
     }
 
 
-    public DefaultResultDto checkToken() {
+    public DefaultResultDto checkToken(String accessToken) {
+        System.out.println(accessToken);
         return DefaultResultDto.builder()
-                .message("헬로!")
+                .message(JwtTokenProvider.getUserId(accessToken))
                 .success(true)
                 .build();
     }
