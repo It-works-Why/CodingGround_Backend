@@ -47,7 +47,8 @@ public class JwtTokenProvider {
         long now = System.currentTimeMillis();
 
         // Access Token 생성
-        Date accessTokenExpiresIn = new Date(now + 86400000); // 1일
+        Date accessTokenExpiresIn = new Date(now + 60000); // 1분
+//        Date accessTokenExpiresIn = new Date(now + 86400000); // 1일
         String accessToken = Jwts.builder()
                 .setSubject(userId) // 사용자의 ID를 Subject로 설정합니다.
                 .claim("auth", authorities)
@@ -58,6 +59,8 @@ public class JwtTokenProvider {
         // Refresh Token 생성 (액세스 토큰 만료 시간을 기준으로 설정)
         Date refreshTokenExpiresIn = new Date(now + 2 * 86400000); // 2일
         String refreshToken = Jwts.builder()
+                .setSubject(userId) // 사용자의 ID를 Subject로 설정합니다.
+                .claim("auth", authorities)
                 .setExpiration(refreshTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -110,9 +113,12 @@ public class JwtTokenProvider {
     // 토큰 정보를 검증하는 메서드
     public boolean validateToken(String token) {
         try {
+            System.out.println("여기서안댓드1");
+            token = token.replace("Bearer", "").trim();
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            System.out.println("여기서안댓드2");
             return true;
-        } catch (SecurityException | MalformedJwtException e) {
+        } catch (SecurityException | io.jsonwebtoken.security.SignatureException | MalformedJwtException e) {
             log.error("잘못된 JWT 토큰", e);
         } catch (ExpiredJwtException e) {
             log.error("만료된 JWT 토큰", e);

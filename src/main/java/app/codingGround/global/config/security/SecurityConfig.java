@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.stream.Stream;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -31,10 +33,12 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/account/login").permitAll()
-                .antMatchers("/api/account/register").permitAll()
-                .antMatchers("/api/test/successTest").permitAll()
-                .antMatchers("/api/test/failTest").permitAll()
+                // 로그인이 필요없는 URI Endpoint 에서 열거형으로 관리
+                .antMatchers(
+                        Stream.of(Endpoint.values())
+                                .map(Endpoint::getUrl)
+                                .toArray(String[]::new)
+                ).permitAll()
                 .antMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()

@@ -17,6 +17,7 @@ public enum ErrorCode {
     INVALID_INPUT_ACCOUNT_INFO(HttpStatus.BAD_REQUEST, "로그인 정보가 틀렸습니다."),
     SIGN_UP_ID_DUPLICATE(HttpStatus.BAD_REQUEST, "이미 존재하는 아이디 입니다."),
     SIGN_UP_NICKNAME_DUPLICATE(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임 입니다."),
+    INVALID_TOKEN(HttpStatus.BAD_REQUEST, "로그인 재시도."),
 
     // Common
     REQUIRED_REQUEST_NO_PARAMETER(HttpStatus.BAD_REQUEST, "필수 값이 존재하지 않습니다."),

@@ -1,6 +1,11 @@
 package app.codingGround.global.filter;
 
+import app.codingGround.global.config.exception.ErrorCode;
+import app.codingGround.global.config.exception.ErrorResponse;
+import app.codingGround.global.config.security.Endpoint;
 import app.codingGround.global.utils.JwtTokenProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +19,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends GenericFilterBean {
@@ -23,21 +29,43 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        String requestUri = httpRequest.getRequestURI();
+        // Endpoint 열거형 URL 체크
+        boolean isPublicEndpoint = Arrays.stream(Endpoint.values())
+                .anyMatch(endpoint -> requestUri.equals(endpoint.getUrl()));
+        if (isPublicEndpoint) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-        // 1. Request Header에서 JWT 토큰 추출
         String token = resolveToken(httpRequest);
-        // 2. validateToken으로 토큰 유효성 검사
         if (token != null && jwtTokenProvider.validateToken(token)) {
             // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가져와 SecurityContext에 저장
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            chain.doFilter(request, response);
         } else {
-//            System.out.println("잘못된 토큰입니다.");
+            if(token == null){
+                httpResponse.setContentType("application/json; charset=UTF-8");
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.registerModule(new JavaTimeModule());
+                String jsonResponse = objectMapper.writeValueAsString(ErrorResponse.of(ErrorCode.NEED_LOGIN));
+
+                httpResponse.getWriter().write(jsonResponse);
+            }else{
+            // 토큰이 유효하지 않은 경우 클라이언트에게 메시지를 보내고 요청을 중단합니다.
+            httpResponse.setContentType("application/json; charset=UTF-8");
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            String jsonResponse = objectMapper.writeValueAsString(ErrorResponse.of(ErrorCode.INVALID_TOKEN));
+
+            httpResponse.getWriter().write(jsonResponse);
+            }
         }
-
-        chain.doFilter(request, response);
     }
-
 
 
 

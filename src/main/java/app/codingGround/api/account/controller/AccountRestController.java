@@ -35,6 +35,11 @@ public class AccountRestController {
         return ResponseEntity.ok(new ApiResponse<>(tokenInfo));
     }
 
+    @GetMapping("/get/accessToken")
+    public ResponseEntity<ApiResponse<String>> getAccessToken(@RequestHeader("Authorization") String refreshToken) {
+        return ResponseEntity.ok(new ApiResponse<>(accountService.getAccessToken(refreshToken)));
+    }
+
     @GetMapping("/check/token")
     public ResponseEntity<ApiResponse<DefaultResultDto>> checkToken(@RequestHeader("Authorization") String accessToken) {
         return ResponseEntity.ok(new ApiResponse<DefaultResultDto>(accountService.checkToken(accessToken)));

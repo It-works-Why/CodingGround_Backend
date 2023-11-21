@@ -17,6 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -73,5 +75,19 @@ public class AccountService {
             user.setUserProfileImg(userRegisterDto.getUserProfileImg());
             accountRepository.save(user);
         return DefaultResultDto.builder().success(true).message("성공").build();
+    }
+
+    public String getAccessToken(String refreshToken) {
+        try {
+            System.out.println("여기까진옴 ㅇㅇ");
+            String userId = JwtTokenProvider.getUserId(refreshToken);
+            Optional<User> user = accountRepository.findByUserId(userId);
+            System.out.println(user.get().getUserId());
+            TokenInfo token = login(userId, user.get().getPassword());
+            return token.getAccessToken();
+        } catch (Exception e) {
+            System.out.println("catch했음 ㅇㅇ");
+            throw new CustomException("리프레쉬 토큰 오류",ErrorCode.NEED_LOGIN);
+        }
     }
 }
