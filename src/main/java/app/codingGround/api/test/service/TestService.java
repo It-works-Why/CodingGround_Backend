@@ -11,7 +11,7 @@ public class TestService {
 
     private final TestMapper testMapper;
 
-    public TestVo getMybatisTest() {
-        return testMapper.getMybatisTest();
+    public TestVo getMybatisTest(String userId) {
+        return testMapper.getMybatisTest(userId);
     }
 }

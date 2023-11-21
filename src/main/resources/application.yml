@@ -15,10 +15,10 @@ spring:
   freemarker:
     cache: false
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/coding-ground?characterEncoding=UTF-8&useTimezone=true&serverTimezone=Asia/Seoul
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://airspirk.asuscomm.com:43306/coding-ground?characterEncoding=UTF-8&useTimezone=true&serverTimezone=Asia/Seoul
     username: root
-    password: 123456
+    password: root
   jpa:
     hibernate:
       ddl-auto: update

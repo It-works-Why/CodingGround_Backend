@@ -4,6 +4,6 @@
 
 <mapper namespace="app.codingGround.api.test.Mapper.TestMapper">
     <select id="getMybatisTest" resultType="testVo">
-        SELECT * FROM user LIMIT 0, 1
+        SELECT * FROM user WHERE USER_ID = #{userId}
     </select>
 </mapper>
