@@ -47,7 +47,6 @@ public class AccountService {
 
 
     public DefaultResultDto checkToken(String accessToken) {
-        System.out.println(accessToken);
         return DefaultResultDto.builder()
                 .message(JwtTokenProvider.getUserId(accessToken))
                 .success(true)
@@ -79,14 +78,11 @@ public class AccountService {
 
     public String getAccessToken(String refreshToken) {
         try {
-            System.out.println("여기까진옴 ㅇㅇ");
             String userId = JwtTokenProvider.getUserId(refreshToken);
             Optional<User> user = accountRepository.findByUserId(userId);
-            System.out.println(user.get().getUserId());
             TokenInfo token = login(userId, user.get().getPassword());
             return token.getAccessToken();
         } catch (Exception e) {
-            System.out.println("catch했음 ㅇㅇ");
             throw new CustomException("리프레쉬 토큰 오류",ErrorCode.NEED_LOGIN);
         }
     }

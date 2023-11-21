@@ -47,8 +47,8 @@ public class JwtTokenProvider {
         long now = System.currentTimeMillis();
 
         // Access Token 생성
-        Date accessTokenExpiresIn = new Date(now + 60000); // 1분
-//        Date accessTokenExpiresIn = new Date(now + 86400000); // 1일
+//        Date accessTokenExpiresIn = new Date(now + 60000); // 1분 테스트용
+        Date accessTokenExpiresIn = new Date(now + 86400000); // 1일
         String accessToken = Jwts.builder()
                 .setSubject(userId) // 사용자의 ID를 Subject로 설정합니다.
                 .claim("auth", authorities)
@@ -66,17 +66,12 @@ public class JwtTokenProvider {
                 .compact();
 
         // 토큰 검증
-//        System.out.println("Access Token Validation:");
 //        if (validateToken(accessToken)) {
-//            System.out.println("Access Token is valid");
 //        } else {
-//            System.out.println("Access Token is not valid");
 //        }
 
         // 토큰의 클레임 확인
 //        Claims claims = parseClaims(accessToken);
-//        System.out.println("Subject: " + claims.getSubject());
-//        System.out.println("ID: " + claims.getId());
 
 
         return TokenInfo.builder()
@@ -113,10 +108,8 @@ public class JwtTokenProvider {
     // 토큰 정보를 검증하는 메서드
     public boolean validateToken(String token) {
         try {
-            System.out.println("여기서안댓드1");
             token = token.replace("Bearer", "").trim();
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            System.out.println("여기서안댓드2");
             return true;
         } catch (SecurityException | io.jsonwebtoken.security.SignatureException | MalformedJwtException e) {
             log.error("잘못된 JWT 토큰", e);
