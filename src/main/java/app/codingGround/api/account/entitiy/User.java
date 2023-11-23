@@ -16,7 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "USER")
+@Table(name = "TB_USER")
 @Setter
 public class User implements UserDetails {
 

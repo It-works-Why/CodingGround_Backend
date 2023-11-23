@@ -26,7 +26,6 @@ public class AccountRestController {
     public ResponseEntity<ApiResponse<DefaultResultDto>> register(@RequestBody @Validated UserRegisterDto userRegisterDto) {
         return ResponseEntity.ok(new ApiResponse<>(accountService.register(userRegisterDto)));
     }
-
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<TokenInfo>> login(@RequestBody UserLoginRequestDto userLoginRequestDto) {
         String userId = userLoginRequestDto.getUserId();

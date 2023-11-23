@@ -12,7 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "NOTICE")
+@Table(name = "TB_NOTICE")
 @Setter
 public class Notice {
 
