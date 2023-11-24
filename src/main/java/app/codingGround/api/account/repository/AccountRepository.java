@@ -1,6 +1,6 @@
 package app.codingGround.api.account.repository;
 
-import app.codingGround.api.account.entitiy.User;
+import app.codingGround.api.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

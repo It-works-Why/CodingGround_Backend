@@ -1,6 +1,6 @@
 package app.codingGround.global.utils;
 
-import app.codingGround.api.account.entitiy.TokenInfo;
+import app.codingGround.global.config.model.TokenInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

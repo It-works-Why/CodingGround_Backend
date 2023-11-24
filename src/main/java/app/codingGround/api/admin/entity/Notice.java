@@ -1,6 +1,6 @@
 package app.codingGround.api.admin.entity;
 
-import app.codingGround.api.account.entitiy.User;
+import app.codingGround.api.entity.User;
 import lombok.*;
 
 import javax.persistence.*;
