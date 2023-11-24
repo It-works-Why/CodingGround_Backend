@@ -1,4 +1,4 @@
-package app.codingGround.api.account.entitiy;
+package app.codingGround.api.entity;
 
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

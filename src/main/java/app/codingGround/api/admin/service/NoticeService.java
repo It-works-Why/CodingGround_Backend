@@ -1,11 +1,11 @@
 package app.codingGround.api.admin.service;
 
-import app.codingGround.api.account.entitiy.User;
 import app.codingGround.api.account.repository.AccountRepository;
 import app.codingGround.api.admin.dto.NoticeListDto;
 import app.codingGround.api.admin.dto.NoticeRegisterDto;
-import app.codingGround.api.admin.entity.Notice;
+import app.codingGround.api.entity.Notice;
 import app.codingGround.api.admin.repository.NoticeRepository;
+import app.codingGround.api.entity.User;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.utils.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -57,4 +57,9 @@ public class NoticeService {
         return noticeList;
     }
 
+    public Optional<Notice> getNoticeDetail(Long noticeNum) {
+        Optional<Notice> notice = noticeRepository.findByNoticeNum(noticeNum);
+
+        return notice;
+    }
 }

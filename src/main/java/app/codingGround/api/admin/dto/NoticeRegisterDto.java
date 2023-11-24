@@ -1,6 +1,6 @@
 package app.codingGround.api.admin.dto;
 
-import app.codingGround.api.account.entitiy.User;
+import app.codingGround.api.entity.User;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;

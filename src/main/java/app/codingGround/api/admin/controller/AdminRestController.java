@@ -4,6 +4,7 @@ package app.codingGround.api.admin.controller;
 import app.codingGround.api.admin.dto.NoticeListDto;
 import app.codingGround.api.admin.dto.NoticeRegisterDto;
 import app.codingGround.api.admin.service.NoticeService;
+import app.codingGround.api.entity.Notice;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.model.ApiResponse;
 import io.swagger.annotations.Api;
@@ -14,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -29,14 +31,19 @@ public class AdminRestController {
         return ResponseEntity.ok(new ApiResponse<>(DefaultResultDto.builder().message("어드민페이지 테스트").success(true).build()));
     }
 
-    @GetMapping("/notice/list")
-    public ResponseEntity<ApiResponse<List<NoticeListDto>>> getNoticeList() {
-        return ResponseEntity.ok(new ApiResponse<>(noticeService.getNoticeList()));
-    }
-
     @PostMapping("/notice/register")
     public ResponseEntity<ApiResponse<DefaultResultDto>> postNotice(@RequestHeader("Authorization") String accessToken, @RequestBody @Validated NoticeRegisterDto noticeRegisterDto) {
         return ResponseEntity.ok(new ApiResponse<>(noticeService.postNotice(accessToken, noticeRegisterDto)));
+    }
+
+    @GetMapping("/notice/list")
+    public List<NoticeListDto> getNoticeList() {
+        return noticeService.getNoticeList();
+    }
+
+    @GetMapping("/notice/detail/{noticeNum}")
+    public Optional<Notice> getNoticeDetail(@PathVariable Long noticeNum) {
+        return noticeService.getNoticeDetail(noticeNum);
     }
 
 }
