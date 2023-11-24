@@ -6,4 +6,13 @@
     <select id="getMybatisTest" resultType="testVo">
         SELECT * FROM user WHERE USER_ID = #{userId}
     </select>
+
+    <select id="getMyRanking" resultType="UserInfoVo">
+        SELECT  FROM user WHERE USER_ID = #{userId}
+    </select>
+
+
+
+
+
 </mapper>
