@@ -1,18 +1,19 @@
 package app.codingGround.api.admin.controller;
 
 
-import app.codingGround.api.admin.dto.NoticeDto;
-import app.codingGround.api.admin.repository.NoticeRepository;
+import app.codingGround.api.admin.dto.NoticeListDto;
+import app.codingGround.api.admin.dto.NoticeRegisterDto;
 import app.codingGround.api.admin.service.NoticeService;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.model.ApiResponse;
 import io.swagger.annotations.Api;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -28,12 +29,14 @@ public class AdminRestController {
         return ResponseEntity.ok(new ApiResponse<>(DefaultResultDto.builder().message("어드민페이지 테스트").success(true).build()));
     }
 
-//    @GetMapping("/notice/get/post")
-//    public
+    @GetMapping("/notice/list")
+    public ResponseEntity<ApiResponse<List<NoticeListDto>>> getNoticeList() {
+        return ResponseEntity.ok(new ApiResponse<>(noticeService.getNoticeList()));
+    }
 
     @PostMapping("/notice/register")
-    public ResponseEntity<ApiResponse<DefaultResultDto>> postNotice(@RequestHeader("Authorization") String accessToken, @RequestBody @Validated NoticeDto noticeDto) {
-        return ResponseEntity.ok(new ApiResponse<>(noticeService.postNotice(accessToken, noticeDto)));
+    public ResponseEntity<ApiResponse<DefaultResultDto>> postNotice(@RequestHeader("Authorization") String accessToken, @RequestBody @Validated NoticeRegisterDto noticeRegisterDto) {
+        return ResponseEntity.ok(new ApiResponse<>(noticeService.postNotice(accessToken, noticeRegisterDto)));
     }
 
 }
