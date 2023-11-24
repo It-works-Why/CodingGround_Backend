@@ -2,11 +2,10 @@ package app.codingGround.api.account.controller;
 
 import app.codingGround.api.account.dto.request.UserLoginRequestDto;
 import app.codingGround.api.account.dto.request.UserRegisterDto;
-import app.codingGround.api.account.entitiy.TokenInfo;
+import app.codingGround.global.config.model.TokenInfo;
 import app.codingGround.api.account.service.AccountService;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.model.ApiResponse;
-import app.codingGround.global.utils.JwtTokenProvider;
 import app.codingGround.global.utils.SHA256Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

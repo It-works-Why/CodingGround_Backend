@@ -1,8 +1,8 @@
 package app.codingGround.api.account.service;
 
 import app.codingGround.api.account.dto.request.UserRegisterDto;
-import app.codingGround.api.account.entitiy.TokenInfo;
-import app.codingGround.api.account.entitiy.User;
+import app.codingGround.global.config.model.TokenInfo;
+import app.codingGround.api.entity.User;
 import app.codingGround.api.account.repository.AccountRepository;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.exception.CustomException;

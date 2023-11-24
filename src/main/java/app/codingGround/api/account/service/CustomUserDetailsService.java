@@ -1,6 +1,6 @@
 package app.codingGround.api.account.service;
 
-import app.codingGround.api.account.entitiy.User;
+import app.codingGround.api.entity.User;
 import app.codingGround.api.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
