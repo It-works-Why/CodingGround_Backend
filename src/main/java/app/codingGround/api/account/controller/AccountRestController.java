@@ -2,6 +2,7 @@ package app.codingGround.api.account.controller;
 
 import app.codingGround.api.account.dto.request.UserLoginRequestDto;
 import app.codingGround.api.account.dto.request.UserRegisterDto;
+import app.codingGround.api.account.dto.response.UserInfoFromToken;
 import app.codingGround.global.config.model.TokenInfo;
 import app.codingGround.api.account.service.AccountService;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
@@ -40,7 +41,12 @@ public class AccountRestController {
 
     @GetMapping("/check/token")
     public ResponseEntity<ApiResponse<DefaultResultDto>> checkToken(@RequestHeader("Authorization") String accessToken) {
-        return ResponseEntity.ok(new ApiResponse<DefaultResultDto>(accountService.checkToken(accessToken)));
+        return ResponseEntity.ok(new ApiResponse<>(accountService.checkToken(accessToken)));
+    }
+
+    @GetMapping("/userInfo")
+    public ResponseEntity<ApiResponse<UserInfoFromToken>> getUserInfoFromToken(@RequestHeader("Authorization") String accessToken) {
+        return ResponseEntity.ok(new ApiResponse<>(accountService.getUserInfo(accessToken)));
     }
 
 }

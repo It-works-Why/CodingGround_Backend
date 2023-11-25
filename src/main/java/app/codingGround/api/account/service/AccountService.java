@@ -1,6 +1,7 @@
 package app.codingGround.api.account.service;
 
 import app.codingGround.api.account.dto.request.UserRegisterDto;
+import app.codingGround.api.account.dto.response.UserInfoFromToken;
 import app.codingGround.global.config.model.TokenInfo;
 import app.codingGround.api.entity.User;
 import app.codingGround.api.account.repository.AccountRepository;
@@ -85,5 +86,15 @@ public class AccountService {
         } catch (Exception e) {
             throw new CustomException("리프레쉬 토큰 오류",ErrorCode.NEED_LOGIN);
         }
+    }
+
+    public UserInfoFromToken getUserInfo(String accessToken) {
+        String userId = JwtTokenProvider.getUserId(accessToken);
+        Optional<User> user = accountRepository.findByUserId(userId);
+
+        return UserInfoFromToken.builder()
+                .userNickname(user.get().getUserNickname())
+                .userRole(user.get().getUserRole())
+                .userId(userId).build();
     }
 }

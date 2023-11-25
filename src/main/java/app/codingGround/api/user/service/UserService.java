@@ -20,7 +20,7 @@ public class UserService {
 
     private final UserMapper userMapper;
     public UserInfoVo getUserInfo(String userId) {
-        User user = userRepository.findById(userId);
+        User user = userRepository.findByUserId(userId);
         List<Ranking> rankingList = userMapper.getMyRanking(userId);
 
 
