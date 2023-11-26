@@ -47,14 +47,11 @@ dependencies {
     implementation 'mysql:mysql-connector-java'
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '3.0.11'
 
-
     // StringUtils
     implementation 'org.apache.commons:commons-text:1.8'
 
     // lucy filter
     implementation 'com.navercorp.lucy:lucy-xss-servlet:2.0.1'
-
-
 
     //security
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -67,6 +64,10 @@ dependencies {
     // jpa
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // websocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 tasks.named('test') {
