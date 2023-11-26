@@ -10,6 +10,7 @@ import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.utils.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,14 +53,14 @@ public class NoticeService {
             NoticeListDto noticeListDto = new NoticeListDto(notice);
             noticeList.add(noticeListDto);
         }
-
-        log.info("notice List : " + noticeList);
         return noticeList;
     }
 
-    public Optional<Notice> getNoticeDetail(Long noticeNum) {
-        Optional<Notice> notice = noticeRepository.findByNoticeNum(noticeNum);
+    public NoticeListDto getNoticeDetail(Long noticeNum) {
+        Notice notice = noticeRepository.findByNoticeNum(noticeNum);
+        NoticeListDto noticeListDto = new NoticeListDto(notice);
 
-        return notice;
+        log.info("notice detail : " + noticeListDto);
+        return noticeListDto;
     }
 }

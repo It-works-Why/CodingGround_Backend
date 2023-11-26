@@ -42,8 +42,18 @@ public class AdminRestController {
     }
 
     @GetMapping("/notice/detail/{noticeNum}")
-    public Optional<Notice> getNoticeDetail(@PathVariable Long noticeNum) {
+    public NoticeListDto getNoticeDetail(@PathVariable Long noticeNum) {
         return noticeService.getNoticeDetail(noticeNum);
+    }
+
+    @PostMapping("/notice/edit/{noticeNum}")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> editNotice(@PathVariable Long noticeNum) {
+        return null;
+    }
+
+    @DeleteMapping("/notice/delete/{noticeNum}")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> deleteNotice(@PathVariable Long noticeNum) {
+        return null;
     }
 
 }
