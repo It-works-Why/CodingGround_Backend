@@ -15,6 +15,7 @@ public class NoticeListDto {
     private String noticeTitle;
     private String noticeContent;
     private String userNickname;
+    private String userProfileImg;
     private String noticeTime;
 
     public NoticeListDto(Notice notice) {
@@ -25,6 +26,7 @@ public class NoticeListDto {
         this.noticeTitle = notice.getNoticeTitle();
         this.noticeContent = notice.getNoticeContent();
         this.userNickname = notice.getUser().getUserNickname();
+        this.userProfileImg = notice.getUser().getUserProfileImg();
         this.noticeTime = format.format(notice.getNoticeTime());
     }
 
