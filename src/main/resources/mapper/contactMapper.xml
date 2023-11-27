@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.codingGround.api.account.mapper.ContactMapper">
+    <select id="getContactList" resultType="ContactListDto">
+        SELECT
+            c.CONTACT_NUM,
+            c.USER_NUM,
+            c.CONTACT_TITLE,
+            c.CONTACT_CONTENT,
+            DATE_FORMAT(c.CONTACT_TIME, '%Y/%m/%d %H:%i') AS CONTACT_TIME,
+            c.CONTACT_ANSWER,
+            c.USE_STATUS,
+            u.USER_NICKNAME,
+            CASE
+                WHEN c.CONTACT_ANSWER = '' THEN 0
+                ELSE 1
+                END AS ANSWER_STATUS
+        FROM
+            TB_CONTACT c
+                INNER JOIN
+            TB_USER u ON c.USER_NUM = u.USER_NUM;
+    </select>
+
+
+
+
+
+</mapper>

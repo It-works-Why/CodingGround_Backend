@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 @Getter
@@ -15,18 +16,17 @@ public class ContactAnswerDto {
     private Long contactNum;
     private String contactTitle;
     private String contactContent;
-    private String contactTime;
+    private Timestamp contactTime;
     private String contactAnswer;
 
-    public ContactAnswerDto(Contact contact) {
-
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-
-        this.contactNum = contact.getContactNum();
-        this.contactTitle = contact.getContactTitle();
-        this.contactContent = contact.getContactContent();
-        this.contactTime = simpleDateFormat.format(contact.getContactTime());
-        this.contactAnswer = contact.getContactAnswer();
-    }
-
+//    public ContactAnswerDto(Contact contact) {
+//
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+//
+//        this.contactNum = contact.getContactNum();
+//        this.contactTitle = contact.getContactTitle();
+//        this.contactContent = contact.getContactContent();
+//        this.contactTime = simpleDateFormat.format(contact.getContactTime());
+//        this.contactAnswer = contact.getContactAnswer();
+//    }
 }
