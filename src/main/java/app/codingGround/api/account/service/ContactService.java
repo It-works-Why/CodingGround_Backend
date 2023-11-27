@@ -4,6 +4,7 @@ import app.codingGround.api.account.repository.AccountRepository;
 import app.codingGround.api.account.dto.response.ContactListDto;
 import app.codingGround.api.account.mapper.ContactMapper;
 import app.codingGround.api.account.repository.ContactRepository;
+import app.codingGround.api.admin.dto.response.ContactDetailDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,10 @@ public class ContactService {
 
     public List<ContactListDto> getContactList() {
         return contactMapper.getContactList();
+    }
+
+    public ContactDetailDto getContactDetail(Long contactNum) {
+        return contactMapper.getContactDetail(contactNum);
     }
 
 

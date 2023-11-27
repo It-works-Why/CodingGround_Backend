@@ -1,22 +1,20 @@
-package app.codingGround.api.admin.dto;
+package app.codingGround.api.admin.dto.response;
 
-import app.codingGround.api.entity.Contact;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 
 @Getter
-@Setter
 @ToString
-public class ContactAnswerDto {
+public class ContactDetailDto {
 
     private Long contactNum;
     private String contactTitle;
     private String contactContent;
-    private Timestamp contactTime;
+    private String userNickname;
+    private String contactTime;
     private String contactAnswer;
 
 //    public ContactAnswerDto(Contact contact) {

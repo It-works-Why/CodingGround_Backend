@@ -10,21 +10,36 @@
             c.CONTACT_TITLE,
             c.CONTACT_CONTENT,
             DATE_FORMAT(c.CONTACT_TIME, '%Y/%m/%d %H:%i') AS CONTACT_TIME,
-            c.CONTACT_ANSWER,
-            c.USE_STATUS,
             u.USER_NICKNAME,
             CASE
-                WHEN c.CONTACT_ANSWER = '' THEN 0
+                WHEN c.CONTACT_ANSWER IS NULL THEN 0
                 ELSE 1
                 END AS ANSWER_STATUS
         FROM
             TB_CONTACT c
-                INNER JOIN
-            TB_USER u ON c.USER_NUM = u.USER_NUM;
+        INNER JOIN
+            TB_USER u
+        ON
+            c.USER_NUM = u.USER_NUM
+        WHERE
+            c.USE_STATUS = 1;
     </select>
 
-
-
-
-
+    <select id="getContactDetail" resultType="ContactDetailDto">
+        SELECT
+            c.CONTACT_NUM,
+            c.CONTACT_TITLE,
+            c.CONTACT_CONTENT,
+            DATE_FORMAT(c.CONTACT_TIME, '%Y/%m/%d %H:%i') AS CONTACT_TIME,
+            c.CONTACT_ANSWER,
+            c.USE_STATUS,
+            u.USER_NICKNAME
+        FROM
+            TB_CONTACT c
+                INNER JOIN
+            TB_USER u ON c.USER_NUM = u.USER_NUM
+        WHERE
+            c.CONTACT_NUM = #{contactNum}
+    </select>
 </mapper>
+
