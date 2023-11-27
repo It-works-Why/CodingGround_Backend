@@ -62,10 +62,10 @@ public class NoticeService {
         Notice notice = noticeRepository.findByNoticeNum(noticeNum);
         NoticeListDto noticeListDto = new NoticeListDto(notice);
 
-        log.info("notice detail : " + noticeListDto);
         return noticeListDto;
     }
 
+    @Transactional
     public DefaultResultDto editNotice(NoticeRegisterDto noticeRegisterDto, Long noticeNum) {
         Notice notice = null;
         try {
@@ -77,16 +77,14 @@ public class NoticeService {
             throw new CustomException("오류", ErrorCode.TEST_ERROR);
         }
 
-        log.info("edit notice : " + notice);
-
         noticeRepository.save(notice);
 
         return DefaultResultDto.builder().success(true).message("글이 수정되었습니다.").build();
     }
 
+    @Transactional
     public DefaultResultDto deleteNotice(Long noticeNum) {
         Notice notice = noticeRepository.findByNoticeNum(noticeNum);
-        log.info("delete : " + notice);
         noticeRepository.delete(notice);
 
         return DefaultResultDto.builder().success(true).message("글이 삭제 되었습니다.").build();

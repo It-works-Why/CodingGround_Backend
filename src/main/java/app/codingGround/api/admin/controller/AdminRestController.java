@@ -60,5 +60,3 @@ public class AdminRestController {
         return ResponseEntity.ok(new ApiResponse<>(noticeService.deleteNotice(noticeNum)));
     }
 }
-
-
