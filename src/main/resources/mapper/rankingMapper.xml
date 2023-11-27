@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.codingGround.api.user.mapper.RankingMapper">
+
+    <select id="getRankingList" resultType="RankListDto">
+        SELECT
+            ROW_NUMBER() OVER (ORDER BY S.RANK_SCORE DESC) AS RANK_ORDER,
+                U.USER_NICKNAME,
+            U.USER_PROFILE_IMG,
+            S.RANK_NUM,
+            S.RANK_SCORE,
+            ROUND((COUNT(CASE WHEN GR.GAME_RECORD IN (1, 2, 3, 4) THEN 1 END) * 100.0) / COUNT(GR.GAME_RECORD), 1) AS RECORD_PERCENTAGE
+        FROM
+            TB_USER U
+                JOIN
+            TB_SEASON S ON U.USER_NUM = S.USER_NUM
+                LEFT JOIN
+            TB_GAME_RECORD GR ON U.USER_NUM = GR.USER_NUM
+        GROUP BY
+            U.USER_NICKNAME, U.USER_PROFILE_IMG, S.RANK_NUM, S.RANK_SCORE
+        ORDER BY
+            S.RANK_SCORE DESC;
+
+    </select>
+
+
+</mapper>
