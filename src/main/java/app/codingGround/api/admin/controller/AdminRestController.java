@@ -66,6 +66,11 @@ public class AdminRestController {
         return ResponseEntity.ok(new ApiResponse<>(noticeService.deleteNotice(noticeNum)));
     }
 
+    @GetMapping("/user/inquiry/list")
+    public List<ContactListDto> getContactList() {
+        return contactService.getContactList();
+    }
+
     @GetMapping("/user/inquiry/detail/{contactNum}")
     public ContactDetailDto getContactDetail(@PathVariable Long contactNum) {
         return contactService.getContactDetail(contactNum);
