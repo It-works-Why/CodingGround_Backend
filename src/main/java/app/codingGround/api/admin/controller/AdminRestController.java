@@ -1,13 +1,16 @@
 package app.codingGround.api.admin.controller;
 
 
+import app.codingGround.api.account.dto.response.ContactListDto;
 import app.codingGround.api.admin.dto.NoticeListDto;
 import app.codingGround.api.admin.dto.NoticeRegisterDto;
+import app.codingGround.api.account.service.ContactService;
 import app.codingGround.api.admin.service.NoticeService;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.domain.common.dto.response.PageResultDto;
 import app.codingGround.global.config.model.ApiResponse;
 import io.swagger.annotations.Api;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.web.PageableDefault;
@@ -22,10 +25,11 @@ import java.util.List;
 @RestController
 @Api(tags = "어드민 관련 API")
 @RequestMapping("/api/admin")
+@RequiredArgsConstructor
 public class AdminRestController {
 
-    @Autowired
-    NoticeService noticeService;
+    private final NoticeService noticeService;
+    private final ContactService contactService;
 
     @GetMapping("/check/token")
     public ResponseEntity<ApiResponse<DefaultResultDto>> securityAdminTest() {
@@ -43,11 +47,6 @@ public class AdminRestController {
     public List<NoticeListDto> getNoticeList() {
         return noticeService.getNoticeList();
     }
-
-//    @GetMapping("/notice/list")
-//    public ResponseEntity<ApiResponse<PageResultDto<Object>>> getNoticeList(Pageable pageable) {
-//        return ResponseEntity.ok(new ApiResponse<>(noticeService.getNoticeList(pageable)));
-//    }
 
     @GetMapping("/notice/detail/{noticeNum}")
     public NoticeListDto getNoticeDetail(@PathVariable Long noticeNum) {
