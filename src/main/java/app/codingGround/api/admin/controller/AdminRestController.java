@@ -32,7 +32,9 @@ public class AdminRestController {
     }
 
     @PostMapping("/notice/register")
-    public ResponseEntity<ApiResponse<DefaultResultDto>> postNotice(@RequestHeader("Authorization") String accessToken, @RequestBody @Validated NoticeRegisterDto noticeRegisterDto) {
+    public ResponseEntity<ApiResponse<DefaultResultDto>> postNotice
+            (@RequestHeader("Authorization") String accessToken,
+             @RequestBody @Validated NoticeRegisterDto noticeRegisterDto) {
         return ResponseEntity.ok(new ApiResponse<>(noticeService.postNotice(accessToken, noticeRegisterDto)));
     }
 
@@ -46,9 +48,11 @@ public class AdminRestController {
         return noticeService.getNoticeDetail(noticeNum);
     }
 
-    @PostMapping("/notice/edit/{noticeNum}")
-    public ResponseEntity<ApiResponse<DefaultResultDto>> editNotice(@PathVariable Long noticeNum) {
-        return null;
+    @PatchMapping("/notice/edit/{noticeNum}")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> editNotice
+            (@RequestBody @Validated NoticeRegisterDto noticeRegisterDto,
+             @PathVariable Long noticeNum) {
+        return ResponseEntity.ok(new ApiResponse<>(noticeService.editNotice(noticeRegisterDto, noticeNum)));
     }
 
     @DeleteMapping("/notice/delete/{noticeNum}")
