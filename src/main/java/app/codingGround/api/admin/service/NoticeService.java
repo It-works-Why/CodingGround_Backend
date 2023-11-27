@@ -6,15 +6,18 @@ import app.codingGround.api.admin.dto.NoticeRegisterDto;
 import app.codingGround.api.entity.Notice;
 import app.codingGround.api.admin.repository.NoticeRepository;
 import app.codingGround.api.entity.User;
+import app.codingGround.domain.common.dto.Pagination;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
+import app.codingGround.domain.common.dto.response.PageResultDto;
 import app.codingGround.global.config.exception.CustomException;
 import app.codingGround.global.config.exception.ErrorCode;
 import app.codingGround.global.utils.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Not;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +58,27 @@ public class NoticeService {
             NoticeListDto noticeListDto = new NoticeListDto(notice);
             noticeList.add(noticeListDto);
         }
+
         return noticeList;
     }
+
+//    public PageResultDto<Object> getNoticeList(Pageable pageable) {
+//        Page<Notice> notices = noticeRepository.findAll(pageable);
+//        List<NoticeListDto> noticeList = new ArrayList<>();
+//
+//        for (Notice notice : notices) {
+//            NoticeListDto noticeListDto = new NoticeListDto(notice);
+//            noticeList.add(noticeListDto);
+//        }
+//
+//        Pagination pagination = new Pagination(
+//                pageable.getPageNumber() +1,
+//                (int) notices.getTotalElements()
+//        );
+//
+//        return PageResultDto.builder().data(noticeList).pagination(pagination).build();
+//    }
+
 
     public NoticeListDto getNoticeDetail(Long noticeNum) {
         Notice notice = noticeRepository.findByNoticeNum(noticeNum);

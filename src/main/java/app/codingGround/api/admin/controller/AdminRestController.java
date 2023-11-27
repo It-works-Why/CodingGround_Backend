@@ -4,18 +4,19 @@ package app.codingGround.api.admin.controller;
 import app.codingGround.api.admin.dto.NoticeListDto;
 import app.codingGround.api.admin.dto.NoticeRegisterDto;
 import app.codingGround.api.admin.service.NoticeService;
-import app.codingGround.api.entity.Notice;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
+import app.codingGround.domain.common.dto.response.PageResultDto;
 import app.codingGround.global.config.model.ApiResponse;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -42,6 +43,11 @@ public class AdminRestController {
     public List<NoticeListDto> getNoticeList() {
         return noticeService.getNoticeList();
     }
+
+//    @GetMapping("/notice/list")
+//    public ResponseEntity<ApiResponse<PageResultDto<Object>>> getNoticeList(Pageable pageable) {
+//        return ResponseEntity.ok(new ApiResponse<>(noticeService.getNoticeList(pageable)));
+//    }
 
     @GetMapping("/notice/detail/{noticeNum}")
     public NoticeListDto getNoticeDetail(@PathVariable Long noticeNum) {
