@@ -56,9 +56,9 @@ public class AdminRestController {
     }
 
     @DeleteMapping("/notice/delete/{noticeNum}")
-    public ResponseEntity<ApiResponse<DefaultResultDto>> deleteNotice(@PathVariable Long noticeNum) {
-        return null;
+    public ResponseEntity<ApiResponse<DefaultResultDto>> deleteNotice (@PathVariable Long noticeNum) {
+        return ResponseEntity.ok(new ApiResponse<>(noticeService.deleteNotice(noticeNum)));
     }
-
 }
+
 

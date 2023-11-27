@@ -44,7 +44,7 @@ public class NoticeService {
 
         noticeRepository.save(notice);
 
-        return DefaultResultDto.builder().success(true).message("성공").build();
+        return DefaultResultDto.builder().success(true).message("글이 등록되었습니다.").build();
     }
 
     public List<NoticeListDto> getNoticeList() {
@@ -81,6 +81,14 @@ public class NoticeService {
 
         noticeRepository.save(notice);
 
-        return DefaultResultDto.builder().success(true).message("성공").build();
+        return DefaultResultDto.builder().success(true).message("글이 수정되었습니다.").build();
+    }
+
+    public DefaultResultDto deleteNotice(Long noticeNum) {
+        Notice notice = noticeRepository.findByNoticeNum(noticeNum);
+        log.info("delete : " + notice);
+        noticeRepository.delete(notice);
+
+        return DefaultResultDto.builder().success(true).message("글이 삭제 되었습니다.").build();
     }
 }
