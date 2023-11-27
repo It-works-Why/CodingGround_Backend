@@ -1,11 +1,9 @@
 package app.codingGround.api.battle.repository;
 
 import app.codingGround.api.entity.BattleRoom;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 
-import java.util.Optional;
-
-public interface BattleRoomRepository extends JpaRepository<BattleRoom, Long> {
+public interface BattleRoomRepository extends CrudRepository<BattleRoom, Long> {
 
 
     BattleRoom findByRoomId(String roomId);

@@ -31,9 +31,15 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         String requestUri = httpRequest.getRequestURI();
+        if (requestUri.startsWith("/ws")) {
+            System.out.println("여기왔음 왔음");
+            chain.doFilter(request, response); // WebSocket 요청이면 필터링 건너뛰기
+            return;
+        }
         // Endpoint 열거형 URL 체크
         boolean isPublicEndpoint = Arrays.stream(Endpoint.values())
-                .anyMatch(endpoint -> requestUri.equals(endpoint.getUrl()));
+                .anyMatch(endpoint -> requestUri.startsWith(endpoint.getUrl()));
+
         if (isPublicEndpoint) {
             chain.doFilter(request, response);
             return;

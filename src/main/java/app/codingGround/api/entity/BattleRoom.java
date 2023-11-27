@@ -4,11 +4,9 @@ import lombok.Data;
 import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.UUID;
+import org.springframework.data.annotation.Id;
 
-@Entity
 @Data
 @RedisHash("BattleRoom")
 public class BattleRoom {

@@ -6,7 +6,8 @@ public enum Endpoint {
     LOGIN("/api/account/login"),
     REGISTER("/api/account/register"),
     SUCCESS_TEST("/api/test/success/test"),
-    FAIL_TEST("/api/test/fail/test");
+    FAIL_TEST("/api/test/fail/test"),
+    BATTLE("/ws/**");
 
     private final String url;
 

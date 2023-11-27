@@ -15,6 +15,7 @@ public class BattleService {
 
     private final BattleRoomRepository battleRoomRepository;
 
+    @Transactional
     public String createBattleRoom() {
         BattleRoom emptyRoom = emptyRoom();
         if(emptyRoom == null){
