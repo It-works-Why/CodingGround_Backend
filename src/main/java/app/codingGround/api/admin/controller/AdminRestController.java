@@ -13,8 +13,6 @@ import app.codingGround.global.config.model.ApiResponse;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +46,11 @@ public class AdminRestController {
     public List<NoticeListDto> getNoticeList() {
         return noticeService.getNoticeList();
     }
+
+//    @GetMapping("/notice/list")
+//    public ResponseEntity<ApiResponse<PageResultDto<Object>>> getNoticeList(Pageable pageable) {
+//        return ResponseEntity.ok(new ApiResponse<>(noticeService.getNoticeList(pageable)));
+//    }
 
     @GetMapping("/notice/detail/{noticeNum}")
     public NoticeListDto getNoticeDetail(@PathVariable Long noticeNum) {

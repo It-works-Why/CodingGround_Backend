@@ -5,17 +5,19 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class PageResultDto<T> {
 
     @ApiModelProperty(value = "데이터")
-    private T data;
+    private List<T> data;
 
     @ApiModelProperty(value = "페이지")
     private Pagination pagination;
 
     @Builder
-    public PageResultDto(T data, Pagination pagination) {
+    public PageResultDto(List<T> data, Pagination pagination) {
         this.data = data;
         this.pagination = pagination;
     }
