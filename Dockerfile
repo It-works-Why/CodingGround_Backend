@@ -1,6 +1,7 @@
 FROM openjdk:11-jdk as build
 WORKDIR /workspace/app
 COPY . .
+RUN chmod +x ./gradlew
 RUN ./gradlew build
 
 FROM openjdk:11-jre
