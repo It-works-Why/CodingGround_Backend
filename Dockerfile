@@ -7,5 +7,5 @@ RUN ["gradle", "build"]
 
 FROM openjdk:11-jre-slim
 WORKDIR /app
-COPY --from=build /workspace/app/build/libs/*.war app.jar
+COPY --from=build /app/build/libs/*.jar app.jar
 ENTRYPOINT ["java","-jar","/app/app.jar"]
