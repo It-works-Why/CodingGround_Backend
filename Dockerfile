@@ -3,7 +3,8 @@ WORKDIR /app
 COPY . .
 RUN ls -al
 RUN pwd
-RUN ["gradle", "build"]
+RUN ["gradle", "bootJar"]
+RUN ls -al /app/build/libs
 
 FROM openjdk:11-jre-slim
 WORKDIR /app
