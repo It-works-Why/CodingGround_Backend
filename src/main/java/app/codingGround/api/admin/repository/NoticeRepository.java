@@ -10,5 +10,4 @@ import org.springframework.stereotype.Repository;
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
     Notice findByNoticeNum(Long noticeNum);
 
-    Page<Notice> findAll(Pageable pageable);
 }
