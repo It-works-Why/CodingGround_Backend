@@ -1,8 +1,12 @@
 package app.codingGround.api.account.controller;
 
+import app.codingGround.api.account.dto.CommunityListDto;
+import app.codingGround.api.account.dto.CommunityRegisterDto;
 import app.codingGround.api.account.dto.request.UserLoginRequestDto;
 import app.codingGround.api.account.dto.request.UserRegisterDto;
 import app.codingGround.api.account.dto.response.UserInfoFromToken;
+import app.codingGround.api.account.service.CommunityService;
+import app.codingGround.api.admin.dto.NoticeRegisterDto;
 import app.codingGround.global.config.model.TokenInfo;
 import app.codingGround.api.account.service.AccountService;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
@@ -14,12 +18,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/account")
 public class AccountRestController {
 
+    private final CommunityService communityService;
     private final AccountService accountService;
 
     @PostMapping("/register")
@@ -47,6 +54,35 @@ public class AccountRestController {
     @GetMapping("/userInfo")
     public ResponseEntity<ApiResponse<UserInfoFromToken>> getUserInfoFromToken(@RequestHeader("Authorization") String accessToken) {
         return ResponseEntity.ok(new ApiResponse<>(accountService.getUserInfo(accessToken)));
+    }
+
+    @GetMapping("/community/list")
+    public List<CommunityListDto> findByPostNum() {
+        return communityService.getCommunityList();
+    }
+
+    @PostMapping("/community/register")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> postCommunity
+            (@RequestHeader("Authorization") String accessToken,
+             @RequestBody @Validated CommunityRegisterDto communityRegisterDto) {
+        return ResponseEntity.ok(new ApiResponse<>(communityService.postCommunity(accessToken, communityRegisterDto)));
+    }
+
+    @GetMapping("/community/detail/{postNum}")
+    public CommunityListDto getCommunityDetail(@PathVariable Long postNum) {
+        return communityService.getCommunityDetail(postNum);
+    }
+
+    @PatchMapping("/community/edit/{postNum}")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> editCommunity
+            (@RequestBody @Validated CommunityRegisterDto communityRegisterDto,
+             @PathVariable Long postNum) {
+        return ResponseEntity.ok(new ApiResponse<>(communityService.editCommunity(communityRegisterDto, postNum)));
+    }
+
+    @DeleteMapping("/community/delete/{postNum}")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> deleteCommunity (@PathVariable Long postNum) {
+        return ResponseEntity.ok(new ApiResponse<>(communityService.deleteCommunity(postNum)));
     }
 
 }
