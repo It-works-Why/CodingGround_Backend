@@ -4,13 +4,43 @@
 
 <mapper namespace="app.codingGround.api.user.mapper.UserMapper">
 
-    <select id="getMyRanking" resultType="Ranking">
-        SELECT  FROM user WHERE USER_ID = #{userId}
+    <select id="getUserInfo" resultType="UserInfoDto">
+        SELECT
+            U.USER_NICKNAME,
+            U.USER_AFFILIATION_DETAIL,
+            U.USER_PROFILE_IMG,
+            S.RANK_NUM,
+            COUNT(GR.GAME_RECORD) AS matches,
+            SUM(CASE WHEN GR.GAME_RECORD IN (1, 2, 3, 4) THEN 1 ELSE 0 END) AS wins,
+            SUM(CASE WHEN GR.GAME_RECORD = 5 THEN 1 ELSE 0 END) AS losses,
+            ROUND((SUM(CASE WHEN GR.GAME_RECORD IN (1, 2, 3, 4) THEN 1 ELSE 0 END) / COUNT(GR.GAME_RECORD)) * 100, 1) AS RECORD_PERCENTAGE
+        FROM
+            TB_USER U
+                JOIN
+            TB_SEASON S ON U.USER_NUM = S.USER_NUM
+                LEFT JOIN
+            TB_GAME_RECORD GR ON U.USER_NUM = GR.USER_NUM
+        WHERE
+            U.USER_ID = #{userId}
+          AND S.SEASON_NAME = '2023-2'
+        GROUP BY
+            U.USER_NICKNAME, U.USER_AFFILIATION_DETAIL, U.USER_PROFILE_IMG, S.RANK_NUM;
     </select>
 
-
-
-
-
+<!--    <select id="getUserRankings" resultType="RankingDto">
+        SELECT
+            SUM(CASE WHEN GAME_RECORD = 1 THEN 1 ELSE 0 END) AS COUNT1,
+            SUM(CASE WHEN GAME_RECORD = 2 THEN 1 ELSE 0 END) AS COUNT2,
+            SUM(CASE WHEN GAME_RECORD = 3 THEN 1 ELSE 0 END) AS COUNT3,
+            SUM(CASE WHEN GAME_RECORD = 4 THEN 1 ELSE 0 END) AS COUNT4,
+            SUM(CASE WHEN GAME_RECORD = 5 THEN 1 ELSE 0 END) AS COUNT5
+        FROM
+            TB_USER
+                JOIN TB_GAME_RECORD ON TB_USER.USER_NUM = TB_GAME_RECORD.USER_NUM
+        WHERE
+            TB_USER.USER_ID = #{userId}
+        GROUP BY
+            USER_ID;
+    </select>-->
 
 </mapper>

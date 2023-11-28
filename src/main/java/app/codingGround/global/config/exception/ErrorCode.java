@@ -29,9 +29,10 @@ public enum ErrorCode {
     HANDLE_ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
 
     // File Upload
-    FILE_UPLOAD_DENIED_EXTENSION_ERROR(HttpStatus.BAD_REQUEST, "파일 확장자가 올바르지 않습니다.");
+    FILE_UPLOAD_DENIED_EXTENSION_ERROR(HttpStatus.BAD_REQUEST, "파일 확장자가 올바르지 않습니다."),
 
-
+    // Board
+    NOT_USE_POST(HttpStatus.BAD_REQUEST, "이미 삭제된 게시물 입니다.");
     private final HttpStatus status;
     private final String message;
 

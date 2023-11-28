@@ -22,7 +22,6 @@ public class RankingService {
     private final RankingMapper rankingMapper;
 
     public List<RankListDto> getRankingList() {
-
         return rankingMapper.getRankingList();
     };
 

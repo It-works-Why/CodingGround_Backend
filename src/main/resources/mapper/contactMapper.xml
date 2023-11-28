@@ -17,12 +17,17 @@
                 END AS ANSWER_STATUS
         FROM
             TB_CONTACT c
-        INNER JOIN
+                INNER JOIN
             TB_USER u
-        ON
-            c.USER_NUM = u.USER_NUM
+            ON
+                c.USER_NUM = u.USER_NUM
         WHERE
-            c.USE_STATUS = 1;
+            c.USE_STATUS = 1
+          AND
+            c.CONTACT_TITLE LIKE CONCAT('%', #{saerchInput}, '%')
+        ORDER BY
+            ANSWER_STATUS ASC,
+            c.CONTACT_NUM DESC;
     </select>
 
     <select id="getContactDetail" resultType="ContactDetailDto">
@@ -33,7 +38,8 @@
             DATE_FORMAT(c.CONTACT_TIME, '%Y/%m/%d %H:%i') AS CONTACT_TIME,
             c.CONTACT_ANSWER,
             c.USE_STATUS,
-            u.USER_NICKNAME
+            u.USER_NICKNAME,
+            u.USER_PROFILE_IMG
         FROM
             TB_CONTACT c
                 INNER JOIN

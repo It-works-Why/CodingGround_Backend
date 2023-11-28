@@ -6,7 +6,7 @@ on:
     - feature
       
 env:
-  ecr_url: 503237308475.dkr.ecr.ca-central-1.amazonaws.com/
+  ecr_url: 503237308475.dkr.ecr.ca-central-1.amazonaws.com
   aws_region: ca-central-1
 
 jobs:

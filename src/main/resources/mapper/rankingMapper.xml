@@ -18,11 +18,12 @@
             TB_SEASON S ON U.USER_NUM = S.USER_NUM
                 LEFT JOIN
             TB_GAME_RECORD GR ON U.USER_NUM = GR.USER_NUM
+        WHERE
+            S.SEASON_NAME = '2023-2'
         GROUP BY
             U.USER_NICKNAME, U.USER_PROFILE_IMG, S.RANK_NUM, S.RANK_SCORE
         ORDER BY
             S.RANK_SCORE DESC;
-
     </select>
 
 

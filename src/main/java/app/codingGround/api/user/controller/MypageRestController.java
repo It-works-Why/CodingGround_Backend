@@ -1,16 +1,12 @@
 package app.codingGround.api.user.controller;
 
-import app.codingGround.api.entity.User;
-import app.codingGround.api.user.dto.response.UserInfoVo;
-import app.codingGround.api.user.repository.UserRepository;
+import app.codingGround.api.user.dto.response.UserInfoDto;
 import app.codingGround.api.user.service.UserService;
-import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.model.ApiResponse;
 import app.codingGround.global.utils.JwtTokenProvider;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +23,13 @@ public class MypageRestController {
 
 
     @GetMapping("/myinfo")
-    public ResponseEntity<ApiResponse<UserInfoVo>> getMypageInfo(@RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<ApiResponse<UserInfoDto>> getMypageInfo(@RequestHeader("Authorization") String accessToken) {
         String userId = JwtTokenProvider.getUserId(accessToken);
-        return ResponseEntity.ok(new ApiResponse<>(userService.getUserInfo(userId)));
+        UserInfoDto userInfo = userService.getUserInfo(userId);
+        System.out.println(userInfo.getUserNickname());
+//        userInfo.setRanking(userService.getUserRankings(userId));
+
+        return ResponseEntity.ok(new ApiResponse<>(userInfo));
     }
 
 }
