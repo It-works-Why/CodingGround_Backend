@@ -5,7 +5,9 @@ import app.codingGround.api.account.dto.response.ContactListDto;
 import app.codingGround.api.admin.dto.NoticeListDto;
 import app.codingGround.api.admin.dto.NoticeRegisterDto;
 import app.codingGround.api.account.service.ContactService;
+import app.codingGround.api.admin.dto.request.ContactAnswerEditDto;
 import app.codingGround.api.admin.dto.response.ContactDetailDto;
+import app.codingGround.api.admin.service.ContactAnswerEditService;
 import app.codingGround.api.admin.service.NoticeService;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.domain.common.dto.response.PageResultDto;
@@ -29,6 +31,7 @@ public class AdminRestController {
 
     private final NoticeService noticeService;
     private final ContactService contactService;
+    private final ContactAnswerEditService contactAnswerEditService;
 
     @GetMapping("/check/token")
     public ResponseEntity<ApiResponse<DefaultResultDto>> securityAdminTest() {
@@ -77,5 +80,12 @@ public class AdminRestController {
     @GetMapping("/user/inquiry/detail/{contactNum}")
     public ContactDetailDto getContactDetail(@PathVariable Long contactNum) {
         return contactService.getContactDetail(contactNum);
+    }
+
+    @PatchMapping("/user/inquiry/edit/{contactNum}")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> editContactAnswer(
+            @RequestBody @Validated ContactAnswerEditDto contactAnswerEditDto,
+            @PathVariable Long contactNum) {
+        return ResponseEntity.ok(new ApiResponse<>(contactAnswerEditService.editContactAnswer(contactAnswerEditDto, contactNum)));
     }
 }

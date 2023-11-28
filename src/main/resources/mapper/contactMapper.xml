@@ -33,7 +33,8 @@
             DATE_FORMAT(c.CONTACT_TIME, '%Y/%m/%d %H:%i') AS CONTACT_TIME,
             c.CONTACT_ANSWER,
             c.USE_STATUS,
-            u.USER_NICKNAME
+            u.USER_NICKNAME,
+            u.USER_PROFILE_IMG
         FROM
             TB_CONTACT c
                 INNER JOIN
