@@ -5,6 +5,8 @@ import app.codingGround.api.account.dto.response.ContactListDto;
 import app.codingGround.api.account.mapper.ContactMapper;
 import app.codingGround.api.account.repository.ContactRepository;
 import app.codingGround.api.admin.dto.response.ContactDetailDto;
+import app.codingGround.global.config.exception.CustomException;
+import app.codingGround.global.config.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ContactService {
 
-    private final ContactRepository contactRepository;
-    private final AccountRepository accountRepository;
     private final ContactMapper contactMapper;
 
     public List<ContactListDto> getContactList() {
@@ -23,7 +23,11 @@ public class ContactService {
     }
 
     public ContactDetailDto getContactDetail(Long contactNum) {
-        return contactMapper.getContactDetail(contactNum);
+        ContactDetailDto contactDetailDto = contactMapper.getContactDetail(contactNum);
+        if (contactDetailDto.getUseStatus() == 0) {
+            throw new CustomException("이미 삭제된 게시물 입니다.", ErrorCode.NOT_USE_POST);
+        }
+        return contactDetailDto;
     }
 
 

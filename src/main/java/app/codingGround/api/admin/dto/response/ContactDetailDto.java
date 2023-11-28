@@ -14,17 +14,8 @@ public class ContactDetailDto {
     private String contactTitle;
     private String contactContent;
     private String userNickname;
+    private String userProfileImg;
     private String contactTime;
     private String contactAnswer;
-
-//    public ContactAnswerDto(Contact contact) {
-//
-//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-//
-//        this.contactNum = contact.getContactNum();
-//        this.contactTitle = contact.getContactTitle();
-//        this.contactContent = contact.getContactContent();
-//        this.contactTime = simpleDateFormat.format(contact.getContactTime());
-//        this.contactAnswer = contact.getContactAnswer();
-//    }
+    private int useStatus;
 }
