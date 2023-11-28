@@ -3,8 +3,8 @@ WORKDIR /workspace/app
 COPY . .
 RUN ls -al
 RUN pwd
-RUN chmod +x gradlew
-RUN ["source", "/workspace/app/gradlew", "build"]
+#RUN chmod +x gradlew
+RUN ["./gradle", "build"]
 
 FROM openjdk:11-jre-slim
 WORKDIR /app
