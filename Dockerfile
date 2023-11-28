@@ -1,10 +1,9 @@
-FROM openjdk:11-jdk as build
-WORKDIR /workspace/app
+FROM gradle:jdk11 as build
+WORKDIR /app
 COPY . .
 RUN ls -al
 RUN pwd
-#RUN chmod +x gradlew
-RUN ["./gradlew", "build"]
+RUN ["gradle", "build"]
 
 FROM openjdk:11-jre-slim
 WORKDIR /app
