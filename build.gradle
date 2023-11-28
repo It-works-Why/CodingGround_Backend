@@ -20,6 +20,12 @@ repositories {
     mavenCentral()
 }
 
+
+task customJar(type: Jar) {
+    archiveFileName = 'coding-ground.jar' // 원하는 JAR 파일명 설정
+    from sourceSets.main.output
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'

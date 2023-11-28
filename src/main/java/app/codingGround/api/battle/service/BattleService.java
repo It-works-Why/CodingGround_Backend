@@ -1,9 +1,7 @@
 package app.codingGround.api.battle.service;
 
-import java.util.List;
-import java.util.UUID;
 import app.codingGround.api.battle.repository.BattleRoomRepository;
-import app.codingGround.api.entity.BattleRoom;
+import app.codingGround.api.entity.GameRoom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,23 +11,26 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BattleService {
 
-    private final BattleRoomRepository battleRoomRepository;
+    private final BattleRoomRepository GameRoomRepository;
 
     @Transactional
-    public String createBattleRoom() {
-        BattleRoom emptyRoom = emptyRoom();
+    public String createGameRoom() {
+        GameRoom emptyRoom = emptyRoom();
         if(emptyRoom == null){
-            BattleRoom battleRoom = new BattleRoom();
-            battleRoomRepository.save(battleRoom);
+            GameRoom GameRoom = new GameRoom();
+            GameRoomRepository.save(GameRoom);
 
-            return battleRoom.getRoomId();
+            return GameRoom.getGameId();
         }else{
-            return emptyRoom.getRoomId();
+            return emptyRoom.getGameId();
         }
     }
 
-    public BattleRoom emptyRoom() {
-        return battleRoomRepository.findByGameStatusAndParticipantsLessThanEqual("대기중", 7);
+    public GameRoom emptyRoom() {
+        return GameRoomRepository.findByGameStatusAndParticipantsLessThanEqual("대기중", 7);
     }
 
 }
+
+
+

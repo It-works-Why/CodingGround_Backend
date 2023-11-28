@@ -23,7 +23,7 @@ public class BattleRestController {
     @SendTo("/topic/{roomId}")
     public ResponseEntity<String> startBattle() {
         // 게임방 생성 또는 빈 방 확인 로직
-        String roomId = battleService.createBattleRoom();
+        String roomId = battleService.createGameRoom();
 
         if (roomId != null) {
             return ResponseEntity.ok("Joined room: " + roomId);

@@ -1,12 +1,12 @@
 package app.codingGround.api.battle.repository;
 
-import app.codingGround.api.entity.BattleRoom;
+import app.codingGround.api.entity.GameRoom;
 import org.springframework.data.repository.CrudRepository;
 
-public interface BattleRoomRepository extends CrudRepository<BattleRoom, Long> {
+public interface BattleRoomRepository extends CrudRepository<GameRoom, Long> {
 
 
-    BattleRoom findByRoomId(String roomId);
+    GameRoom findByRoomId(String roomId);
 
-    BattleRoom findByGameStatusAndParticipantsLessThanEqual(String gameStatus, int maxParticipants);
+    GameRoom findByGameStatusAndParticipantsLessThanEqual(String gameStatus, int maxParticipants);
 }

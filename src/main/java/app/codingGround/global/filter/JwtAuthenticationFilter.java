@@ -32,7 +32,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         String requestUri = httpRequest.getRequestURI();
         if (requestUri.startsWith("/ws")) {
-            System.out.println("여기왔음 왔음");
             chain.doFilter(request, response); // WebSocket 요청이면 필터링 건너뛰기
             return;
         }
