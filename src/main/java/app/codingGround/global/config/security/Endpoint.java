@@ -7,7 +7,8 @@ public enum Endpoint {
     REGISTER("/api/account/register"),
     SUCCESS_TEST("/api/test/success/test"),
     FAIL_TEST("/api/test/fail/test"),
-    BATTLE("/ws/**");
+    BATTLE("/ws/**"),
+    RANKING_LIST("/api/ranking/list");
 
     private final String url;
 
