@@ -4,7 +4,7 @@ COPY . .
 RUN ls -al
 RUN pwd
 RUN chmod +x gradlew
-RUN /workspace/app/gradlew build
+RUN source /workspace/app/gradlew build
 
 FROM openjdk:11-jre-slim
 WORKDIR /app
