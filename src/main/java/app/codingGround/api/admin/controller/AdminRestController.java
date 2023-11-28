@@ -73,8 +73,9 @@ public class AdminRestController {
     }
 
     @GetMapping("/user/inquiry/list")
-    public List<ContactListDto> getContactList() {
-        return contactService.getContactList();
+    public List<ContactListDto> getContactList(
+            @RequestParam(name = "searchInput", defaultValue = "") String searchInput) {
+        return contactService.getContactList(searchInput);
     }
 
     @GetMapping("/user/inquiry/detail/{contactNum}")

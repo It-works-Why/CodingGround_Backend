@@ -8,6 +8,6 @@ import java.util.List;
 
 @Mapper
 public interface ContactMapper {
-    List<ContactListDto> getContactList();
+    List<ContactListDto> getContactList(String searchInput);
     ContactDetailDto getContactDetail(Long contactNum);
 }
