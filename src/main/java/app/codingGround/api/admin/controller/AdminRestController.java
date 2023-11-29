@@ -7,10 +7,13 @@ import app.codingGround.api.account.service.ContactService;
 import app.codingGround.api.admin.dto.AdminQuestionRegisterDto;
 import app.codingGround.api.admin.dto.request.ContactAnswerEditDto;
 import app.codingGround.api.admin.dto.response.ContactDetailDto;
+import app.codingGround.api.admin.dto.response.UserManageListDto;
 import app.codingGround.api.admin.service.AdminQuestionService;
 import app.codingGround.api.admin.service.ContactAnswerEditService;
+import app.codingGround.api.admin.service.UserManageService;
 import app.codingGround.api.admin.service.AdminNoticeService;
 import app.codingGround.api.entity.Notice;
+import app.codingGround.api.notice.service.NoticeService;
 import app.codingGround.api.entity.Question;
 import app.codingGround.api.entity.TestCase;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
@@ -38,9 +41,15 @@ import java.util.List;
 public class AdminRestController {
 
     private final AdminNoticeService adminNoticeService;
+    private final NoticeService noticeService;
+
+    // 문의사항
     private final ContactService contactService;
     private final ContactAnswerEditService contactAnswerEditService;
     private final AdminQuestionService adminQuestionService;
+
+    // 유저관리
+    private final UserManageService userManageService;
 
     @GetMapping("/check/token")
     public ResponseEntity<ApiResponse<DefaultResultDto>> securityAdminTest() {
@@ -80,6 +89,8 @@ public class AdminRestController {
         return ResponseEntity.ok(new ApiResponse<>(adminNoticeService.deleteNotice(noticeNum)));
     }
 
+
+    // 관리자 문의사항 컨트롤러
     // inquiry
 
     @GetMapping("/user/inquiry/list")
@@ -98,6 +109,13 @@ public class AdminRestController {
             @RequestBody @Validated ContactAnswerEditDto contactAnswerEditDto,
             @PathVariable Long contactNum) {
         return ResponseEntity.ok(new ApiResponse<>(contactAnswerEditService.editContactAnswer(contactAnswerEditDto, contactNum)));
+    }
+
+    // 관리자 유저관리 컨트롤러
+    @GetMapping("/user/list")
+    public List<UserManageListDto> getUserManageList(
+            @RequestParam(name = "searchInput", defaultValue = "") String searchInput) {
+        return userManageService.getUserManageList(searchInput);
     }
 
     // question
