@@ -28,7 +28,8 @@ public class MypageRestController {
         UserInfoDto userInfo = new UserInfoDto();
         userInfo.setUserInfo(userService.getUserInfo(userId));
         userInfo.setRanking(userService.getUserRankings(userId));
-      /*  userInfo.setGameBadge(userService.getUserBadge(userId));*/
+        userInfo.setGameBadge(userService.getUserBadge(userId));
+        userInfo.setGameLanguage(userService.getUserGameLanguage(userId));
 
         return ResponseEntity.ok(new ApiResponse<>(userInfo));
     }

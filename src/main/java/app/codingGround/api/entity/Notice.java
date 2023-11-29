@@ -7,21 +7,21 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "TB_NOTICE")
-@Setter
 public class Notice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "NOTICE_NUM")
+    @Column(name = "NOTICE_NUM", nullable = false)
     private Long noticeNum;
 
     @ManyToOne
-    @JoinColumn(name = "USER_NUM")
+    @JoinColumn(name = "USER_NUM", nullable = false)
     private User user;
 
     @Column(name = "NOTICE_TITLE", length = 50, nullable = false)

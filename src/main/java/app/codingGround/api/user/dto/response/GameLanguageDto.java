@@ -6,13 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data
-@Getter
-@Setter
 @Builder
 public class GameLanguageDto {
-    private Integer Count1;
-    private Integer Count2;
-    private Integer Count3;
-    private Integer Count4;
-    private Integer Count5;
+    private String languageName;
+    private Integer languageCount;
+
 }

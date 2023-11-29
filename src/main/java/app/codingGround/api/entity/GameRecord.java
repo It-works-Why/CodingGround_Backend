@@ -26,6 +26,10 @@ public class GameRecord {
     @JoinColumn(name = "GAME_NUM")
     private Game game;
 
+    @ManyToOne
+    @JoinColumn(name = "LANGUAGE_NUM")
+    private Language language;
+
     @Column(name = "GAME_RECORD",nullable = false)
     private int gameRecord;
 

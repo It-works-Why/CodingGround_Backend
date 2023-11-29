@@ -1,6 +1,7 @@
 package app.codingGround.api.user.service;
 
 import app.codingGround.api.user.dto.response.GameBadgeDto;
+import app.codingGround.api.user.dto.response.GameLanguageDto;
 import app.codingGround.api.user.dto.response.InfoDto;
 import app.codingGround.api.user.dto.response.RankingDto;
 import app.codingGround.api.user.mapper.UserMapper;
@@ -23,8 +24,10 @@ public class UserService {
     public List<RankingDto> getUserRankings(String userId) {
         return userMapper.getUserRankings(userId);
     }
-
-    /*public List<GameBadgeDto> getUserBadge(String userId) {
+    public List<GameBadgeDto> getUserBadge(String userId) {
         return userMapper.getUserBadge(userId);
-    }*/
+    }
+    public List<GameLanguageDto> getUserGameLanguage(String userId) {
+        return userMapper.UserGameLanguage(userId);
+    }
 }
