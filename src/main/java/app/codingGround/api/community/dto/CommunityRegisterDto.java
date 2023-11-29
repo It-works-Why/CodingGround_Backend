@@ -1,4 +1,4 @@
-package app.codingGround.api.account.dto;
+package app.codingGround.api.community.dto;
 
 import app.codingGround.api.entity.User;
 import lombok.Getter;

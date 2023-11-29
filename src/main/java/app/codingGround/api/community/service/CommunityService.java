@@ -1,9 +1,9 @@
-package app.codingGround.api.account.service;
+package app.codingGround.api.community.service;
 
-import app.codingGround.api.account.dto.CommunityListDto;
-import app.codingGround.api.account.dto.CommunityRegisterDto;
+import app.codingGround.api.community.dto.CommunityListDto;
+import app.codingGround.api.community.dto.CommunityRegisterDto;
 import app.codingGround.api.account.repository.AccountRepository;
-import app.codingGround.api.account.repository.CommunityRepositroy;
+import app.codingGround.api.community.repository.CommunityRepositroy;
 import app.codingGround.api.entity.Community;
 import app.codingGround.api.entity.User;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
@@ -12,11 +12,11 @@ import app.codingGround.global.config.exception.ErrorCode;
 import app.codingGround.global.utils.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class CommunityService {
+
     private final CommunityRepositroy communityRepositroy;
     private final AccountRepository accountRepository;
 
@@ -42,17 +43,22 @@ public class CommunityService {
         return DefaultResultDto.builder().success(true).message("글이 등록되었습니다.").build();
     }
 
-    public List<CommunityListDto> getCommunityList() {
-        List<Community> communities = communityRepositroy.findAll();
-        List<CommunityListDto> communityList = new ArrayList<>();
-
-        for (Community community : communities) {
-            CommunityListDto communityListDto = new CommunityListDto(community);
-            communityList.add(communityListDto);
-        }
-
-        return communityList;
+    public Page<Community> getCommunityList(Pageable pageable) {
+        return communityRepositroy.findAll(pageable);
     }
+
+
+//    public List<CommunityListDto> getCommunityList() {
+//        List<Community> communities = communityRepositroy.findAll();
+//        List<CommunityListDto> communityList = new ArrayList<>();
+//
+//        for (Community community : communities) {
+//            CommunityListDto communityListDto = new CommunityListDto(community);
+//            communityList.add(communityListDto);
+//        }
+//
+//        return communityList;
+//    }
 
     public CommunityListDto getCommunityDetail(Long postNum) {
         Community community = communityRepositroy.findByPostNum(postNum);
