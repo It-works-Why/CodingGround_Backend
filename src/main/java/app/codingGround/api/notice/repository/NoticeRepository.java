@@ -1,4 +1,4 @@
-package app.codingGround.api.admin.repository;
+package app.codingGround.api.notice.repository;
 
 import app.codingGround.api.entity.Notice;
 import org.springframework.data.domain.Page;
@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
-    Notice findByNoticeNum(Long noticeNum);
+    Notice findByNoticeNumAndUseStatus(Long noticeNum, int userStatus);
 
+    Page<Notice> findAllByUseStatus(Pageable pageable, int userStatus);
 }

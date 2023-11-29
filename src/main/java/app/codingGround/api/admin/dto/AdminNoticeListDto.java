@@ -4,12 +4,11 @@ import app.codingGround.api.entity.Notice;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 @Getter
 @ToString
-public class NoticeListDto {
+public class AdminNoticeListDto {
 
     private Long noticeNum;
     private String noticeTitle;
@@ -18,7 +17,7 @@ public class NoticeListDto {
     private String userProfileImg;
     private String noticeTime;
 
-    public NoticeListDto(Notice notice) {
+    public AdminNoticeListDto(Notice notice) {
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 

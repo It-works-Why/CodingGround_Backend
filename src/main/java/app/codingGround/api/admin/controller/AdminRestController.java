@@ -1,14 +1,13 @@
 package app.codingGround.api.admin.controller;
 
-
 import app.codingGround.api.account.dto.response.ContactListDto;
-import app.codingGround.api.admin.dto.NoticeListDto;
-import app.codingGround.api.admin.dto.NoticeRegisterDto;
+import app.codingGround.api.admin.dto.AdminNoticeListDto;
+import app.codingGround.api.admin.dto.AdminNoticeRegisterDto;
 import app.codingGround.api.account.service.ContactService;
 import app.codingGround.api.admin.dto.request.ContactAnswerEditDto;
 import app.codingGround.api.admin.dto.response.ContactDetailDto;
 import app.codingGround.api.admin.service.ContactAnswerEditService;
-import app.codingGround.api.admin.service.NoticeService;
+import app.codingGround.api.admin.service.AdminNoticeService;
 import app.codingGround.api.entity.Notice;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.model.ApiResponse;
@@ -20,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminRestController {
 
-    private final NoticeService noticeService;
+    private final AdminNoticeService adminNoticeService;
     private final ContactService contactService;
     private final ContactAnswerEditService contactAnswerEditService;
 
@@ -45,32 +43,32 @@ public class AdminRestController {
     @PostMapping("/notice/register")
     public ResponseEntity<ApiResponse<DefaultResultDto>> postNotice
             (@RequestHeader("Authorization") String accessToken,
-             @RequestBody @Validated NoticeRegisterDto noticeRegisterDto) {
-        return ResponseEntity.ok(new ApiResponse<>(noticeService.postNotice(accessToken, noticeRegisterDto)));
+             @RequestBody @Validated AdminNoticeRegisterDto adminNoticeRegisterDto) {
+        return ResponseEntity.ok(new ApiResponse<>(adminNoticeService.postNotice(accessToken, adminNoticeRegisterDto)));
     }
 
     @GetMapping("/notice/list")
     public Page<Notice> getNoticeList(
             @PageableDefault(size = 10, sort = "noticeNum", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<Notice> noticeList = noticeService.getNoticeList(pageable);
+        Page<Notice> noticeList = adminNoticeService.getNoticeList(pageable);
         return noticeList;
     }
 
     @GetMapping("/notice/detail/{noticeNum}")
-    public NoticeListDto getNoticeDetail(@PathVariable Long noticeNum) {
-        return noticeService.getNoticeDetail(noticeNum);
+    public AdminNoticeListDto getNoticeDetail(@PathVariable Long noticeNum) {
+        return adminNoticeService.getNoticeDetail(noticeNum);
     }
 
     @PatchMapping("/notice/edit/{noticeNum}")
     public ResponseEntity<ApiResponse<DefaultResultDto>> editNotice
-            (@RequestBody @Validated NoticeRegisterDto noticeRegisterDto,
+            (@RequestBody @Validated AdminNoticeRegisterDto adminNoticeRegisterDto,
              @PathVariable Long noticeNum) {
-        return ResponseEntity.ok(new ApiResponse<>(noticeService.editNotice(noticeRegisterDto, noticeNum)));
+        return ResponseEntity.ok(new ApiResponse<>(adminNoticeService.editNotice(adminNoticeRegisterDto, noticeNum)));
     }
 
-    @DeleteMapping("/notice/delete/{noticeNum}")
-    public ResponseEntity<ApiResponse<DefaultResultDto>> deleteNotice (@PathVariable Long noticeNum) {
-        return ResponseEntity.ok(new ApiResponse<>(noticeService.deleteNotice(noticeNum)));
+    @PatchMapping("/notice/delete/{noticeNum}")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> deleteNotice(@PathVariable Long noticeNum) {
+        return ResponseEntity.ok(new ApiResponse<>(adminNoticeService.deleteNotice(noticeNum)));
     }
 
     @GetMapping("/user/inquiry/list")

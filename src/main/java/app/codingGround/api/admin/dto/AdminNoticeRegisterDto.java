@@ -6,7 +6,7 @@ import lombok.Getter;
 import javax.validation.constraints.NotBlank;
 
 @Getter
-public class NoticeRegisterDto {
+public class AdminNoticeRegisterDto {
 
     // @NotNull : null만 허용x, "", " "은 허용
     // @NotBlank : null, "", " " 모두 허용 x
