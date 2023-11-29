@@ -20,6 +20,6 @@ public class UserInfoDto {
 //    private String recordPercentage;
     private InfoDto userInfo;
     private List<RankingDto> ranking;
-/*    private List<GameBadgeDto> gameBadge;
-    private List<GameLanguageDto> gameLanguage;*/
+    private List<GameBadgeDto> gameBadge;
+   /* private List<GameLanguageDto> gameLanguage;*/
 }
