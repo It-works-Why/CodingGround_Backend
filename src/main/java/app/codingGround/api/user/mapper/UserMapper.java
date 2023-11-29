@@ -15,6 +15,6 @@ public interface UserMapper {
 
     List<RankingDto> getUserRankings(String userId);
 
-    List<GameBadgeDto> getUserBadge(String userId);
+    /*List<GameBadgeDto> getUserBadge(String userId);*/
 
 }

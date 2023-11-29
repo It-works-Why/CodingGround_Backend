@@ -6,24 +6,29 @@
 
     <select id="getRankingList" resultType="RankListDto">
         SELECT
-            ROW_NUMBER() OVER (ORDER BY S.RANK_SCORE DESC) AS RANK_ORDER,
+            ROW_NUMBER() OVER (ORDER BY US.RANK_SCORE DESC) AS RANK_ORDER,
                 U.USER_NICKNAME,
             U.USER_PROFILE_IMG,
-            S.RANK_NUM,
-            S.RANK_SCORE,
-            ROUND((COUNT(CASE WHEN GR.GAME_RECORD IN (1, 2, 3, 4) THEN 1 END) * 100.0) / COUNT(GR.GAME_RECORD), 1) AS RECORD_PERCENTAGE
+            US.RANK_NUM,
+            US.RANK_SCORE,
+            COUNT(CASE WHEN GR.GAME_RECORD IN (1, 2, 3, 4) THEN 1 END) / COUNT(GR.GAME_RECORD) * 100 AS RECORD_PERCENTAGE
         FROM
             TB_USER U
                 JOIN
-            TB_SEASON S ON U.USER_NUM = S.USER_NUM
-                LEFT JOIN
-            TB_GAME_RECORD GR ON U.USER_NUM = GR.USER_NUM
+            TB_USER_SEASON US ON U.USER_NUM = US.USER_NUM
+                JOIN
+            TB_GAME_RECORD GR ON U.USER_NUM = GR.USER_NUM AND US.SEASON_NUM = GR.SEASON_NUM
         WHERE
-            S.SEASON_NAME = '2023-2'
+                US.SEASON_NUM = (
+                SELECT
+                    MAX(SEASON_NUM)
+                FROM
+                    TB_USER_SEASON
+            )
         GROUP BY
-            U.USER_NICKNAME, U.USER_PROFILE_IMG, S.RANK_NUM, S.RANK_SCORE
+            U.USER_NICKNAME, U.USER_PROFILE_IMG, US.RANK_NUM, US.RANK_SCORE
         ORDER BY
-            S.RANK_SCORE DESC;
+            US.RANK_SCORE DESC;
     </select>
 
 

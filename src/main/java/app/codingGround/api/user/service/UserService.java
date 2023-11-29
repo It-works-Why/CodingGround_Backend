@@ -24,7 +24,7 @@ public class UserService {
         return userMapper.getUserRankings(userId);
     }
 
-    public List<GameBadgeDto> getUserBadge(String userId) {
+    /*public List<GameBadgeDto> getUserBadge(String userId) {
         return userMapper.getUserBadge(userId);
-    }
+    }*/
 }
