@@ -10,6 +10,6 @@ import lombok.Setter;
 @Setter
 @Builder
 public class GameBadgeDto {
-    private String BadgeNum;
-    private Integer BadgeName;
+    private String num;
+    private String name;
 }

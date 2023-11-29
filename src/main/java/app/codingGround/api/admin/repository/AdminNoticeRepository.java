@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AdminNoticeRepository extends JpaRepository<Notice, Long> {
-    Notice findByNoticeNumAndUseStatus(Long noticeNum, int userStatus);
+    Notice findByNoticeNumAndUseStatus(Long noticeNum, int useStatus);
 
-    Page<Notice> findAllByUseStatus(Pageable pageable, int userStatus);
+    Page<Notice> findAllByUseStatus(Pageable pageable, int useStatus);
 }

@@ -52,28 +52,35 @@
 
     <select id="getUserBadge" resultType="GameBadgeDto">
         SELECT
-            TB_SEASON.RANK_NUM as BADGE_NUM,
-            TB_SEASON.SEASON_NAME as BADGE_NAME
+        US.RANK_NUM AS NUM,
+        S.SEASON_NAME AS NAME,
+        S.SEASON_END_TIME AS TIME
         FROM
-            TB_USER
-                JOIN
-            TB_SEASON ON TB_USER.USER_NUM = TB_SEASON.USER_NUM
+        TB_USER U
+        JOIN
+        TB_USER_SEASON US ON U.USER_NUM = US.USER_NUM
+        JOIN
+        TB_SEASON S ON US.SEASON_NUM = S.SEASON_NUM
         WHERE
-            TB_USER.USER_ID = 'test2' AND TB_SEASON.SEASON_NUM != (
-        SELECT MAX(SEASON_NUM) FROM TB_SEASON JOIN TB_USER ON TB_USER.USER_NUM = TB_SEASON.USER_NUM WHERE  TB_USER.USER_ID = 'test2'
-    )
-        UNION DISTINCT
+        U.USER_ID = #{userId}
+        AND S.SEASON_NUM &lt; (SELECT MAX(SEASON_NUM) FROM TB_SEASON)
+
+        UNION
+
         SELECT
-            TB_BADGE.BADGE_NAME,
-            TB_ACHIEVEMENT.BADGE_NUM
+        B.BADGE_NUM AS NUM,
+        B.BADGE_NAME AS NAME,
+        A.ACQUISITION_TIME AS TIME
         FROM
-            TB_USER
-                JOIN
-            TB_ACHIEVEMENT ON TB_USER.USER_NUM = TB_ACHIEVEMENT.USER_NUM
-                JOIN
-            TB_BADGE ON TB_ACHIEVEMENT.BADGE_NUM = TB_BADGE.BADGE_NUM
+        TB_USER U
+        JOIN
+        TB_ACHIEVEMENT A ON U.USER_NUM = A.USER_NUM
+        JOIN
+        TB_BADGE B ON A.BADGE_NUM = B.BADGE_NUM
         WHERE
-            TB_USER.USER_ID = #{userId};
+        U.USER_ID = #{userId}
+
+        ORDER BY TIME DESC;
     </select>
 
 </mapper>
