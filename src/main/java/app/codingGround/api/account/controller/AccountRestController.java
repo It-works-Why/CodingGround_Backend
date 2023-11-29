@@ -1,8 +1,12 @@
 package app.codingGround.api.account.controller;
 
+import app.codingGround.api.community.dto.CommunityListDto;
+import app.codingGround.api.community.dto.CommunityRegisterDto;
 import app.codingGround.api.account.dto.request.UserLoginRequestDto;
 import app.codingGround.api.account.dto.request.UserRegisterDto;
 import app.codingGround.api.account.dto.response.UserInfoFromToken;
+import app.codingGround.api.community.service.CommunityService;
+import app.codingGround.api.entity.Community;
 import app.codingGround.global.config.model.TokenInfo;
 import app.codingGround.api.account.service.AccountService;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
@@ -10,6 +14,10 @@ import app.codingGround.global.config.model.ApiResponse;
 import app.codingGround.global.utils.SHA256Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -48,5 +56,4 @@ public class AccountRestController {
     public ResponseEntity<ApiResponse<UserInfoFromToken>> getUserInfoFromToken(@RequestHeader("Authorization") String accessToken) {
         return ResponseEntity.ok(new ApiResponse<>(accountService.getUserInfo(accessToken)));
     }
-
 }

@@ -4,7 +4,7 @@
 
 <mapper namespace="app.codingGround.api.user.mapper.UserMapper">
 
-    <select id="getUserInfo" resultType="UserInfoDto">
+    <select id="getUserInfo" resultType="InfoDto">
         SELECT
             U.USER_NICKNAME,
             U.USER_AFFILIATION_DETAIL,
@@ -27,7 +27,7 @@
             U.USER_NICKNAME, U.USER_AFFILIATION_DETAIL, U.USER_PROFILE_IMG, S.RANK_NUM;
     </select>
 
-<!--    <select id="getUserRankings" resultType="RankingDto">
+    <select id="getUserRankings" resultType="RankingDto">
         SELECT
             SUM(CASE WHEN GAME_RECORD = 1 THEN 1 ELSE 0 END) AS COUNT1,
             SUM(CASE WHEN GAME_RECORD = 2 THEN 1 ELSE 0 END) AS COUNT2,
@@ -41,6 +41,32 @@
             TB_USER.USER_ID = #{userId}
         GROUP BY
             USER_ID;
-    </select>-->
+    </select>
+
+    <select id="getUserBadge" resultType="GameBadgeDto">
+        SELECT
+            TB_SEASON.RANK_NUM as BADGE_NUM,
+            TB_SEASON.SEASON_NAME as BADGE_NAME
+        FROM
+            TB_USER
+                JOIN
+            TB_SEASON ON TB_USER.USER_NUM = TB_SEASON.USER_NUM
+        WHERE
+            TB_USER.USER_ID = 'test2' AND TB_SEASON.SEASON_NUM != (
+        SELECT MAX(SEASON_NUM) FROM TB_SEASON JOIN TB_USER ON TB_USER.USER_NUM = TB_SEASON.USER_NUM WHERE  TB_USER.USER_ID = 'test2'
+    )
+        UNION DISTINCT
+        SELECT
+            TB_BADGE.BADGE_NAME,
+            TB_ACHIEVEMENT.BADGE_NUM
+        FROM
+            TB_USER
+                JOIN
+            TB_ACHIEVEMENT ON TB_USER.USER_NUM = TB_ACHIEVEMENT.USER_NUM
+                JOIN
+            TB_BADGE ON TB_ACHIEVEMENT.BADGE_NUM = TB_BADGE.BADGE_NUM
+        WHERE
+            TB_USER.USER_ID = #{userId};
+    </select>
 
 </mapper>

@@ -18,8 +18,8 @@ public class ContactService {
 
     private final ContactMapper contactMapper;
 
-    public List<ContactListDto> getContactList() {
-        return contactMapper.getContactList();
+    public List<ContactListDto> getContactList(String searchInput) {
+        return contactMapper.getContactList(searchInput);
     }
 
     public ContactDetailDto getContactDetail(Long contactNum) {

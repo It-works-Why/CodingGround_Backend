@@ -17,17 +17,16 @@ public class Season {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "SEASON_NAME")
-    private Long seasonName;
+    @Column(name = "SEASON_NUM")
+    private Long seasonNum;
 
-    @ManyToOne
-    @JoinColumn(name = "USER_NUM")
-    private User user;
+    @Column(name = "SEASON_NAME", length = 20, nullable = false)
+    private String seasonName;
 
-    @ManyToOne
-    @JoinColumn(name = "RANK_NUM")
-    private Rank rankNum;
+    @Column(name = "SEASON_START_TIME", nullable = false)
+    private Timestamp seasonStartTime;
 
-    @Column(name = "RANK_SCORE", nullable = false)
-    private int rankScore;
+    @Column(name = "SEASON_START_TIME", nullable = false)
+    private Timestamp seasonEndTime;
+
 }
