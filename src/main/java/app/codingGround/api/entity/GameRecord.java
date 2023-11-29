@@ -22,7 +22,7 @@ public class GameRecord {
     @JoinColumn(name = "USER_NUM")
     private User user;
 
-  /*  @ManyToOne*/
+  /* @ManyToOne*/
     @JoinColumn(name = "GAME_NUM")
     private Integer game;
 
