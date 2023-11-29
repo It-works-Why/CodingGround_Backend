@@ -26,7 +26,7 @@ public class Season {
     @Column(name = "SEASON_START_TIME", nullable = false)
     private Timestamp seasonStartTime;
 
-    @Column(name = "SEASON_START_TIME", nullable = false)
+    @Column(name = "SEASON_END_TIME", nullable = false)
     private Timestamp seasonEndTime;
 
 }
