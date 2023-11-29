@@ -4,11 +4,15 @@ import app.codingGround.api.account.dto.response.ContactListDto;
 import app.codingGround.api.admin.dto.AdminNoticeListDto;
 import app.codingGround.api.admin.dto.AdminNoticeRegisterDto;
 import app.codingGround.api.account.service.ContactService;
+import app.codingGround.api.admin.dto.AdminQuestionRegisterDto;
 import app.codingGround.api.admin.dto.request.ContactAnswerEditDto;
 import app.codingGround.api.admin.dto.response.ContactDetailDto;
+import app.codingGround.api.admin.service.AdminQuestionService;
 import app.codingGround.api.admin.service.ContactAnswerEditService;
 import app.codingGround.api.admin.service.AdminNoticeService;
 import app.codingGround.api.entity.Notice;
+import app.codingGround.api.entity.Question;
+import app.codingGround.api.entity.TestCase;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.model.ApiResponse;
 import io.swagger.annotations.Api;
@@ -22,6 +26,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -34,11 +40,14 @@ public class AdminRestController {
     private final AdminNoticeService adminNoticeService;
     private final ContactService contactService;
     private final ContactAnswerEditService contactAnswerEditService;
+    private final AdminQuestionService adminQuestionService;
 
     @GetMapping("/check/token")
     public ResponseEntity<ApiResponse<DefaultResultDto>> securityAdminTest() {
         return ResponseEntity.ok(new ApiResponse<>(DefaultResultDto.builder().message("어드민페이지 테스트").success(true).build()));
     }
+
+    // notice
 
     @PostMapping("/notice/register")
     public ResponseEntity<ApiResponse<DefaultResultDto>> postNotice
@@ -71,6 +80,8 @@ public class AdminRestController {
         return ResponseEntity.ok(new ApiResponse<>(adminNoticeService.deleteNotice(noticeNum)));
     }
 
+    // inquiry
+
     @GetMapping("/user/inquiry/list")
     public List<ContactListDto> getContactList(
             @RequestParam(name = "searchInput", defaultValue = "") String searchInput) {
@@ -88,4 +99,26 @@ public class AdminRestController {
             @PathVariable Long contactNum) {
         return ResponseEntity.ok(new ApiResponse<>(contactAnswerEditService.editContactAnswer(contactAnswerEditDto, contactNum)));
     }
+
+    // question
+    @PostMapping("/question/register")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> postQuestion(@RequestBody @Validated AdminQuestionRegisterDto adminQuestionRegisterDto) {
+        return ResponseEntity.ok(new ApiResponse<>(adminQuestionService.postQuestion(adminQuestionRegisterDto)));
+    }
+
+    @GetMapping("/question/list")
+    public Page<Question> getSearchQuestionList(
+            @PageableDefault(size = 10, sort = "QuestionNum", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(name = "keyword", required = false) String keyword) {
+
+        if (keyword == null) {
+            Page<Question> questionList = adminQuestionService.getQuestionList(pageable);
+            return questionList;
+        } else {
+            String decodedKeyword = URLDecoder.decode(keyword, StandardCharsets.UTF_8);
+            Page<Question> questionList = adminQuestionService.getSearchQuestionList(pageable, decodedKeyword);
+            return questionList;
+        }
+}
+
 }

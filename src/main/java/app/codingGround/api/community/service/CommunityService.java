@@ -44,24 +44,11 @@ public class CommunityService {
     }
 
     public Page<Community> getCommunityList(Pageable pageable) {
-        return communityRepositroy.findAll(pageable);
+        return communityRepositroy.findAllByUseStatus(pageable, 1);
     }
 
-
-//    public List<CommunityListDto> getCommunityList() {
-//        List<Community> communities = communityRepositroy.findAll();
-//        List<CommunityListDto> communityList = new ArrayList<>();
-//
-//        for (Community community : communities) {
-//            CommunityListDto communityListDto = new CommunityListDto(community);
-//            communityList.add(communityListDto);
-//        }
-//
-//        return communityList;
-//    }
-
     public CommunityListDto getCommunityDetail(Long postNum) {
-        Community community = communityRepositroy.findByPostNum(postNum);
+        Community community = communityRepositroy.findByPostNumAndUseStatus(postNum, 1);
         CommunityListDto communityListDto = new CommunityListDto(community);
 
         return communityListDto;
@@ -71,7 +58,7 @@ public class CommunityService {
     public DefaultResultDto editCommunity(CommunityRegisterDto communityRegisterDto, Long postNum) {
         Community community = null;
         try {
-            community = communityRepositroy.findByPostNum(postNum);
+            community = communityRepositroy.findByPostNumAndUseStatus(postNum, 1);
             community.setPostTitle(communityRegisterDto.getPostTitle());
             community.setPostContent(communityRegisterDto.getPostContent());
         } catch (Exception e) {
@@ -86,9 +73,26 @@ public class CommunityService {
 
     @Transactional
     public DefaultResultDto deleteCommunity(Long postNum) {
-        Community community = communityRepositroy.findByPostNum(postNum);
-        communityRepositroy.delete(community);
+        Community community = null;
+        try {
+            community = communityRepositroy.findByPostNumAndUseStatus(postNum,1);
+            community.setUseStatus(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CustomException("오류", ErrorCode.TEST_ERROR);
+        }
+
+        communityRepositroy.save(community);
 
         return DefaultResultDto.builder().success(true).message("게시물이 삭제 되었습니다.").build();
+    }
+
+    public CommunityListDto getUserId(Long postNum) {
+        Community community = communityRepositroy.findByPostNum(postNum);
+        CommunityListDto communityListDto = new CommunityListDto(community);
+        System.out.println(community.getUser().getUserId());
+
+
+        return communityListDto;
     }
 }
