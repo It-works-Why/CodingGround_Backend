@@ -25,9 +25,10 @@ public class MypageRestController {
     @GetMapping("/myinfo")
     public ResponseEntity<ApiResponse<UserInfoDto>> getMypageInfo(@RequestHeader("Authorization") String accessToken) {
         String userId = JwtTokenProvider.getUserId(accessToken);
-        UserInfoDto userInfo = userService.getUserInfo(userId);
-        System.out.println(userInfo.getUserNickname());
-//        userInfo.setRanking(userService.getUserRankings(userId));
+        UserInfoDto userInfo = new UserInfoDto();
+        userInfo.setUserInfo(userService.getUserInfo(userId));
+        userInfo.setRanking(userService.getUserRankings(userId));
+        userInfo.setGameBadge(userService.getUserBadge(userId));
 
         return ResponseEntity.ok(new ApiResponse<>(userInfo));
     }

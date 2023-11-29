@@ -4,11 +4,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.ibatis.type.Alias;
 
 @Data
-@Getter
-@Setter
 @Builder
+@Alias("RankingDto")
 public class RankingDto {
     private Integer count1;
     private Integer count2;
