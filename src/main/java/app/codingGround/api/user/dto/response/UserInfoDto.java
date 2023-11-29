@@ -21,5 +21,5 @@ public class UserInfoDto {
     private InfoDto userInfo;
     private List<RankingDto> ranking;
     private List<GameBadgeDto> gameBadge;
-   /* private List<GameLanguageDto> gameLanguage;*/
+    private List<GameLanguageDto> gameLanguage;
 }

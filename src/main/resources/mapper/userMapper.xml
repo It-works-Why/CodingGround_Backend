@@ -83,4 +83,21 @@
         ORDER BY TIME DESC;
     </select>
 
+    <select id="UserGameLanguage" resultType="GameLanguageDto">
+        SELECT
+            L.LANGUAGE_NAME,
+            COUNT(*) AS LANGUAGE_COUNT
+        FROM
+            TB_LANGUAGE L
+                JOIN
+            TB_GAME_RECORD GR ON L.LANGUAGE_NUM = GR.LANGUAGE_NUM
+                JOIN
+            TB_USER U ON GR.USER_NUM = U.USER_NUM
+        WHERE
+            U.USER_ID = #{userId}
+          AND GR.SEASON_NUM = (SELECT MAX(SEASON_NUM) FROM TB_GAME_RECORD WHERE USER_NUM = U.USER_NUM)
+        GROUP BY
+            L.LANGUAGE_NAME;
+    </select>
+
 </mapper>
