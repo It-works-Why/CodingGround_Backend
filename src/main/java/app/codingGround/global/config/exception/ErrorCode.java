@@ -32,7 +32,13 @@ public enum ErrorCode {
     FILE_UPLOAD_DENIED_EXTENSION_ERROR(HttpStatus.BAD_REQUEST, "파일 확장자가 올바르지 않습니다."),
 
     // Board
-    NOT_USE_POST(HttpStatus.BAD_REQUEST, "이미 삭제된 게시물 입니다.");
+    NOT_USE_POST(HttpStatus.BAD_REQUEST, "이미 삭제된 게시물 입니다."),
+
+
+    //Battle
+    CANT_CREATE_GAME(HttpStatus.INTERNAL_SERVER_ERROR, "게임 생성을 실패했습니다.");
+
+
     private final HttpStatus status;
     private final String message;
 

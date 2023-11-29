@@ -72,8 +72,14 @@ dependencies {
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    // websocket
+
+    // jedis
+    implementation 'redis.clients:jedis:5.1.0'
+
+    // websocketdas
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+
 }
 
 tasks.named('test') {
