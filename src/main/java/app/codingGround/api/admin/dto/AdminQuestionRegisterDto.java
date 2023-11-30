@@ -15,6 +15,8 @@ public class AdminQuestionRegisterDto {
 
     private int questionDifficult;
 
+    // 정답률
+
     @NotBlank(message = "내용을 입력해주세요.")
     private String questionContent;
 
@@ -35,6 +37,4 @@ public class AdminQuestionRegisterDto {
 
     @NotBlank(message = "테스트 케이스를 작성해주세요.")
     private String testCaseOutput3;
-
-
 }

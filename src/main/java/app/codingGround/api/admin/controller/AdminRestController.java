@@ -1,5 +1,6 @@
 package app.codingGround.api.admin.controller;
 
+import app.codingGround.api.admin.dto.AdminQuestionListDto;
 import app.codingGround.api.contact.dto.response.ContactListDto;
 import app.codingGround.api.admin.dto.AdminNoticeListDto;
 import app.codingGround.api.admin.dto.AdminNoticeRegisterDto;
@@ -125,17 +126,34 @@ public class AdminRestController {
 
     @GetMapping("/question/list")
     public Page<Question> getSearchQuestionList(
-            @PageableDefault(size = 10, sort = "QuestionNum", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(size = 10, sort = "questionNum", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(name = "keyword", required = false) String keyword) {
 
+        System.out.println("keyword : " + keyword);
         if (keyword == null) {
             Page<Question> questionList = adminQuestionService.getQuestionList(pageable);
             return questionList;
         } else {
-            String decodedKeyword = URLDecoder.decode(keyword, StandardCharsets.UTF_8);
-            Page<Question> questionList = adminQuestionService.getSearchQuestionList(pageable, decodedKeyword);
+            Page<Question> questionList = adminQuestionService.getSearchQuestionList(pageable, keyword);
             return questionList;
         }
-}
+    }
+
+    @GetMapping("/question/detail/{questionNum}")
+    public List<AdminQuestionListDto> getQuestionDetail(@PathVariable Long questionNum) {
+        return adminQuestionService.getQuestionDetail(questionNum);
+    }
+
+    @PatchMapping("/question/edit/{questionNum}")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> editQuestion
+            (@RequestBody @Validated AdminQuestionRegisterDto adminQuestionRegisterDto,
+             @PathVariable Long questionNum) {
+        return ResponseEntity.ok(new ApiResponse<>(adminQuestionService.editQuestion(adminQuestionRegisterDto, questionNum)));
+    }
+
+    @PatchMapping("/question/delete/{questionNum}")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> deleteQuestion(@PathVariable Long questionNum) {
+        return ResponseEntity.ok(new ApiResponse<>(adminQuestionService.deleteQuestion(questionNum)));
+    }
 
 }
