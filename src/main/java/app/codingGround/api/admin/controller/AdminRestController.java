@@ -1,11 +1,11 @@
 package app.codingGround.api.admin.controller;
 
-import app.codingGround.api.admin.dto.AdminQuestionListDto;
+import app.codingGround.api.admin.dto.response.AdminQuestionListDto;
 import app.codingGround.api.contact.dto.response.ContactListDto;
-import app.codingGround.api.admin.dto.AdminNoticeListDto;
-import app.codingGround.api.admin.dto.AdminNoticeRegisterDto;
+import app.codingGround.api.admin.dto.response.AdminNoticeListDto;
+import app.codingGround.api.admin.dto.request.AdminNoticeRegisterDto;
 import app.codingGround.api.contact.service.ContactService;
-import app.codingGround.api.admin.dto.AdminQuestionRegisterDto;
+import app.codingGround.api.admin.dto.request.AdminQuestionRegisterDto;
 import app.codingGround.api.admin.dto.request.ContactAnswerEditDto;
 import app.codingGround.api.admin.dto.response.ContactDetailDto;
 import app.codingGround.api.admin.dto.response.UserManageListDto;
@@ -29,8 +29,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j

@@ -1,4 +1,4 @@
-package app.codingGround.api.admin.dto;
+package app.codingGround.api.admin.dto.response;
 
 import app.codingGround.api.entity.Notice;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package app.codingGround.api.admin.service;
 
-import app.codingGround.api.admin.dto.AdminQuestionListDto;
-import app.codingGround.api.admin.dto.AdminQuestionRegisterDto;
+import app.codingGround.api.admin.dto.response.AdminQuestionListDto;
+import app.codingGround.api.admin.dto.request.AdminQuestionRegisterDto;
 import app.codingGround.api.admin.repository.AdminQuestionRepository;
 import app.codingGround.api.admin.repository.AdminTestCaseRepository;
 import app.codingGround.api.entity.Question;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
