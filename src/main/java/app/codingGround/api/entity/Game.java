@@ -25,8 +25,8 @@ public class Game {
     private Language languageNum;
 
     @ManyToOne
-    @JoinColumn(name = "SEASON_NAME")
-    private Season seasonName;
+    @JoinColumn(name = "SEASON_NUM")
+    private Season seasonNum;
 
     @Column(name = "GAME_DATE",nullable = false)
     private Timestamp gameDate;
