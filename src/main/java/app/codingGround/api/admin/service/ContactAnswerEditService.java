@@ -1,6 +1,6 @@
 package app.codingGround.api.admin.service;
 
-import app.codingGround.api.notice.repository.ContactRepository;
+import app.codingGround.api.admin.repository.ContactRepository;
 import app.codingGround.api.admin.dto.request.ContactAnswerEditDto;
 import app.codingGround.api.entity.Contact;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
