@@ -8,7 +8,8 @@ public enum Endpoint {
     SUCCESS_TEST("/api/test/success/test"),
     FAIL_TEST("/api/test/fail/test"),
     BATTLE("/ws/**"),
-    RANKING_LIST("/api/ranking/list");
+    RANKING_LIST("/api/ranking/list"),
+    TEST("/api/battle/testtest");
 
     private final String url;
 

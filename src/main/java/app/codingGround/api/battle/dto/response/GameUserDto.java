@@ -16,17 +16,17 @@ public class GameUserDto {
     private String userId;
     private String userNickname;
     private String profileImg;
-    private String userStatus;
+    private String userGameResult;
 
 
-    public String getGameUser(String userStatus) {
-        // 1, 2, 3, 4 , disconnect, defeat, play
-        String returnUser = "{userGameStatus : '" + userStatus + "', userProfileImgUrl : '"+ this.profileImg +"', userNickname : '"+ this.userNickname +"', userId= '"+ this.userId +"'}";
+    public String getGameUser(String userGameResult) {
+        // 1, 2, 3, 4, 5
+        String returnUser = "{userGameResult : '" + userGameResult + "', userProfileImgUrl : '"+ this.profileImg +"', userNickname : '"+ this.userNickname +"', userId= '"+ this.userId +"'}";
         return returnUser;
-    }
+}
 
     public String getGameUser() {
-        String returnUser = "{userGameStatus : '" + this.userStatus + "', userProfileImgUrl : '"+ this.profileImg +"', userNickname : '"+ this.userNickname +"', userId= '"+ this.userId +"'}";
+        String returnUser = "{userGameResult : '" + this.userGameResult + "', userProfileImgUrl : '"+ this.profileImg +"', userNickname : '"+ this.userNickname +"', userId= '"+ this.userId +"'}";
         return returnUser;
     }
 

@@ -52,7 +52,6 @@ public class CommunityRestController {
              @PathVariable Long postNum) {
         String userId = JwtTokenProvider.getUserId(accessToken);
         CommunityListDto dto = communityService.getUserId(postNum);
-        System.out.println(dto.getUserId());
         if(userId.equals(dto.getUserId())) {
             return ResponseEntity.ok(new ApiResponse<>(communityService.editCommunity(communityRegisterDto, postNum)));
         } else {

@@ -32,43 +32,61 @@ public class RedisUtil {
         return redisPassword;
     }
 
-    public String createGameRoom(ConnectGameInfo connectGameInfo, GameUserDto gameUser) {
-        try {
-            findConnectedGame(gameUser.getUserId());
+//    public String createGameRoom(ConnectGameInfo connectGameInfo, GameUserDto gameUser) {
+//        try {
+//            findConnectedGame(gameUser.getUserId());
+//
+//            String gameId = findGameRoom(connectGameInfo);
+//
+//            Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+//            jedis.auth(getRedisPassword());
+//            if(gameId != null){
+//
+//            }else{
+//
+//
+//
+//            }
+//            // GameRoom 안의 gameUser 필드에 참여한 유저 정보를 저장
+//            // Redis 연결 닫기
+//
+//            jedis.close();
+//            return gameId;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 
-            String gameId = findGameRoom(connectGameInfo);
 
-            Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
-            jedis.auth(getRedisPassword());
-            if(gameId != null){
-                jedis.set(gameUser.getUserId(), gameId);
-            }else{
-                Map<String, String> gameRoom = new HashMap<>();
-                gameId = UUID.randomUUID().toString(); // 고유 아이디
-                gameRoom.put("gameId", gameId);
-                gameRoom.put("gameType", connectGameInfo.getGameType());
-                gameRoom.put("gameLanguage", connectGameInfo.getGameLanguage());
-                gameRoom.put("gameRound", "1");
-                gameRoom.put("gameMaxParticipants", "8");
-//                gameRoom.put("gameParticipants", "0");
-                gameRoom.put("gameStatus", "WAITING");
 
-                // GameRoom 정보를 Redis Hash에 저장
-                jedis.set(gameUser.getUserId(), gameId);
-                jedis.hmset(gameId + "_gameRoom", gameRoom);
-            }
-            // GameRoom 안의 gameUser 필드에 참여한 유저 정보를 저장
-            jedis.rpush(gameId + "_gameUsers", gameUser.getGameUser("play"));
-            // Redis 연결 닫기
 
-            jedis.close();
-            return gameId;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+    // 원하는 단어 때기
+    public String removeSuffix(String input, String suffix) {
+        if (input != null && input.endsWith(suffix)) {
+            return input.substring(0, input.length() - suffix.length());
         }
+        return input;
     }
 
+    // 재접속 여부 판단
+    public String findConnectedGame(String userId){
+        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        jedis.auth(getRedisPassword());
+
+        Map<String, String> userKey = jedis.hgetAll(userId);
+        if(userKey.get("gameId") != null){
+            String userKeyGameStatus = userKey.get("status");
+            if(userKeyGameStatus.equals("DISCONNECT")){
+                return userKey.get("gameId");
+            }
+        }
+        return null;
+    }
+
+
+
+    // 참가 가능한 게임방 검색 후 방 키 RETURN 없으면 NULL
     public String findGameRoom(ConnectGameInfo connectGameInfo) {
         Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
         jedis.auth(getRedisPassword());
@@ -101,29 +119,99 @@ public class RedisUtil {
                 }
             }
         }
-        // Redis 연결 닫기
         jedis.close();
         if(gameRooms.isEmpty()){
             return null;
+        }else{
+            return gameRooms.get(0);
         }
-        return gameRooms.get(0);
     }
 
 
-    public String findConnectedGame(String userId){
+    // 방생성
+    public String createRoom(ConnectGameInfo connectGameInfo) {
         Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
         jedis.auth(getRedisPassword());
-
-        String gameRoomKey = jedis.get(userId);
-
-        List<String> results = jedis.lrange(gameRoomKey+"_gameUsers", 0, -1);
-
-        return null;
+        Map<String, String> gameRoom = new HashMap<>();
+        String gameId = UUID.randomUUID().toString(); // 고유 아이디
+        gameRoom.put("gameId", gameId);
+        gameRoom.put("gameType", connectGameInfo.getGameType());
+        gameRoom.put("gameLanguage", connectGameInfo.getGameLanguage());
+        gameRoom.put("gameRound", "1");
+        gameRoom.put("gameMaxParticipants", "8");
+//        gameRoom.put("gameParticipants", "0");
+        gameRoom.put("gameStatus", "WAIT"); // WAIT PLAY
+        jedis.hmset(gameId + "_gameRoom", gameRoom);
+        jedis.close();
+        return gameId;
     }
-    public String removeSuffix(String input, String suffix) {
-        if (input != null && input.endsWith(suffix)) {
-            return input.substring(0, input.length() - suffix.length());
+
+
+
+
+
+    // 게임서비스를 이용중인 유저 정보 저장
+    public void createUserKey(String gameId, GameUserDto gameUserDto) {
+        Jedis jedis = null;
+        try {
+            jedis = new Jedis(getRedisHost(), getRedisPort());
+            jedis.auth(getRedisPassword());
+            Map<String, String> userKey = new HashMap<>();
+            userKey.put("gameId", gameId);
+            userKey.put("status", "DISCONNECT"); // WAITING PLAYING DISCONNECT
+            // GameRoom 정보를 Redis Hash에 저장
+            jedis.hmset(gameUserDto.getUserId(), userKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            if (jedis != null) {
+                jedis.close();
+            }
         }
-        return input;
     }
+
+
+
+
+
+    // 유저 참여
+    public void joinGameRoom(String gameId, GameUserDto gameUserDto){
+        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        Map<String, String> userKey = new HashMap<>();
+
+        jedis.auth(getRedisPassword());
+        jedis.rpush(gameId + "_gameUsers", gameUserDto.getGameUser("")); // 1, 2, 3, 4, 5 OR 'DEFEAT'
+        userKey.put("gameId", gameId);
+        userKey.put("status", "WAIT"); // WAIT PLAY
+    }
+
+
+
+    // 재접속 수락
+    public void acceptReconnect(String userId) {
+        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        jedis.auth(getRedisPassword());
+        Map<String, String> userKey = jedis.hgetAll(userId);
+        String gameKey = userKey.get("gameKey");
+        userKey.put("status", "PLAYING");
+        jedis.hmset(userId, userKey);
+    }
+
+
+
+
+    // 재접속 거절 (탈락처리)
+    public void denyReconnect(String userId){
+        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        jedis.auth(getRedisPassword());
+        jedis.del(userId);
+    }
+
+
+
+
+    // 탈주 (탈주처리)
+
+
 }
