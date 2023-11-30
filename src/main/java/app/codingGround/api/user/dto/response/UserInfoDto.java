@@ -22,4 +22,5 @@ public class UserInfoDto {
     private List<RankingDto> ranking;
     private List<GameBadgeDto> gameBadge;
     private List<GameLanguageDto> gameLanguage;
+    private List<GameInfoDto> GameInfoData;
 }

@@ -14,5 +14,6 @@ public interface UserMapper {
 
     List<GameBadgeDto> getUserBadge(String userId);
     List<GameLanguageDto> UserGameLanguage(String userId);
+    List<GameInfoDto> getUserGameInfo(String userId);
 
 }
