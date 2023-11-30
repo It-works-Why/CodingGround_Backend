@@ -25,7 +25,10 @@ public class Language {
     private String languageName;
 
 
-    @Column(name = "QUESTION_BASECODE", nullable = false)
-    private String questionBasecode;
+    @Column(name = "LANGUAGE_BASE_CODE", nullable = false)
+    private String languageBaseCode;
+
+    @Column(name = "LANGUAGE_CODE", nullable = false)
+    private int languageCode;
 
 }

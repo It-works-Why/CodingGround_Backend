@@ -22,7 +22,6 @@ public class ContactAnswerEditService {
                 .orElseThrow(() -> new NullPointerException("해당 문의사항이 존재하지 않습니다."));
 
         contact.setContactAnswer(contactAnswerEditDto.getContactAnswer());
-
         contactRepository.save(contact);
 
         return DefaultResultDto.builder().success(true).message("답변이 등록/수정 되었습니다").build();
