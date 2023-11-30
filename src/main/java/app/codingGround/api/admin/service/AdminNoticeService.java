@@ -1,8 +1,8 @@
 package app.codingGround.api.admin.service;
 
 import app.codingGround.api.account.repository.AccountRepository;
-import app.codingGround.api.admin.dto.AdminNoticeListDto;
-import app.codingGround.api.admin.dto.AdminNoticeRegisterDto;
+import app.codingGround.api.admin.dto.response.AdminNoticeListDto;
+import app.codingGround.api.admin.dto.request.AdminNoticeRegisterDto;
 import app.codingGround.api.entity.Notice;
 import app.codingGround.api.admin.repository.AdminNoticeRepository;
 import app.codingGround.api.entity.User;

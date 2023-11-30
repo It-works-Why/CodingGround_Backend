@@ -1,14 +1,12 @@
 package app.codingGround.api.user.service;
 
-import app.codingGround.api.user.dto.response.GameBadgeDto;
-import app.codingGround.api.user.dto.response.GameLanguageDto;
-import app.codingGround.api.user.dto.response.InfoDto;
-import app.codingGround.api.user.dto.response.RankingDto;
+import app.codingGround.api.user.dto.response.*;
 import app.codingGround.api.user.mapper.UserMapper;
 import app.codingGround.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -29,5 +27,18 @@ public class UserService {
     }
     public List<GameLanguageDto> getUserGameLanguage(String userId) {
         return userMapper.UserGameLanguage(userId);
+    }
+    public List<GameInfoDto> getUserGameInfo(String userId){
+        List<GameInfoDto> gameInfoList = userMapper.getUserGameInfo(userId);
+
+        for (GameInfoDto gameInfoDto : gameInfoList) {
+            String userNicknamesString = gameInfoDto.getUserNicknames();
+            String userProfileImgString = gameInfoDto.getUserProfileImgs();
+            List<String> userProfileImgList = Arrays.asList(userProfileImgString.split(","));
+            List<String> userNicknamesList = Arrays.asList(userNicknamesString.split(","));
+            gameInfoDto.setUserNicknamesList(userNicknamesList);
+            gameInfoDto.setUserProfileImgList(userProfileImgList);
+        }
+        return  gameInfoList;
     }
 }

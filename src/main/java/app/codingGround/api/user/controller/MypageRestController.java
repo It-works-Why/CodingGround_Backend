@@ -1,5 +1,6 @@
 package app.codingGround.api.user.controller;
 
+import app.codingGround.api.user.dto.response.GameRecordDto;
 import app.codingGround.api.user.dto.response.UserInfoDto;
 import app.codingGround.api.user.service.UserService;
 import app.codingGround.global.config.model.ApiResponse;
@@ -30,8 +31,17 @@ public class MypageRestController {
         userInfo.setRanking(userService.getUserRankings(userId));
         userInfo.setGameBadge(userService.getUserBadge(userId));
         userInfo.setGameLanguage(userService.getUserGameLanguage(userId));
+        userInfo.setGameInfoData(userService.getUserGameInfo(userId));
 
         return ResponseEntity.ok(new ApiResponse<>(userInfo));
+    }
+
+    @GetMapping("/gamerecord/{gamenum}")
+    public ResponseEntity<ApiResponse<GameRecordDto>>getmyrecord(@PathVariable Long gamenum) {
+        GameRecordDto gameRecord = new GameRecordDto();
+
+
+        return ResponseEntity.ok(new ApiResponse<>(gameRecord));
     }
 
 }

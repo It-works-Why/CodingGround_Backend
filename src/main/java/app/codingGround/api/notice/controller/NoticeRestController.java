@@ -1,7 +1,5 @@
 package app.codingGround.api.notice.controller;
 
-import app.codingGround.api.admin.dto.AdminNoticeListDto;
-import app.codingGround.api.admin.service.AdminNoticeService;
 import app.codingGround.api.entity.Notice;
 import app.codingGround.api.notice.dto.NoticeListDto;
 import app.codingGround.api.notice.service.NoticeService;
