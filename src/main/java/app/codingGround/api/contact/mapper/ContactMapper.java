@@ -1,6 +1,6 @@
-package app.codingGround.api.account.mapper;
+package app.codingGround.api.contact.mapper;
 
-import app.codingGround.api.account.dto.response.ContactListDto;
+import app.codingGround.api.contact.dto.response.ContactListDto;
 import app.codingGround.api.admin.dto.response.ContactDetailDto;
 import org.apache.ibatis.annotations.Mapper;
 

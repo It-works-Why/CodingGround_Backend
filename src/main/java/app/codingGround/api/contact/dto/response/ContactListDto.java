@@ -1,4 +1,4 @@
-package app.codingGround.api.account.dto.response;
+package app.codingGround.api.contact.dto.response;
 
 import lombok.Getter;
 import org.apache.ibatis.type.Alias;

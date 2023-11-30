@@ -1,9 +1,7 @@
-package app.codingGround.api.account.service;
+package app.codingGround.api.contact.service;
 
-import app.codingGround.api.account.repository.AccountRepository;
-import app.codingGround.api.account.dto.response.ContactListDto;
-import app.codingGround.api.account.mapper.ContactMapper;
-import app.codingGround.api.account.repository.ContactRepository;
+import app.codingGround.api.contact.dto.response.ContactListDto;
+import app.codingGround.api.contact.mapper.ContactMapper;
 import app.codingGround.api.admin.dto.response.ContactDetailDto;
 import app.codingGround.global.config.exception.CustomException;
 import app.codingGround.global.config.exception.ErrorCode;

@@ -1,9 +1,9 @@
 package app.codingGround.api.admin.controller;
 
-import app.codingGround.api.account.dto.response.ContactListDto;
+import app.codingGround.api.contact.dto.response.ContactListDto;
 import app.codingGround.api.admin.dto.AdminNoticeListDto;
 import app.codingGround.api.admin.dto.AdminNoticeRegisterDto;
-import app.codingGround.api.account.service.ContactService;
+import app.codingGround.api.contact.service.ContactService;
 import app.codingGround.api.admin.dto.AdminQuestionRegisterDto;
 import app.codingGround.api.admin.dto.request.ContactAnswerEditDto;
 import app.codingGround.api.admin.dto.response.ContactDetailDto;
@@ -15,7 +15,6 @@ import app.codingGround.api.admin.service.AdminNoticeService;
 import app.codingGround.api.entity.Notice;
 import app.codingGround.api.notice.service.NoticeService;
 import app.codingGround.api.entity.Question;
-import app.codingGround.api.entity.TestCase;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.model.ApiResponse;
 import io.swagger.annotations.Api;

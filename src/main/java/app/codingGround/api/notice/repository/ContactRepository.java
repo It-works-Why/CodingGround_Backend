@@ -1,4 +1,4 @@
-package app.codingGround.api.account.repository;
+package app.codingGround.api.notice.repository;
 
 import app.codingGround.api.entity.Contact;
 import org.springframework.data.jpa.repository.JpaRepository;
