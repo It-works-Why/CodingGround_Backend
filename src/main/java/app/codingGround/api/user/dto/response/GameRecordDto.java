@@ -12,6 +12,6 @@ import java.util.List;
 @Alias("GameRecordDto")
 public class GameRecordDto {
 
-
     private List<GameInfoDto> GameInfoData;
+
 }

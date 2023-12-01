@@ -1,5 +1,7 @@
 package app.codingGround.api.user.mapper;
 
+import app.codingGround.api.contact.dto.response.ContactListDto;
+import app.codingGround.api.contact.dto.response.InquiryDetailDto;
 import app.codingGround.api.user.dto.response.*;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -15,5 +17,8 @@ public interface UserMapper {
     List<GameBadgeDto> getUserBadge(String userId);
     List<GameLanguageDto> UserGameLanguage(String userId);
     List<GameInfoDto> getUserGameInfo(String userId);
+    List<GameInfoDto> getGameRecordInfo(Long gamenum);
+    List<ContactListDto> getContactList(String userId);
+    InquiryDetailDto getmyinquirydetail(Long contactNum);
 
 }

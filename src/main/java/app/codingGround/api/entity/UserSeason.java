@@ -25,14 +25,13 @@ public class UserSeason {
 
     @ManyToOne
     @JoinColumn(name = "RANK_NUM")
-    private Rank rankNum;
+    private Rank rank;
 
     @ManyToOne
     @JoinColumn(name = "SEASON_NUM")
-    private Rank seasonNum;
+    private Season season;
 
     @Column(name = "RANK_SCORE", nullable = false)
     private int rankScore;
-
 
 }

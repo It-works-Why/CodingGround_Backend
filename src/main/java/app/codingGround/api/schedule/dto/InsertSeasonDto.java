@@ -1,39 +1,44 @@
 package app.codingGround.api.schedule.dto;
 
+import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
-
+import java.time.format.DateTimeFormatter;
 
 @Getter
+@Setter
 public class InsertSeasonDto {
 
-    private Long seasonNum;
     private String seasonName;
-    private ZonedDateTime seasonStartTime;
+    private Timestamp seasonStartTime;
     private Timestamp seasonEndTime;
 
-    public InsertSeasonDto(Long seasonNum, String seasonName, Timestamp seasonStartTime, Timestamp seasonEndTime) {
-        Date date = new Date();
+    public InsertSeasonDto() {
 
-//
-//        this.seasonNum = seasonNum;
-//
-//        if (month.equals("1")) {
-//            this.seasonName = year + "-1";
-//        } else if (month.equals("4")) {
-//            this.seasonName = year + "-2";
-//        } else if (month.equals("7")) {
-//            this.seasonName = year + "-3";
-//        } else if (month.equals("10")) {
-//            this.seasonName = year + "-4";
-//        }
+        LocalDateTime nowDate = LocalDateTime.now();
+
+        DateTimeFormatter dateFormatYear =  DateTimeFormatter.ofPattern("yyyy");
+        String year = dateFormatYear.format(nowDate);
+
+        DateTimeFormatter dateFormatMonth = DateTimeFormatter.ofPattern("MM");
+        String month = dateFormatMonth.format(nowDate);
+
+        if (month.equals("1")) {
+            this.seasonName = year + "-1";
+        } else if (month.equals("4")) {
+            this.seasonName = year + "-2";
+        } else if (month.equals("7")) {
+            this.seasonName = year + "-3";
+        } else if (month.equals("10")) {
+            this.seasonName = year + "-4";
+        } else if (month.equals("12")) {
+            this.seasonName = year + "-5";
+        }
+
+        this.seasonStartTime = Timestamp.valueOf(nowDate);
+        this.seasonEndTime = Timestamp.valueOf(nowDate.plusMonths(3).minusSeconds(1));
     }
 }
