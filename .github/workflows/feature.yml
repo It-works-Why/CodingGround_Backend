@@ -35,8 +35,11 @@ jobs:
           push: false
           tags: codingground-backend:${{ steps.version.outputs.version }}
           file: ./Dockerfile
-          run: |
-            docker images
+
+      - name: Docker Image Check
+        id: Check
+        run: |
+          docker images
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
