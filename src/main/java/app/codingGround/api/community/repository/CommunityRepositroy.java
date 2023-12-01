@@ -13,4 +13,6 @@ public interface CommunityRepositroy extends JpaRepository<Community, Long> {
     Page<Community> findAllByUseStatus(Pageable pageable, int useStatuts);
 
     Community findByPostNum(Long postNum);
+
+    Page<Community> findAllByPostContentContainingAndUseStatus(Pageable pageable, String searchInput, int useStatus);
 }

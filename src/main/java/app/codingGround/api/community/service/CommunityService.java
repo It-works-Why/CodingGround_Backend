@@ -47,6 +47,10 @@ public class CommunityService {
         return communityRepositroy.findAllByUseStatus(pageable, 1);
     }
 
+    public Page<Community> getSearchCommunityList(Pageable pageable, String searchInput) {
+        return communityRepositroy.findAllByPostContentContainingAndUseStatus(pageable, searchInput, 1);
+    }
+
     public CommunityListDto getCommunityDetail(Long postNum) {
         Community community = communityRepositroy.findByPostNumAndUseStatus(postNum, 1);
         CommunityListDto communityListDto = new CommunityListDto(community);
