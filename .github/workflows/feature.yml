@@ -33,9 +33,9 @@ jobs:
         with:
           context: .
           push: false
-          tags: codingground-backend:latest
+          tags: codingground-backend:${{ steps.version.outputs.version }}
           file: ./Dockerfile
-        
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
