@@ -53,6 +53,10 @@ jobs:
         run: |
           docker tag codingground-backend:${{ steps.version.outputs.version }} ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }}
           docker tag codingground-backend:${{ steps.version.outputs.version }} ${{ env.ecr_url }}/codingground-backend:latest
-          docker images
           docker push ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }}
           docker push ${{ env.ecr_url }}/codingground-backend:latest
+
+      - name: Docker Image Check
+        id: Check
+        run: |
+          docker images
