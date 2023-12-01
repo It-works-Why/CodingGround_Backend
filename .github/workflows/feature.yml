@@ -1,9 +1,9 @@
 name: Backend build and ECR
 
 on:
-  push:
-    branches:
-    - feature
+  release:
+    types:
+    - published
       
 env:
   ecr_url: 503237308475.dkr.ecr.ca-central-1.amazonaws.com
@@ -20,7 +20,7 @@ jobs:
       - name: Get the version from Git tag
         id: version
         run: |
-          VERSION=$(git describe --tags --abbrev=0)
+          VERSION=${{ github.event.release.tag_name }}
           if [[ $VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::set-output name=version::$VERSION"
           else
