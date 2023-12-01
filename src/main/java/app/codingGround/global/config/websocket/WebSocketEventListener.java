@@ -1,6 +1,9 @@
 package app.codingGround.global.config.websocket;
 
+import app.codingGround.api.battle.service.BattleService;
 import app.codingGround.global.config.model.ChatMessage;
+import app.codingGround.global.utils.RedisUtil;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,31 +18,32 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
  * Created by rajeevkumarsingh on 25/07/17.
  */
 @Component
+@RequiredArgsConstructor
 public class WebSocketEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSocketEventListener.class);
 
-    @Autowired
-    private SimpMessageSendingOperations messagingTemplate;
+    private final SimpMessageSendingOperations messagingTemplate;
+
+    private final BattleService battleService;
 
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {
         logger.info("Received a new web socket connection");
     }
 
+
+    // 유저상태가 WAITING이면 유저를 삭제, PLAYING이면 DISCONNECT로 변경
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
-        String username = (String) headerAccessor.getSessionAttributes().get("username");
-        if(username != null) {
-            logger.info("User Disconnected : " + username);
+        String userId = (String) headerAccessor.getSessionAttributes().get("userId");
+        if(userId != null) {
+            logger.info("User Disconnected : " + userId);
+            battleService.escapeGame(userId);
 
-            ChatMessage chatMessage = new ChatMessage();
-            chatMessage.setType(ChatMessage.MessageType.LEAVE);
-            chatMessage.setSender(username);
-
-            messagingTemplate.convertAndSend("/topic/public", chatMessage);
+            messagingTemplate.convertAndSend("/topic/public/disconnect", "");
         }
     }
 }

@@ -2,7 +2,9 @@ package app.codingGround.global.utils;
 
 import app.codingGround.api.battle.dto.request.ConnectGameInfo;
 import app.codingGround.api.battle.dto.response.GameUserDto;
+import app.codingGround.api.battle.dto.response.PersonalGameDataDto;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
@@ -70,16 +72,23 @@ public class RedisUtil {
     }
 
     // 재접속 여부 판단
+    // 유저 해시 테이블이 존재하는지 확인하고, 'DISCONNECT'인지 판단후 gameId 또는 null 리턴
     public String findConnectedGame(String userId){
         Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
         jedis.auth(getRedisPassword());
 
-        Map<String, String> userKey = jedis.hgetAll(userId);
-        if(userKey.get("gameId") != null){
-            String userKeyGameStatus = userKey.get("status");
+        Map<String, String> personalGameData = jedis.hgetAll(userId);
+        if(personalGameData.get("gameId") != null){
+            String userKeyGameStatus = personalGameData.get("status");
             if(userKeyGameStatus.equals("DISCONNECT")){
-                return userKey.get("gameId");
+                if (jedis != null) {
+                    jedis.close();
+                }
+                return personalGameData.get("gameId");
             }
+        }
+        if (jedis != null) {
+            jedis.close();
         }
         return null;
     }
@@ -108,7 +117,7 @@ public class RedisUtil {
                 String gameType = gameRoom.get("gameType");
                 String gameLanguage = gameRoom.get("gameLanguage");
 
-                if ("WAITING".equals(gameStatus) && gameType.equals(connectGameInfo.getGameType()) && gameLanguage.equals(connectGameInfo.getGameLanguage())) {
+                if ("WAIT".equals(gameStatus) && gameType.equals(connectGameInfo.getGameType()) && gameLanguage.equals(connectGameInfo.getGameLanguage())) {
                     // key에 _gameRoom 제거
                     String suffixKey = removeSuffix(key, "_gameRoom");
                     if(jedis.llen(suffixKey+"_gameUsers") < Integer.parseInt(gameRoom.get("gameMaxParticipants"))){
@@ -146,10 +155,6 @@ public class RedisUtil {
         return gameId;
     }
 
-
-
-
-
     // 게임서비스를 이용중인 유저 정보 저장
     public void createUserKey(String gameId, GameUserDto gameUserDto) {
         Jedis jedis = null;
@@ -158,7 +163,7 @@ public class RedisUtil {
             jedis.auth(getRedisPassword());
             Map<String, String> userKey = new HashMap<>();
             userKey.put("gameId", gameId);
-            userKey.put("status", "DISCONNECT"); // WAITING PLAYING DISCONNECT
+            userKey.put("status", "WAITING"); // WAITING PLAYING DISCONNECT
             // GameRoom 정보를 Redis Hash에 저장
             jedis.hmset(gameUserDto.getUserId(), userKey);
         } catch (Exception e) {
@@ -178,12 +183,12 @@ public class RedisUtil {
     // 유저 참여
     public void joinGameRoom(String gameId, GameUserDto gameUserDto){
         Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
-        Map<String, String> userKey = new HashMap<>();
-
         jedis.auth(getRedisPassword());
-        jedis.rpush(gameId + "_gameUsers", gameUserDto.getGameUser("")); // 1, 2, 3, 4, 5 OR 'DEFEAT'
-        userKey.put("gameId", gameId);
-        userKey.put("status", "WAIT"); // WAIT PLAY
+
+        jedis.rpush(gameId + "_gameUsers", gameUserDto.getGameUser("DEFAULT")); // 1, 2, 3, 4, 5 OR 'DEFEAT', 'DEFAULT'
+        if (jedis != null) {
+            jedis.close();
+        }
     }
 
 
@@ -193,9 +198,11 @@ public class RedisUtil {
         Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
         jedis.auth(getRedisPassword());
         Map<String, String> userKey = jedis.hgetAll(userId);
-        String gameKey = userKey.get("gameKey");
         userKey.put("status", "PLAYING");
         jedis.hmset(userId, userKey);
+        if (jedis != null) {
+            jedis.close();
+        }
     }
 
 
@@ -206,9 +213,91 @@ public class RedisUtil {
         Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
         jedis.auth(getRedisPassword());
         jedis.del(userId);
+        if (jedis != null) {
+            jedis.close();
+        }
     }
 
+    // 게임방 사용자 수 체크 로직
+    public long getUserCount(String gameId) {
+        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        jedis.auth(getRedisPassword());
+        long result = jedis.llen(gameId+"_gameUsers");
+        if (jedis != null) {
+            jedis.close();
+        }
+        return result;
+    }
 
+    public List<GameUserDto> getGameUserDtoList(String gameId) {
+        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        jedis.auth(getRedisPassword());
+        String listKey = gameId+"_gameUsers";
+        List<GameUserDto> gameUserDtoList = GameUserDto.parseToGameUserList(jedis.lrange(listKey,0,-1).toString());
+        if (jedis != null) {
+            jedis.close();
+        }
+        return gameUserDtoList;
+    }
+
+    // 현재 게임중인 usersList에서 내가 존재하는지 AND 목록에 userGameResult가 DEFAULT 인지 확인 로직
+    // 악성유자가 gameId 를 탈취 했을때, 그방에 못들어가게하는 로직.
+    public Boolean authJoinUser(String gameId, String userId) {
+        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        jedis.auth(getRedisPassword());
+        String listKey = gameId+"_gameUsers";
+        List<GameUserDto> gameUserDtoList = GameUserDto.parseToGameUserList(jedis.lrange(listKey,0,-1).toString());
+        jedis.close();;
+        for(GameUserDto dto : gameUserDtoList){
+            if(dto.getUserId().equals(userId) && dto.getUserGameResult().equals("DEFAULT")){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public PersonalGameDataDto findGameKeyByUserId(String userId) {
+        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        jedis.auth(getRedisPassword());
+
+        Map<String, String> personalGameData = jedis.hgetAll(userId);
+        jedis.close();
+        return PersonalGameDataDto.builder()
+                .userId(userId)
+                .gameId(personalGameData.get("gameId"))
+                .status(personalGameData.get("status"))
+                .build();
+    }
+
+    public void disconnectGameFromIngame(String userId) {
+        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        jedis.auth(getRedisPassword());
+        Map<String, String> userKey = jedis.hgetAll(userId);
+        userKey.put("status", "DISCONNECT");
+        jedis.hmset(userId, userKey);
+        jedis.close();
+    }
+
+    public void allRemoveRelatedUserId(PersonalGameDataDto personalGameDataDto) {
+        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        jedis.auth(getRedisPassword());
+
+        List<GameUserDto> gameUserDtoList = getGameUserDtoList(personalGameDataDto.getGameId());
+        String gameUserDtoToString = null;
+        for(GameUserDto dto : gameUserDtoList){
+            if(dto.getUserId().equals(personalGameDataDto.getUserId())){
+                gameUserDtoToString = dto.getGameUser();
+                break;
+            }
+        }
+        jedis.lrem(personalGameDataDto.getGameId()+"_gameUsers",0,gameUserDtoToString);
+        jedis.del(personalGameDataDto.getUserId());
+        Long usersCount = jedis.llen(personalGameDataDto.getGameId()+"_gameUsers");
+        if(usersCount == 0 || usersCount == null){
+            jedis.del(personalGameDataDto.getGameId()+"_gameRoom");
+        }
+        jedis.close();
+    }
 
 
     // 탈주 (탈주처리)

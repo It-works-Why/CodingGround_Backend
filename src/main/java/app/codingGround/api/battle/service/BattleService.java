@@ -2,6 +2,7 @@ package app.codingGround.api.battle.service;
 
 import app.codingGround.api.battle.dto.request.ConnectGameInfo;
 import app.codingGround.api.battle.dto.response.GameUserDto;
+import app.codingGround.api.battle.dto.response.PersonalGameDataDto;
 import app.codingGround.api.battle.dto.response.QueueInfoDto;
 import app.codingGround.api.battle.repository.LanguageRepository;
 import app.codingGround.api.entity.Language;
@@ -43,22 +44,17 @@ public class BattleService {
                                   .profileImg(user.getUserProfileImg())
                                   .userId(userId)
                                   .build();
-        System.out.println("start");
         String isReconnect = redisUtil.findConnectedGame(user.getUserId());
         if(isReconnect != null){
-            System.out.println("재접속가능 리턴");
             return QueueInfoDto.builder().gameId(isReconnect).isReconnect(true).build();
         }
         // 여기서부터는 재접속이 필요없는 유저
         String gameId = redisUtil.findGameRoom(connectGameInfo);
-        System.out.println(gameId + "방 키임");
         if(gameId == null){
-            System.out.println("널이라서 새로만듬 방");
             gameId = redisUtil.createRoom(connectGameInfo);
         }
         redisUtil.createUserKey(gameId, gameUserDto);
         redisUtil.joinGameRoom(gameId, gameUserDto);
-        System.out.println("저장댐");
         return QueueInfoDto.builder().gameId(gameId).isReconnect(false).build();
     }
 
@@ -76,7 +72,34 @@ public class BattleService {
         return DefaultResultDto.builder().success(true).message("재접속 거절").build();
     }
 
+    public long getUserCount(String gameId) {
+        return redisUtil.getUserCount(gameId);
+    }
 
+
+    public List<GameUserDto> getGameUserDtoList(String gameId) {
+        return redisUtil.getGameUserDtoList(gameId);
+    }
+
+    public String authJoinUser(String gameId, String userId) {
+        String isSuccess = "";
+        if(redisUtil.authJoinUser(gameId, userId)) {
+            isSuccess = "succeed";
+        }else{
+            isSuccess = "failed";
+        }
+        return isSuccess;
+    }
+
+    public void escapeGame(String userId) {
+        PersonalGameDataDto personalGameDataDto = redisUtil.findGameKeyByUserId(userId);
+        if(personalGameDataDto.getStatus().equals("PLAYING")){
+            redisUtil.disconnectGameFromIngame(userId);
+        }
+        if(personalGameDataDto.getStatus().equals("WAITING")){
+            redisUtil.allRemoveRelatedUserId(personalGameDataDto);
+        }
+    }
 }
 
 

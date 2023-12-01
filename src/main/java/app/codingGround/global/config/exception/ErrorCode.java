@@ -36,7 +36,8 @@ public enum ErrorCode {
 
 
     //Battle
-    CANT_CREATE_GAME(HttpStatus.INTERNAL_SERVER_ERROR, "게임 생성을 실패했습니다.");
+    CANT_CREATE_GAME(HttpStatus.INTERNAL_SERVER_ERROR, "게임 생성을 실패했습니다."),
+    ILLEGAL_CONNECT(HttpStatus.BAD_REQUEST, "비정상적인 접근");
 
 
     private final HttpStatus status;

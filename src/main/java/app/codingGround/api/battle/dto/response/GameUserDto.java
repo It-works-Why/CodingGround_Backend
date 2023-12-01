@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 @Data
 @Builder
+@ToString
 public class GameUserDto {
     private String userId;
     private String userNickname;
@@ -20,14 +22,13 @@ public class GameUserDto {
 
 
     public String getGameUser(String userGameResult) {
-        // 1, 2, 3, 4, 5
-        String returnUser = "{userGameResult : '" + userGameResult + "', userProfileImgUrl : '"+ this.profileImg +"', userNickname : '"+ this.userNickname +"', userId= '"+ this.userId +"'}";
-        return returnUser;
-}
+        Gson gson = new Gson();
+        return gson.toJson(new GameUserDto(this.userId, this.userNickname, this.profileImg, userGameResult));
+    }
 
     public String getGameUser() {
-        String returnUser = "{userGameResult : '" + this.userGameResult + "', userProfileImgUrl : '"+ this.profileImg +"', userNickname : '"+ this.userNickname +"', userId= '"+ this.userId +"'}";
-        return returnUser;
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 
     public static List<GameUserDto> parseToGameUserList(String jsonString) {
