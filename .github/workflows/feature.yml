@@ -17,14 +17,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Get the version
+      - name: Get the version from Git tag
         id: version
         run: |
-          VERSION=$(git log -1 --pretty=%B | head -n 1)
+          VERSION=$(git describe --tags --abbrev=0)
           if [[ $VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::set-output name=version::$VERSION"
           else
-            echo "Version information not found in the commit message. Skipping build."
+            echo "Version information not found in the Git tag. Skipping build."
             exit 1
           fi
 
