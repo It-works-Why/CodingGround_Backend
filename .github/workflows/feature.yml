@@ -17,9 +17,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Get the date
-        id: date
-        run: echo "::set-output name=date::$(date +'%Y%m%d')"
+      - name: Get the version
+        id: version
+        run: |
+          VERSION=$(git log -1 --pretty=%B | head -n 1)
+          if [[ $VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::set-output name=version::$VERSION"
+          else
+            echo "Version information not found in the commit message. Skipping build."
+            exit 1
+          fi
 
       - name: Build Docker image
         uses: docker/build-push-action@v2
@@ -42,5 +49,7 @@ jobs:
 
       - name: Push Image to ECR
         run: |
-          docker tag codingground-backend:latest ${{ env.ecr_url }}/codingground-backend:${{ steps.date.outputs.date }}
-          docker push ${{ env.ecr_url }}/codingground-backend:${{ steps.date.outputs.date }}
+          docker tag codingground-backend:${{ steps.version.outputs.version }} ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }}
+          docker tag codingground-backend:latest ${{ env.ecr_url }}/codingground-backend:latest
+          docker push ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }}
+          docker push ${{ env.ecr_url }}/codingground-backend:latest
