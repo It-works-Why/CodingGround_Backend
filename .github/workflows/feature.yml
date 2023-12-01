@@ -35,7 +35,6 @@ jobs:
           push: false
           tags: |
             codingground-backend:${{ steps.version.outputs.version }}
-            codingground-backend:latest
           file: ./Dockerfile
 
       - name: Docker Image Check
@@ -50,13 +49,10 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
       - name: Push Image to ECR
         run: |
           docker tag codingground-backend:${{ steps.version.outputs.version }} ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }}
-          docker tag codingground-backend:latest ${{ env.ecr_url }}/codingground-backend:latest
+          docker tag codingground-backend:${{ steps.version.outputs.version }} ${{ env.ecr_url }}/codingground-backend:latest
+          docker images
           docker push ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }}
           docker push ${{ env.ecr_url }}/codingground-backend:latest
