@@ -48,6 +48,10 @@ jobs:
           aws-region: ${{ env.aws_region }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
           
       - name: Push Image to ECR
         run: |
@@ -55,8 +59,3 @@ jobs:
           docker tag ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }} ${{ env.ecr_url }}/codingground-backend:latest
           docker push ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }}
           docker push ${{ env.ecr_url }}/codingground-backend:latest
-
-      - name: Docker Image Check 2
-        id: Check 2
-        run: |
-          docker images
