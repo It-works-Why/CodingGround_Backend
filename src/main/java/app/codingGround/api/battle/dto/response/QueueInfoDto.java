@@ -9,5 +9,5 @@ import lombok.ToString;
 @Data
 public class QueueInfoDto {
     private String gameId;
-    private Boolean isReconnect;
+    private String connectType; // failed : 연결불가 , succeed : 연결, reConnect : 재접속 여부 선택
 }

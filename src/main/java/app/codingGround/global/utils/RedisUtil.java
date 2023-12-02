@@ -78,7 +78,6 @@ public class RedisUtil {
     }
 
 
-
     // 참가 가능한 게임방 검색 후 방 키 RETURN 없으면 NULL
     public String findGameRoom(ConnectGameInfo connectGameInfo) {
         Jedis jedis = null;
@@ -168,9 +167,6 @@ public class RedisUtil {
     }
 
 
-
-
-
     // 유저 참여
     public void joinGameRoom(String gameId, GameUserDto gameUserDto) {
         Jedis jedis = null;
@@ -183,7 +179,6 @@ public class RedisUtil {
             closeJedisInstance(jedis);
         }
     }
-
 
 
     // 재접속 수락
@@ -201,8 +196,6 @@ public class RedisUtil {
         }
 
     }
-
-
 
 
     // 재접속 거절 (탈락처리)
@@ -274,11 +267,7 @@ public class RedisUtil {
             jedis = getJedisInstance();
 
             Map<String, String> personalGameData = jedis.hgetAll(userId);
-            return PersonalGameDataDto.builder()
-                    .userId(userId)
-                    .gameId(personalGameData.get("gameId"))
-                    .status(personalGameData.get("status"))
-                    .build();
+            return PersonalGameDataDto.builder().userId(userId).gameId(personalGameData.get("gameId")).status(personalGameData.get("status")).build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -319,6 +308,24 @@ public class RedisUtil {
             if (usersCount == 0 || usersCount == null) {
                 jedis.del(personalGameDataDto.getGameId() + "_gameRoom");
             }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeJedisInstance(jedis);
+        }
+    }
+
+    public String findTryConnectSameUserId(String userId) {
+        Jedis jedis = null;
+
+        try {
+            jedis = getJedisInstance();
+            Map<String, String> userKey = jedis.hgetAll(userId);
+            String gameId = null;
+            if (userKey != null && userKey.containsKey("status") && userKey.get("status").equals("WAITING")) {
+                gameId = userKey.get("gameId");
+            }
+            return gameId;
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {

@@ -46,8 +46,15 @@ public class BattleService {
                                   .build();
         String isReconnect = redisUtil.findConnectedGame(user.getUserId());
         if(isReconnect != null){
-            return QueueInfoDto.builder().gameId(isReconnect).isReconnect(true).build();
+            return QueueInfoDto.builder().gameId(isReconnect).connectType("reConnect").build();
         }
+
+        // 큐를 잡고있는사람이 게임방 입장 할려고 할때 연결 거부
+        String isWaiting = redisUtil.findTryConnectSameUserId(userId);
+        if(isWaiting != null){
+            return QueueInfoDto.builder().gameId(isWaiting).connectType("failed").build();
+        }
+
         // 여기서부터는 재접속이 필요없는 유저
         String gameId = redisUtil.findGameRoom(connectGameInfo);
         if(gameId == null){
@@ -55,7 +62,7 @@ public class BattleService {
         }
         redisUtil.createUserKey(gameId, gameUserDto);
         redisUtil.joinGameRoom(gameId, gameUserDto);
-        return QueueInfoDto.builder().gameId(gameId).isReconnect(false).build();
+        return QueueInfoDto.builder().gameId(gameId).connectType("succeed").build();
     }
 
     public DefaultResultDto acceptReconnect(String accessToken) {
