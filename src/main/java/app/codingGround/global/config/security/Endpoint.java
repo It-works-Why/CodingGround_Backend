@@ -9,7 +9,7 @@ public enum Endpoint {
     FAIL_TEST("/api/test/fail/test"),
     BATTLE("/ws/**"),
     RANKING_LIST("/api/ranking/list"),
-    TEST("/api/battle/testtest");
+    GAME_ACCESS_TOKEN("/api/get/accessToken");
 
     private final String url;
 
