@@ -158,28 +158,37 @@ ORDER BY
 
     <select id="getContactList" resultType="ContactListDto">
         SELECT
-            c.CONTACT_NUM,
-    c.CONTACT_TITLE,
-    DATE_FORMAT(c.CONTACT_TIME, '%Y/%m/%d %H:%i') AS CONTACT_TIME,
-    u.USER_NICKNAME,
-    CASE
-        WHEN c.CONTACT_ANSWER IS NULL THEN 0
-        ELSE 1
-        END AS ANSWER_STATUS
-FROM
-    TB_CONTACT c
-        INNER JOIN
-    TB_USER u
-    ON
-        c.USER_NUM = u.USER_NUM
-CROSS JOIN (SELECT @row_number := 0) AS dummy -- 초기화
-WHERE
-    c.USE_STATUS = 1
-  AND
-    u.USER_ID =  #{userId}
-ORDER BY
-    ANSWER_STATUS ASC,
-    c.CONTACT_NUM DESC;
+            ROW_NUMBER() OVER (ORDER BY ANSWER_STATUS ASC, c.CONTACT_NUM DESC) AS NUMBER,
+                c.CONTACT_NUM,
+            c.CONTACT_TITLE,
+            DATE_FORMAT(c.CONTACT_TIME, '%Y/%m/%d %H:%i') AS CONTACT_TIME,
+            u.USER_NICKNAME,
+            CASE
+                WHEN c.CONTACT_ANSWER IS NULL THEN 0
+                ELSE 1
+                END AS ANSWER_STATUS
+        FROM
+            TB_CONTACT c
+                INNER JOIN TB_USER u ON c.USER_NUM = u.USER_NUM
+        WHERE
+            c.USE_STATUS = 1
+          AND u.USER_ID = #{userId}
+        ORDER BY
+            ANSWER_STATUS ASC,
+            c.CONTACT_NUM DESC
+            LIMIT 7 OFFSET #{postNum};
+    </select>
+
+    <select id="getPageNum" resultType="PageNumDto">
+        SELECT
+            CEIL(COUNT(*) / 7) AS TOTAL_PAGES
+        FROM
+            TB_CONTACT c
+                INNER JOIN
+            TB_USER u ON c.USER_NUM = u.USER_NUM
+        WHERE
+            c.USE_STATUS = 1
+          AND u.USER_ID = #{userId};
     </select>
 
     <select id="getmyinquirydetail" resultType="InquiryDetailDto">

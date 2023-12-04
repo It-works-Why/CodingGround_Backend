@@ -48,13 +48,16 @@ public class MypageRestController {
 
         return ResponseEntity.ok(new ApiResponse<>(gameRecord));
     }
-    @GetMapping("/myinquiry")
-    public ResponseEntity<ApiResponse<UserInquiryDto>>getmyinquiry(@RequestHeader("Authorization") String accessToken) {
+    @GetMapping("/myinquiry/{pageNum}")
+    public ResponseEntity<ApiResponse<UserInquiryDto>>getmyinquiry(@RequestHeader("Authorization") String accessToken, @PathVariable int pageNum) {
         String userId = JwtTokenProvider.getUserId(accessToken);
+        int postNum = pageNum * 7;
         UserInquiryDto userInquiry = new UserInquiryDto();
         userInquiry.setUserInfo(userService.getUserInfo(userId));
         userInquiry.setRanking(userService.getUserRankings(userId));
-        userInquiry.setContactList(userService.getContactList(userId));
+        userInquiry.setContactList(userService.getContactList(userId, postNum));
+        userInquiry.setTotalPageNum(userService.getPageNum(userId));
+        userInquiry.setPageNum(pageNum);
         return ResponseEntity.ok(new ApiResponse<>(userInquiry));
     }
 

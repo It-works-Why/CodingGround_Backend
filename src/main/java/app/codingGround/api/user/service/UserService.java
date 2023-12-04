@@ -69,9 +69,13 @@ public class UserService {
         }
         return  gameInfoList;
     }
-    public List<ContactListDto> getContactList(String userId){
-        return userMapper.getContactList(userId);
+    public List<ContactListDto> getContactList(String userId , int postNum){
+        return userMapper.getContactList(userId, postNum);
     }
+    public PageNumDto getPageNum(String userId){
+        return userMapper.getPageNum(userId);
+    }
+
 
     public InquiryDetailDto getmyinquirydetail(Long contactNum){
         InquiryDetailDto inquiryDetailDto = userMapper.getmyinquirydetail(contactNum);

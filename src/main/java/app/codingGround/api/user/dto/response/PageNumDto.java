@@ -10,12 +10,9 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@Alias("UserInquiryDto")
-public class UserInquiryDto {
+@Alias("PageNumDto")
+public class PageNumDto {
 
-    private InfoDto userInfo;
-    private List<RankingDto> ranking;
-    private List<ContactListDto> ContactList;
-    private PageNumDto totalPageNum;
-    private int pageNum;
+    private int totalPages;
+
 }
