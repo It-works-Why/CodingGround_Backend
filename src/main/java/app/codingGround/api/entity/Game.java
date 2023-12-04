@@ -33,7 +33,7 @@ public class Game {
 
 
     @Column(name = "GAME_TYPE", nullable = false)
-    private int gameType;
+    private String gameType;
 
     @PrePersist
     protected void onCreate() {

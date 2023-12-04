@@ -11,6 +11,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -25,6 +26,8 @@ public class WebConfig implements WebMvcConfigurer {
         filterRegistration.setFilter(new XssEscapeServletFilter());
         filterRegistration.setOrder(1);
         filterRegistration.addUrlPatterns("/*");
+        filterRegistration.setUrlPatterns(Arrays.asList("/mypage/record/*"));
+
         return filterRegistration;
     }
 

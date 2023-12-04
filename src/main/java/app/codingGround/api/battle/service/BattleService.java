@@ -1,18 +1,24 @@
 package app.codingGround.api.battle.service;
 
 import app.codingGround.api.battle.dto.request.ConnectGameInfo;
+import app.codingGround.api.battle.dto.response.GameDto;
 import app.codingGround.api.battle.dto.response.GameUserDto;
 import app.codingGround.api.battle.dto.response.PersonalGameDataDto;
 import app.codingGround.api.battle.dto.response.QueueInfoDto;
+import app.codingGround.api.battle.repository.GameRepository;
 import app.codingGround.api.battle.repository.LanguageRepository;
+import app.codingGround.api.entity.Game;
 import app.codingGround.api.entity.Language;
+import app.codingGround.api.entity.Season;
 import app.codingGround.api.entity.User;
+import app.codingGround.api.schedule.repository.SeasonRepository;
 import app.codingGround.api.user.repository.UserRepository;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.utils.JwtTokenProvider;
 import app.codingGround.global.utils.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,6 +28,8 @@ public class BattleService {
     //jpa
     private final LanguageRepository languageRepository;
     private final UserRepository userRepository;
+    private final SeasonRepository seasonRepository;
+    private final GameRepository gameRepository;
     private final RedisUtil redisUtil;
 
 //    userId { gameRoomId }, userId { gameRoomId }
@@ -106,6 +114,33 @@ public class BattleService {
         if(personalGameDataDto.getStatus().equals("WAITING")){
             redisUtil.allRemoveRelatedUserId(personalGameDataDto);
         }
+    }
+
+    public String getGameId(String userId) {
+        return redisUtil.getGameId(userId);
+    }
+
+    public String getGameStatus(String gameId) {
+        GameDto gameDto = redisUtil.findGameByGameId(gameId);
+        return gameDto.getGameStatus();
+    }
+
+    @Transactional
+    public void startGame(String gameId) {
+        GameDto gameDto = redisUtil.findGameByGameId(gameId);
+        Game game = new Game();
+        Language language = languageRepository.findByLanguageCode(gameDto.getGameLanguage());
+        Season season = seasonRepository.findFirstByOrderBySeasonNumDesc();
+
+        game.setGameType(gameDto.getGameType());
+        game.setLanguageNum(language);
+        game.setSeasonNum(season);
+        gameRepository.save(game);
+        gameDto.setGameNum(game.getGameNum());
+        gameDto.setGameStatus("PLAY");
+        redisUtil.updateGameData(gameDto);
+        List<GameUserDto> usersGameDtoList = redisUtil.getGameUserDtoList(gameDto.getGameId());
+        redisUtil.updateUserGameStatus(usersGameDtoList, "PLAYING", gameDto.getGameId());
     }
 }
 

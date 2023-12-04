@@ -35,11 +35,19 @@ public class BattleController {
         long userCount = gameUserDtoList.size();
         playUserInfo.setPlayUsers(gameUserDtoList);
         playUserInfo.setUserTotalCount(userCount);
+
         if(failed.equals("failed")){
             messagingTemplate.convertAndSend("/topic/public/getGameUsersData/" + failed + "/" + gameId + "/" + userId, playUserInfo);
         }else{
             messagingTemplate.convertAndSend("/topic/public/getGameUsersData/" + failed + "/" + gameId, playUserInfo);
+        }
+//      게임 타입이 WAIT 이고, 유저 인원수가 8명일때! 게임시작 전송
+        String gameStatus = battleService.getGameStatus(gameId);
+        if(gameStatus.equals("WAIT") && userCount == 2){
+            battleService.startGame(gameId);
 
+
+            messagingTemplate.convertAndSend("/topic/public/gameStart/"+gameId, true);
         }
     }
 

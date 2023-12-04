@@ -1,10 +1,10 @@
 package app.codingGround.global.utils;
 
 import app.codingGround.api.battle.dto.request.ConnectGameInfo;
+import app.codingGround.api.battle.dto.response.GameDto;
 import app.codingGround.api.battle.dto.response.GameUserDto;
 import app.codingGround.api.battle.dto.response.PersonalGameDataDto;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
@@ -139,6 +139,7 @@ public class RedisUtil {
             gameRoom.put("gameMaxParticipants", "8");
 //        gameRoom.put("gameParticipants", "0");
             gameRoom.put("gameStatus", "WAIT"); // WAIT PLAY
+            gameRoom.put("gameNum", "0");
             jedis.hmset(gameId + "_gameRoom", gameRoom);
             return gameId;
         } catch (Exception e) {
@@ -330,6 +331,78 @@ public class RedisUtil {
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
+        }
+    }
+
+    public String getGameId(String userId) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedisInstance();
+            Map<String, String> joiningGame = jedis.hgetAll(userId);
+            return joiningGame.get("gameId");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeJedisInstance(jedis);
+        }
+    }
+
+    public GameDto findGameByGameId(String gameId) {
+        Jedis jedis = null;
+
+        GameDto gameDto = null;
+        try {
+            jedis = getJedisInstance();
+            Map<String, String> game = jedis.hgetAll(gameId + "_gameRoom");
+            gameDto = new GameDto();
+            gameDto.setGameLanguage(Integer.valueOf(game.get("gameLanguage")));
+            gameDto.setGameStatus(game.get("gameStatus"));
+            gameDto.setGameRound(Integer.parseInt(game.get("gameRound")));
+            gameDto.setGameId(gameId);
+            gameDto.setGameType(game.get("gameType"));
+            gameDto.setGameNum(Long.valueOf(game.get("gameNum")));
+            gameDto.setGameMaxParticipants(Long.parseLong(game.get("gameMaxParticipants")));
+
+        } catch (NumberFormatException e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeJedisInstance(jedis);
+        }
+
+
+        return gameDto;
+    }
+
+    public void updateGameData(GameDto gameDto) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedisInstance();
+            Map<String, String> gameRoom = new HashMap<>();
+            gameRoom.put("gameId", gameDto.getGameId());
+            gameRoom.put("gameType", gameDto.getGameType());
+            gameRoom.put("gameLanguage", String.valueOf(gameDto.getGameLanguage()));
+            gameRoom.put("gameRound", String.valueOf(gameDto.getGameRound()));
+            gameRoom.put("gameMaxParticipants", String.valueOf(gameDto.getGameMaxParticipants()));
+            gameRoom.put("gameStatus", gameDto.getGameStatus()); // WAIT PLAY
+            gameRoom.put("gameNum", String.valueOf(gameDto.getGameNum()));
+            jedis.hmset(gameDto.getGameId() + "_gameRoom", gameRoom);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeJedisInstance(jedis);
+        }
+
+    }
+
+    public void updateUserGameStatus(List<GameUserDto> list, String gameStatus, String gameId) {
+        Jedis jedis = null;
+        Map<String, String> userGameInfo = null;
+        jedis = getJedisInstance();
+        for(GameUserDto dto : list){
+            userGameInfo = new HashMap<>();
+            userGameInfo.put("gameId", gameId);
+            userGameInfo.put("status", gameStatus);
+            jedis.hmset(dto.getUserId(),userGameInfo);
         }
     }
 

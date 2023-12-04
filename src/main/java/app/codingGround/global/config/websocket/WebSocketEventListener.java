@@ -1,18 +1,23 @@
 package app.codingGround.global.config.websocket;
 
 import app.codingGround.api.battle.service.BattleService;
-import app.codingGround.global.config.model.ChatMessage;
-import app.codingGround.global.utils.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.GenericMessage;
+import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.messaging.support.NativeMessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by rajeevkumarsingh on 25/07/17.
@@ -29,6 +34,21 @@ public class WebSocketEventListener {
 
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {
+//        Message<byte[]> message = event.getMessage();
+//
+//        MessageHeaderAccessor accessor = NativeMessageHeaderAccessor.getAccessor(event.getMessage(), SimpMessageHeaderAccessor.class);
+//        GenericMessage generic = (GenericMessage) accessor.getHeader("simpConnectMessage");
+//        Map nativeHeaders = (Map) generic.getHeaders().get("nativeHeaders");
+//        String gameId = (String) ((List) nativeHeaders.get("gameId")).get(0);
+//        System.out.println(gameId);
+//        System.out.println("herererererere");
+//        long totalUser = battleService.getUserCount(gameId);
+//        System.out.println(totalUser);
+//        System.out.println("hererererere");
+//        if(totalUser == 2){
+//            System.out.println("아이오옹");
+//            messagingTemplate.convertAndSend("/topic/public/gameStart/"+gameId, true);
+//        }
         logger.info("Received a new web socket connection");
     }
 
