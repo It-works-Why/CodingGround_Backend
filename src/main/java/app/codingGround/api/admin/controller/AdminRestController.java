@@ -1,6 +1,7 @@
 package app.codingGround.api.admin.controller;
 
 import app.codingGround.api.admin.dto.response.AdminQuestionListDto;
+import app.codingGround.api.admin.service.*;
 import app.codingGround.api.contact.dto.response.ContactListDto;
 import app.codingGround.api.admin.dto.response.AdminNoticeListDto;
 import app.codingGround.api.admin.dto.request.AdminNoticeRegisterDto;
@@ -9,10 +10,7 @@ import app.codingGround.api.admin.dto.request.AdminQuestionRegisterDto;
 import app.codingGround.api.admin.dto.request.ContactAnswerEditDto;
 import app.codingGround.api.admin.dto.response.ContactDetailDto;
 import app.codingGround.api.admin.dto.response.UserManageListDto;
-import app.codingGround.api.admin.service.AdminQuestionService;
-import app.codingGround.api.admin.service.ContactAnswerEditService;
-import app.codingGround.api.admin.service.UserManageService;
-import app.codingGround.api.admin.service.AdminNoticeService;
+import app.codingGround.api.entity.Community;
 import app.codingGround.api.entity.Notice;
 import app.codingGround.api.notice.service.NoticeService;
 import app.codingGround.api.entity.Question;
@@ -48,6 +46,9 @@ public class AdminRestController {
 
     // 유저관리
     private final UserManageService userManageService;
+
+    //커뮤니티
+    private final AdminCommunityService adminCommunityService;
 
     @GetMapping("/check/token")
     public ResponseEntity<ApiResponse<DefaultResultDto>> securityAdminTest() {
@@ -153,5 +154,16 @@ public class AdminRestController {
     public ResponseEntity<ApiResponse<DefaultResultDto>> deleteQuestion(@PathVariable Long questionNum) {
         return ResponseEntity.ok(new ApiResponse<>(adminQuestionService.deleteQuestion(questionNum)));
     }
+
+    //community
+
+    @GetMapping("/community/list")
+    public Page<Community> getcommunityList(
+            @PageableDefault(size = 10, sort = "postNum", direction = Sort.Direction.DESC) Pageable pageable) {
+        System.out.println("여기여기");
+        Page<Community> communityList = adminCommunityService.getcommunityList(pageable);
+        return communityList;
+    }
+
 
 }

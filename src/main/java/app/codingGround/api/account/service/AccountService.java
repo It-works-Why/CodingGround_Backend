@@ -1,6 +1,7 @@
 package app.codingGround.api.account.service;
 
 import app.codingGround.api.account.dto.request.UserRegisterDto;
+import app.codingGround.api.account.dto.response.SendEmailDto;
 import app.codingGround.api.account.dto.response.UserInfoFromToken;
 import app.codingGround.global.config.model.TokenInfo;
 import app.codingGround.api.entity.User;
@@ -96,5 +97,11 @@ public class AccountService {
                 .userNickname(user.get().getUserNickname())
                 .userRole(user.get().getUserRole())
                 .userId(userId).build();
+    }
+
+    public SendEmailDto sendEmail(String email) {
+        User user = accountRepository.findByUserEmailAndUserStatus(email, "ACTIVE");
+        SendEmailDto userDto = new SendEmailDto(user);
+        return userDto;
     }
 }
