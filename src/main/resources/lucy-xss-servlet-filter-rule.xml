@@ -56,6 +56,10 @@
             <url disable="true">/disableUrl1.do</url>
         </url-rule>
 
+        <url-rule>
+            <url disable="true">/api/mypage/gamerecord/*</url>
+        </url-rule>
+
         <!-- url disable이 false인 설정은 기본이기 때문에 불필요하다. 아래와 같은 불필요한 설정은 하지 않는다.-->
         <url-rule>
             <url disable="false">/disableUrl2.do</url>
