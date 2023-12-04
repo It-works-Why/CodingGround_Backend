@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 @Getter
 @Alias("ContactListDto")
 public class ContactListDto {
-
+    private int number;
     private Long contactNum;
     private String contactTitle;
     private String contactTime;
