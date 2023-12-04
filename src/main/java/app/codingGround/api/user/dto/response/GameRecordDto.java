@@ -13,5 +13,7 @@ import java.util.List;
 public class GameRecordDto {
 
     private List<GameInfoDto> GameInfoData;
+    private List<GameRecordRoundOneDto> gameRecordRoundOne;
+    private List<GameRecordRoundTwoDto> gameRecordRoundTwo;
 
 }
