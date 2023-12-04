@@ -40,10 +40,15 @@ public class MypageRestController {
     }
 
     @GetMapping("/gamerecord/{gamenum}")
-    public ResponseEntity<ApiResponse<GameRecordDto>>getmyrecord(@PathVariable Long gamenum) {
+    public ResponseEntity<ApiResponse<GameRecordDto>>getmyrecord(@RequestHeader("Authorization") String accessToken, @PathVariable Long gamenum) {
         GameRecordDto gameRecord = new GameRecordDto();
+        String userId = JwtTokenProvider.getUserId(accessToken);
 
         gameRecord.setGameInfoData(userService.getGameRecordInfo(gamenum));
+        gameRecord.setGameRecordRoundOne(userService.getGameRecordRoundOne(userId, gamenum));
+        gameRecord.setGameRecordRoundTwo(userService.getGameRecordRoundTwo(userId, gamenum));
+
+
 
 
         return ResponseEntity.ok(new ApiResponse<>(gameRecord));

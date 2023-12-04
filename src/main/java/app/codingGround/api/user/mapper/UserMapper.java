@@ -18,6 +18,8 @@ public interface UserMapper {
     List<GameLanguageDto> UserGameLanguage(String userId);
     List<GameInfoDto> getUserGameInfo(String userId);
     List<GameInfoDto> getGameRecordInfo(Long gamenum);
+    List<GameRecordRoundOneDto> getGameRecordRoundOne(String userId, Long gamenum);
+    List<GameRecordRoundTwoDto> getGameRecordRoundTwo(String userId, Long gamenum);
     List<ContactListDto> getContactList(String userId , int postNum);
     PageNumDto getPageNum(String userId);
     InquiryDetailDto getmyinquirydetail(Long contactNum);

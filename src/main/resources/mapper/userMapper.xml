@@ -156,6 +156,58 @@ ORDER BY
     g.GAME_DATE DESC;
     </select>
 
+    <select id="getGameRecordRoundOne" resultType="GameRecordRoundOneDto">
+        SELECT
+            G.GAME_NUM,
+            R.ROUND,
+            Q.QUESTION_TITLE,
+            Q.QUESTION_LIMIT_TIME,
+            Q.QUESTION_DIFFICULT,
+            Q.QUESTION_CONTENT,
+            RR.ROUND_RECORD_ANSWER,
+            RR.ROUND_RECORD_ANSWER_CORRECT
+        FROM
+            TB_GAME G
+                JOIN
+            TB_ROUND R ON G.GAME_NUM = R.GAME_NUM
+                JOIN
+            TB_ROUND_RECORD RR ON R.ROUND_NUM = RR.ROUND_NUM
+                JOIN
+            TB_USER U ON RR.USER_NUM = U.USER_NUM
+                JOIN
+            TB_QUESTION Q ON R.QUESTION_NUM = Q.QUESTION_NUM
+        WHERE
+            G.GAME_NUM = #{gamenum}
+          AND U.USER_ID = #{userId}
+          AND R.ROUND = 1;
+    </select>
+
+    <select id="getGameRecordRoundTwo" resultType="GameRecordRoundTwoDto">
+        SELECT
+            G.GAME_NUM,
+            R.ROUND,
+            Q.QUESTION_TITLE,
+            Q.QUESTION_LIMIT_TIME,
+            Q.QUESTION_DIFFICULT,
+            Q.QUESTION_CONTENT,
+            RR.ROUND_RECORD_ANSWER,
+            RR.ROUND_RECORD_ANSWER_CORRECT
+        FROM
+            TB_GAME G
+                JOIN
+            TB_ROUND R ON G.GAME_NUM = R.GAME_NUM
+                JOIN
+            TB_ROUND_RECORD RR ON R.ROUND_NUM = RR.ROUND_NUM
+                JOIN
+            TB_USER U ON RR.USER_NUM = U.USER_NUM
+                JOIN
+            TB_QUESTION Q ON R.QUESTION_NUM = Q.QUESTION_NUM
+        WHERE
+            G.GAME_NUM = #{gamenum}
+          AND U.USER_ID = #{userId}
+          AND R.ROUND = 2;
+    </select>
+
     <select id="getContactList" resultType="ContactListDto">
         SELECT
             ROW_NUMBER() OVER (ORDER BY ANSWER_STATUS ASC, c.CONTACT_NUM DESC) AS NUMBER,

@@ -69,6 +69,13 @@ public class UserService {
         }
         return  gameInfoList;
     }
+    public List<GameRecordRoundOneDto>getGameRecordRoundOne(String userId , Long gamenum){
+        return userMapper.getGameRecordRoundOne(userId, gamenum);
+    }
+    public List<GameRecordRoundTwoDto>getGameRecordRoundTwo(String userId , Long gamenum){
+        return userMapper.getGameRecordRoundTwo(userId, gamenum);
+    }
+
     public List<ContactListDto> getContactList(String userId , int postNum){
         return userMapper.getContactList(userId, postNum);
     }
