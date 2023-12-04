@@ -3,6 +3,8 @@ package app.codingGround.api.admin.service;
 import app.codingGround.api.account.repository.AccountRepository;
 import app.codingGround.api.admin.dto.response.AdminNoticeListDto;
 import app.codingGround.api.admin.dto.request.AdminNoticeRegisterDto;
+import app.codingGround.api.admin.repository.AdminCommunityRepository;
+import app.codingGround.api.entity.Community;
 import app.codingGround.api.entity.Notice;
 import app.codingGround.api.admin.repository.AdminNoticeRepository;
 import app.codingGround.api.entity.User;
@@ -27,6 +29,7 @@ public class AdminNoticeService {
 
     private final AdminNoticeRepository adminNoticeRepository;
     private final AccountRepository accountRepository;
+    private final AdminCommunityRepository admincommunityRepository;
 
     @Transactional
     public DefaultResultDto postNotice(String accessToken, AdminNoticeRegisterDto adminNoticeRegisterDto) {
@@ -89,4 +92,5 @@ public class AdminNoticeService {
 
         return DefaultResultDto.builder().success(true).message("글이 삭제 되었습니다.").build();
     }
+
 }
