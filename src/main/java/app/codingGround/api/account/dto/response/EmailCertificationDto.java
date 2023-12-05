@@ -4,13 +4,15 @@ import app.codingGround.api.entity.User;
 import lombok.Getter;
 import org.apache.ibatis.type.Alias;
 
+import java.util.Optional;
+
 @Getter
 @Alias("SendEmailDto")
-public class SendEmailDto {
+public class EmailCertificationDto {
 
     private String userEmail;
 
-    public SendEmailDto(User user) {
+    public EmailCertificationDto(User user) {
         this.userEmail = user.getUserEmail();
     }
 }

@@ -17,5 +17,7 @@ public interface AccountRepository extends JpaRepository<User, Long> {
 
     List<User> findAllByUserStatus(String userStaus);
 
-    User findByUserEmailAndUserStatus(String email, String userStatus);
+    User findByUserEmail(String email);
+
+    Optional<User> findByUserNickname(String userNickname);
 }
