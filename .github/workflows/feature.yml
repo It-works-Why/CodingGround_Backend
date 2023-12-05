@@ -8,9 +8,6 @@ on:
 env:
   ecr_url: 503237308475.dkr.ecr.ca-central-1.amazonaws.com
   aws_region: ca-central-1
-  GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
-  GIT_USER_NAME: ${{ secrets.GIT_USER_NAME}}
-  GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
 
 jobs:
   build:
@@ -80,9 +77,13 @@ jobs:
           ./deploy.yaml
 
       - name: Commit and push changes
+        env:
+          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GIT_USER_NAME: ${{ secrets.GIT_USER_NAME}}
+          GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
         run: |
           git config --global user.name "${GIT_USER_NAME}"
           git config --global user.email "${GIT_USER_EMAIL}"
           git add ./deploy.yaml
           git commit -m "Update image version to ${{ steps.version.outputs.version }}"
-          git push https://${GIT_TOKEN}@github.com/It-works-Why/CodingGround_ArgoCD.git
+          git push https://github.com/It-works-Why/CodingGround_ArgoCD.git
