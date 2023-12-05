@@ -30,5 +30,4 @@ public class Language {
 
     @Column(name = "LANGUAGE_CODE", nullable = false)
     private int languageCode;
-
 }

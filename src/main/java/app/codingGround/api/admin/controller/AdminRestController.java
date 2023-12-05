@@ -4,6 +4,7 @@ import app.codingGround.api.admin.dto.response.*;
 import app.codingGround.api.admin.service.*;
 import app.codingGround.api.contact.dto.response.ContactListDto;
 import app.codingGround.api.admin.dto.request.AdminNoticeRegisterDto;
+import app.codingGround.api.contact.dto.response.ContactListWithTotalPageDto;
 import app.codingGround.api.contact.service.ContactService;
 import app.codingGround.api.admin.dto.request.AdminQuestionRegisterDto;
 import app.codingGround.api.admin.dto.request.ContactAnswerEditDto;
@@ -25,6 +26,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -89,10 +92,13 @@ public class AdminRestController {
     // 관리자 문의사항 컨트롤러
     // inquiry
 
-    @GetMapping("/user/inquiry/list")
-    public List<ContactListDto> getContactList(
-            @RequestParam(name = "searchInput", defaultValue = "") String searchInput) {
-        return contactService.getContactList(searchInput);
+    @GetMapping("/user/inquiry/list/{pageNum}")
+    public ContactListWithTotalPageDto getContactList(
+            @RequestParam(name = "searchInput", defaultValue = "") String searchInput,
+            @PathVariable int pageNum) {
+        System.out.println("hegegegege");
+        System.out.println(searchInput);
+        return contactService.getContactList(searchInput, pageNum);
     }
 
     @GetMapping("/user/inquiry/detail/{contactNum}")
