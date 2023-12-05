@@ -9,7 +9,14 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AdminCommunityRepository extends JpaRepository<Community, Long> {
-    /*Community findByCommunityNumAndUseStatus(Long community, int useStatus);*/
+    Community findByPostNumAndUseStatus(Long postNum, int useStatus);
 
     Page<Community> findAllByUseStatus(Pageable pageable, int useStatus);
+
+
+    Page<Community> findAllByUseStatusAndPostTitle(Pageable pageable, int i, String keyword);
+
+    Page<Community> findAllByUseStatusAndUser_UserNickname(Pageable pageable, int i, String keyword);
+
+    Page<Community> findAllByUseStatusAndPostContent(Pageable pageable, int i, String keyword);
 }
