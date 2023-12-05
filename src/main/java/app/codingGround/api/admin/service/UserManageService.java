@@ -1,6 +1,7 @@
 package app.codingGround.api.admin.service;
 
 import app.codingGround.api.admin.dto.response.UserManageListDto;
+import app.codingGround.api.admin.dto.response.UserManageListWithTotalPageDto;
 import app.codingGround.api.admin.mapper.UserManageMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,18 @@ public class UserManageService {
 
     private final UserManageMapper userManageMapper;
 
-    public List<UserManageListDto> getUserManageList(String searchInput) {
-        return userManageMapper.getUserManageList(searchInput);
+    public UserManageListWithTotalPageDto getUserManageList(String searchInput, int pageNum) {
+
+        UserManageListWithTotalPageDto userManageListWithTotalPageDto = new UserManageListWithTotalPageDto();
+
+        if(pageNum == 0) {
+            pageNum = 1;
+        } else {
+            pageNum = (pageNum-1)*10;
+        }
+        userManageListWithTotalPageDto.setUserManageListDtoList(userManageMapper.getUserManageList(searchInput, pageNum));
+        userManageListWithTotalPageDto.setTotalPage(userManageMapper.getTotalPage(searchInput));
+
+        return userManageListWithTotalPageDto;
     }
 }

@@ -96,8 +96,6 @@ public class AdminRestController {
     public ContactListWithTotalPageDto getContactList(
             @RequestParam(name = "searchInput", defaultValue = "") String searchInput,
             @PathVariable int pageNum) {
-        System.out.println("hegegegege");
-        System.out.println(searchInput);
         return contactService.getContactList(searchInput, pageNum);
     }
 
@@ -114,10 +112,11 @@ public class AdminRestController {
     }
 
     // 관리자 유저관리 컨트롤러
-    @GetMapping("/user/list")
-    public List<UserManageListDto> getUserManageList(
-            @RequestParam(name = "searchInput", defaultValue = "") String searchInput) {
-        return userManageService.getUserManageList(searchInput);
+    @GetMapping("/user/list/{pageNum}")
+    public UserManageListWithTotalPageDto getUserManageList(
+            @RequestParam(name = "searchInput", defaultValue = "") String searchInput,
+            @PathVariable int pageNum) {
+        return userManageService.getUserManageList(searchInput, pageNum);
     }
 
     // question

@@ -4,7 +4,19 @@
 
 <mapper namespace="app.codingGround.api.admin.mapper.UserManageMapper">
     <select id="getUserManageList" resultType="UserManageListDto">
+        SELECT USER_NUM, USER_PROFILE_IMG, USER_NICKNAME, USER_EMAIL, USER_ID, USER_AFFILIATION, USER_AFFILIATION_DETAIL, USER_STATUS
+        FROM TB_USER
+        WHERE USER_ROLE = 'ADMIN'
+          AND USER_NICKNAME LIKE CONCAT('%', #{searchInput}, '%')
+        ORDER BY USER_NUM DESC
+            LIMIT 10 OFFSET #{pageNum};
+    </select>
 
+    <select id="getTotalPage" resultType="int">
+        SELECT COUNT(*) AS TOTAL_COUNT
+        FROM TB_USER
+        WHERE USER_ROLE = 'ADMIN'
+          AND USER_NICKNAME LIKE CONCAT('%', #{searchInput}, '%');
     </select>
 </mapper>
 
