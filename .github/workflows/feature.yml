@@ -55,7 +55,28 @@ jobs:
           
       - name: Push Image to ECR
         run: |
-          docker tag codingground-backend:${{ steps.version.outputs.version }} ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }}
-          docker tag ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }} ${{ env.ecr_url }}/codingground-backend:latest
+          docker tag codingground-backend:${{ steps.version.outputs.version }} \
+          ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }}
+          docker tag ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }} \
+          ${{ env.ecr_url }}/codingground-backend:latest
           docker push ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }}
           docker push ${{ env.ecr_url }}/codingground-backend:latest
+
+      - name: Update image in Kubernetes mainfest
+        run: |
+          sed -i -e \
+          "s|503237308475.dkr.ecr.ca-central-1.amazonaws.com/codingground-backend:v[0-9.]*|\
+          503237308475.dkr.ecr.ca-central-1.amazonaws.com/codingground-backend:${{steps.version.outputs.version}}|g" \
+          ./deploy.yaml
+
+      - name: Commit and push changes
+        env:
+          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GIT_USER_NAME: ${{ secrets.GIT_USER_NAME}}
+          GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
+        run: |
+          git config --global user.name "${GIT_USER_NAME}"
+          git config --global user.email "${GIT_USER_EMAIL}"
+          git add ./deploy.yaml
+          git commit -m "Update image version to ${{ steps.version.outputs.version }}"
+          git push https://${GIT_TOKEN}@github.com/It-works-Why/CodingGround_ArgoCD.git
