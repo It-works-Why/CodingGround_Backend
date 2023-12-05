@@ -23,8 +23,11 @@ public class ContactService {
     public ContactListWithTotalPageDto getContactList(String searchInput, int pageNum) {
         ContactListWithTotalPageDto contactListWithTotalPageDto = new ContactListWithTotalPageDto();
 
-        pageNum = (pageNum-1)*10;
-
+        if(pageNum == 0) {
+            pageNum = 1;
+        } else {
+            pageNum = (pageNum-1)*10;
+        }
         contactListWithTotalPageDto.setContactListDtoList(contactMapper.getContactList(searchInput, pageNum));
         contactListWithTotalPageDto.setTotalPage(contactMapper.getTotalPage(searchInput));
 
