@@ -62,6 +62,12 @@ jobs:
           docker push ${{ env.ecr_url }}/codingground-backend:${{ steps.version.outputs.version }}
           docker push ${{ env.ecr_url }}/codingground-backend:latest
 
+      - name: Checkout ArgoCD repository
+        uses: actions/checkout@v3
+        with:
+          repository: https://github.com/It-works-Why/CodingGround_ArgoCD
+          path: .
+
       - name: Update image in Kubernetes mainfest
         run: |
           sed -i -e \
