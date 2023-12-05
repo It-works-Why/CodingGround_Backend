@@ -93,6 +93,48 @@ public class AccountRestController {
             map.put("key", key);
             map.put("dto", dto);
         }
+
+        return map;
+    }
+
+    @PatchMapping("/send/password")
+    public Map sendEmailAndId(@RequestBody UserRegisterDto userRegisterDto) {
+
+        Map map = new HashMap<>();
+        EmailCertificationDto dto = accountService.getEmailAndId(userRegisterDto);
+
+        if (dto != null) {
+            Random random = new Random(); // 난수 생성을 위한 랜덤 클래스
+            String key = ""; // 인증번호 담을 String key 변수 생성
+
+            SimpleMailMessage message = new SimpleMailMessage(); // 이메일 제목, 내용 작업 메서드
+            message.setTo(userRegisterDto.getUserEmail()); // 스크립트에서 보낸 메일을 받을 사용자 이메일 주소
+
+            // 입력 키를 위한 난수 생성 코드
+            for (int i = 0; i < 3; i++) {
+                int index = random.nextInt(26) + 65;
+                key += (char) index;
+            }
+            for (int i = 0; i < 6; i++) {
+                int numIndex = random.nextInt(10);
+                key += numIndex;
+            }
+            key += "qwert@#$%!";
+
+            message.setSubject("Coding-Ground 임시 비밀번호 입니다!"); // 이메일 제목
+            String mail = "\n          안녕하세요. Coding-Ground ⚙️ 입니다. \n\n ----------------------------------------------------------------------- \n\n";
+            message.setText(mail + "            임시 비밀번호는 🌟 " + key + " 🌟 입니다."); // 이메일 내용
+
+            try {
+                accountService.sendEmail(message);
+                accountService.updatePassword(userRegisterDto.getUserEmail(), SHA256Util.encrypt(key));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            map.put("notExist", "존재하지 않는 사용자입니다.");
+        }
+
         return map;
     }
 
@@ -106,5 +148,11 @@ public class AccountRestController {
     public int checkUserNickname(@RequestBody UserRegisterDto userRegisterDto) {
         String userNickname = userRegisterDto.getUserNickname();
         return accountService.checkUserNickname(userNickname);
+    }
+
+    @PostMapping("/check/userEmail")
+    public String checkUserNickname(@RequestBody EmailCertificationDto emailCertificationDto) {
+        String userEmail = emailCertificationDto.getUserEmail();
+        return accountService.checkUserEmail(userEmail);
     }
 }

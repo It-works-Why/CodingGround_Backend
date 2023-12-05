@@ -12,6 +12,7 @@ import app.codingGround.global.config.exception.ErrorCode;
 import app.codingGround.global.utils.JwtTokenProvider;
 import app.codingGround.global.utils.SHA256Util;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,8 +22,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -137,5 +140,34 @@ public class AccountService {
         } else {
             return 0;
         }
+    }
+
+    public String checkUserEmail(String userEmail) {
+        User user = accountRepository.findByUserEmail(userEmail);
+
+        if (user == null) {
+            return null;
+        } else {
+            return user.getUserId();
+        }
+    }
+
+    public EmailCertificationDto getEmailAndId(UserRegisterDto userRegisterDto) {
+        User user = accountRepository.findByUserEmailAndUserId(userRegisterDto.getUserEmail(), userRegisterDto.getUserId());
+
+        if (user == null) {
+            return null;
+        } else {
+            EmailCertificationDto userDto = new EmailCertificationDto(user);
+            return userDto;
+        }
+    }
+
+    @Transactional
+    public void updatePassword(String userEmail, String key) {
+        User user = accountRepository.findByUserEmail(userEmail);
+        user.setUserPassword(key);
+        accountRepository.save(user);
+        log.info("here!!!! user" + user.toString());
     }
 }

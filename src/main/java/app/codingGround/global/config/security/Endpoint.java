@@ -11,8 +11,11 @@ public enum Endpoint {
     RANKING_LIST("/api/ranking/list"),
     GAME_ACCESS_TOKEN("/api/get/accessToken"),
     EMAIL_CERTIFICATION("/api/account/send/email"),
+    CHECK_USER_ID_AND_EMAIL("/api/account/send/password"),
     CHECK_USER_ID("/api/account/check/userId"),
-    CHECK_USER_NICKNAME("/api/account/check/userNickname");
+    CHECK_USER_NICKNAME("/api/account/check/userNickname"),
+    CHECK_USER_EMAIL("/api/account/check/userEmail");
+
 
     private final String url;
 
