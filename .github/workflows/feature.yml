@@ -78,7 +78,7 @@ jobs:
 
       - name: Commit and push changes
         env:
-          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GIT_USER_NAME: ${{ secrets.GIT_USER_NAME}}
           GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
         run: |
@@ -86,4 +86,4 @@ jobs:
           git config --global user.email "${GIT_USER_EMAIL}"
           git add ./deploy.yaml
           git commit -m "Update image version to ${{ steps.version.outputs.version }}"
-          git push https://github.com/It-works-Why/CodingGround_ArgoCD.git
+          git push https://${GH_TOKEN}@github.com/It-works-Why/CodingGround_ArgoCD.git
