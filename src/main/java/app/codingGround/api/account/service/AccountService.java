@@ -1,6 +1,7 @@
 package app.codingGround.api.account.service;
 
 import app.codingGround.api.account.dto.request.UserRegisterDto;
+import app.codingGround.api.account.dto.response.EditUserInfoDto;
 import app.codingGround.api.account.dto.response.EmailCertificationDto;
 import app.codingGround.api.account.dto.response.UserInfoFromToken;
 import app.codingGround.global.config.model.TokenInfo;
@@ -168,6 +169,36 @@ public class AccountService {
         User user = accountRepository.findByUserEmail(userEmail);
         user.setUserPassword(key);
         accountRepository.save(user);
-        log.info("here!!!! user" + user.toString());
+//        log.info("here!!!! user" + user.toString());
+    }
+
+    public EditUserInfoDto getUseInfoDetail(String accessToken) {
+        String userId = JwtTokenProvider.getUserId(accessToken);
+        Optional<User> user = accountRepository.findByUserId(userId);
+        EditUserInfoDto editUserInfoDto = new EditUserInfoDto(user.get());
+        return editUserInfoDto;
+    }
+
+    @Transactional
+    public int updateUserInfo(UserRegisterDto userRegisterDto) {
+        User user = accountRepository.findByUserEmail(userRegisterDto.getUserEmail());
+
+        if (userRegisterDto.getUserNickname() != null) {
+            Optional<User> userNickname = accountRepository.findByUserNickname(userRegisterDto.getUserNickname());
+            if (userNickname.isEmpty()) {
+               user.setUserNickname(userRegisterDto.getUserNickname());
+               user.setUserAffiliation(userRegisterDto.getUserAffiliation());
+               user.setUserAffiliationDetail(userRegisterDto.getUserAffiliationDetail());
+               accountRepository.save(user);
+               return 0;
+           } else {
+               return 1;
+           }
+        } else {
+            user.setUserAffiliation(userRegisterDto.getUserAffiliation());
+            user.setUserAffiliationDetail(userRegisterDto.getUserAffiliationDetail());
+            accountRepository.save(user);
+            return 0;
+        }
     }
 }

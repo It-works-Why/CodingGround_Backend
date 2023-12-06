@@ -34,8 +34,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminRestController {
 
+    // 공지사항
     private final AdminNoticeService adminNoticeService;
-    private final NoticeService noticeService;
 
     // 문의사항
     private final ContactService contactService;
@@ -53,7 +53,7 @@ public class AdminRestController {
         return ResponseEntity.ok(new ApiResponse<>(DefaultResultDto.builder().message("어드민페이지 테스트").success(true).build()));
     }
 
-    // notice
+    // 공지사항
 
     @PostMapping("/notice/register")
     public ResponseEntity<ApiResponse<DefaultResultDto>> postNotice

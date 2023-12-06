@@ -2,6 +2,7 @@ package app.codingGround.api.account.controller;
 
 import app.codingGround.api.account.dto.request.UserLoginRequestDto;
 import app.codingGround.api.account.dto.request.UserRegisterDto;
+import app.codingGround.api.account.dto.response.EditUserInfoDto;
 import app.codingGround.api.account.dto.response.EmailCertificationDto;
 import app.codingGround.api.account.dto.response.UserInfoFromToken;
 import app.codingGround.global.config.model.TokenInfo;
@@ -123,7 +124,7 @@ public class AccountRestController {
 
             message.setSubject("Coding-Ground 임시 비밀번호 입니다!"); // 이메일 제목
             String mail = "\n          안녕하세요. Coding-Ground ⚙️ 입니다. \n\n ----------------------------------------------------------------------- \n\n";
-            message.setText(mail + "            임시 비밀번호는 🌟 " + key + " 🌟 입니다."); // 이메일 내용
+            message.setText(mail + "  임시 비밀번호는 🌟 " + key + " 🌟 입니다."); // 이메일 내용
 
             try {
                 accountService.sendEmail(message);
@@ -155,4 +156,33 @@ public class AccountRestController {
         String userEmail = emailCertificationDto.getUserEmail();
         return accountService.checkUserEmail(userEmail);
     }
+
+    @GetMapping("/get/userInfoDetail")
+    public EditUserInfoDto getUserInfoDetail(@RequestHeader("Authorization") String accessToken) {
+        return accountService.getUseInfoDetail(accessToken);
+    }
+
+    @PatchMapping("/edit/password")
+    public Map editUserPassword(@RequestBody UserRegisterDto userRegisterDto) {
+        Map map = new HashMap<>();
+        accountService.updatePassword(userRegisterDto.getUserEmail(), SHA256Util.encrypt(userRegisterDto.getUserPassword()));
+
+        map.put("success", "비밀번호를 변경했습니다.");
+        return map;
+    }
+
+    @PatchMapping("/edit/myInfo")
+    public Map editUserInfo(@RequestBody UserRegisterDto userRegisterDto) {
+        Map map = new HashMap<>();
+        int result = accountService.updateUserInfo(userRegisterDto);
+
+        if (result == 1) {
+            map.put("fail", "이미 존재하는 닉네임입니다.");
+        } else {
+            map.put("success", "수정이 완료되었습니다.");
+        }
+
+        return map;
+    }
+
 }
