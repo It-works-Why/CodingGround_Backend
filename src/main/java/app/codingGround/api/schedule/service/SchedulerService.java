@@ -8,7 +8,7 @@ import app.codingGround.api.entity.UserSeason;
 import app.codingGround.api.schedule.dto.InsertSeasonDto;
 import app.codingGround.api.schedule.repository.SeasonRepository;
 import app.codingGround.api.schedule.repository.UserSeasonRepository;
-import app.codingGround.api.user.repository.RankingRepository;
+import app.codingGround.api.ranking.repository.RankingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

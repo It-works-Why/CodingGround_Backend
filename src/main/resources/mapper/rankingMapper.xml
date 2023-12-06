@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="app.codingGround.api.user.mapper.RankingMapper">
+<mapper namespace="app.codingGround.api.ranking.mapper.RankingMapper">
 
     <select id="getRankingList" resultType="RankListDto">
         SELECT
@@ -11,7 +11,61 @@
             U.USER_PROFILE_IMG,
             US.RANK_NUM,
             US.RANK_SCORE,
-            COUNT(CASE WHEN GR.GAME_RECORD IN (1, 2, 3, 4) THEN 1 END) / COUNT(GR.GAME_RECORD) * 100 AS RECORD_PERCENTAGE
+            COUNT(CASE WHEN GR.GAME_RECORD IN (1, 2, 3, 4) THEN 1 END) / COUNT(GR.GAME_RECORD) * 100 AS RECORD_PERCENTAGE,
+            US.SEASON_NUM
+        FROM
+            TB_USER U
+                JOIN TB_USER_SEASON US ON U.USER_NUM = US.USER_NUM
+                JOIN TB_GAME_RECORD GR ON U.USER_NUM = GR.USER_NUM AND US.SEASON_NUM = GR.SEASON_NUM
+        WHERE
+            US.SEASON_NUM = (SELECT MAX(SEASON_NUM) FROM TB_USER_SEASON)
+        GROUP BY
+            U.USER_NICKNAME, U.USER_PROFILE_IMG, US.RANK_NUM, US.RANK_SCORE
+        ORDER BY
+            US.RANK_SCORE DESC
+            LIMIT 10 OFFSET #{rankingPageNum};
+    </select>
+
+    <select id="getTotalPage" resultType="PageNumDto">
+        WITH RankedResults AS (
+            SELECT
+                ROW_NUMBER() OVER (ORDER BY US.RANK_SCORE DESC) AS RANK_ORDER,
+                    U.USER_NICKNAME,
+                U.USER_PROFILE_IMG,
+                US.RANK_NUM,
+                US.RANK_SCORE,
+                COUNT(CASE WHEN GR.GAME_RECORD IN (1, 2, 3, 4) THEN 1 END) / COUNT(GR.GAME_RECORD) * 100 AS RECORD_PERCENTAGE,
+                US.SEASON_NUM
+            FROM
+                TB_USER U
+                    JOIN TB_USER_SEASON US ON U.USER_NUM = US.USER_NUM
+                    JOIN TB_GAME_RECORD GR ON U.USER_NUM = GR.USER_NUM AND US.SEASON_NUM = GR.SEASON_NUM
+            WHERE
+                US.SEASON_NUM = (SELECT MAX(SEASON_NUM) FROM TB_USER_SEASON)
+            GROUP BY
+                U.USER_NICKNAME, U.USER_PROFILE_IMG, US.RANK_NUM, US.RANK_SCORE
+        )
+        SELECT
+            CEIL(COUNT(*) / 10.0) AS TOTAL_PAGES
+        FROM
+            RankedResults;
+    </select>
+
+    <select id="getSeasonList" resultType="SeasonListDto">
+        SELECT SEASON_NAME
+        FROM TB_SEASON
+        ORDER BY SEASON_START_TIME DESC;
+    </select>
+
+    <select id="getSeasonRankingList" resultType="RankListDto">
+        SELECT
+            ROW_NUMBER() OVER (ORDER BY US.RANK_SCORE DESC) AS RANK_ORDER,
+                U.USER_NICKNAME,
+            U.USER_PROFILE_IMG,
+            US.RANK_NUM,
+            US.RANK_SCORE,
+            COUNT(CASE WHEN GR.GAME_RECORD IN (1, 2, 3, 4) THEN 1 END) / COUNT(GR.GAME_RECORD) * 100 AS RECORD_PERCENTAGE,
+            US.SEASON_NUM
         FROM
             TB_USER U
                 JOIN
@@ -19,16 +73,116 @@
                 JOIN
             TB_GAME_RECORD GR ON U.USER_NUM = GR.USER_NUM AND US.SEASON_NUM = GR.SEASON_NUM
         WHERE
-                US.SEASON_NUM = (
-                SELECT
-                    MAX(SEASON_NUM)
-                FROM
-                    TB_USER_SEASON
-            )
+                US.SEASON_NUM = (SELECT SEASON_NUM FROM TB_SEASON WHERE SEASON_NAME =  #{season})
         GROUP BY
             U.USER_NICKNAME, U.USER_PROFILE_IMG, US.RANK_NUM, US.RANK_SCORE
         ORDER BY
-            US.RANK_SCORE DESC;
+            US.RANK_SCORE DESC
+        LIMIT 10 OFFSET #{rankingPageNum};
+    </select>
+    <select id="getSeasonTotalPage" resultType="PageNumDto">
+        WITH RankedResults AS (
+            SELECT
+                ROW_NUMBER() OVER (ORDER BY US.RANK_SCORE DESC) AS RANK_ORDER,
+                    U.USER_NICKNAME,
+                U.USER_PROFILE_IMG,
+                US.RANK_NUM,
+                US.RANK_SCORE,
+                COUNT(CASE WHEN GR.GAME_RECORD IN (1, 2, 3, 4) THEN 1 END) / COUNT(GR.GAME_RECORD) * 100 AS RECORD_PERCENTAGE,
+                US.SEASON_NUM
+            FROM
+                TB_USER U
+                    JOIN TB_USER_SEASON US ON U.USER_NUM = US.USER_NUM
+                    JOIN TB_GAME_RECORD GR ON U.USER_NUM = GR.USER_NUM AND US.SEASON_NUM = GR.SEASON_NUM
+            WHERE
+                US.SEASON_NUM = (SELECT MAX(SEASON_NUM) FROM TB_USER_SEASON)
+            GROUP BY
+                U.USER_NICKNAME, U.USER_PROFILE_IMG, US.RANK_NUM, US.RANK_SCORE
+        )
+        SELECT
+            CEIL(COUNT(*) / 10.0) AS TOTAL_PAGES
+        FROM
+            RankedResults;
+    </select>
+
+    <select id="getKeywordRankingList" resultType="RankListDto">
+        WITH RankedUsers AS (
+            SELECT
+                U.USER_NICKNAME,
+                U.USER_PROFILE_IMG,
+                US.RANK_NUM,
+                US.RANK_SCORE,
+                COUNT(CASE WHEN GR.GAME_RECORD IN (1, 2, 3, 4) THEN 1 END) / COUNT(GR.GAME_RECORD) * 100 AS RECORD_PERCENTAGE,
+                US.SEASON_NUM,
+                DENSE_RANK() OVER (PARTITION BY U.USER_NICKNAME ORDER BY US.RANK_SCORE DESC) AS NicknameRank
+            FROM
+                TB_USER U
+                    JOIN TB_USER_SEASON US ON U.USER_NUM = US.USER_NUM
+                    JOIN TB_GAME_RECORD GR ON U.USER_NUM = GR.USER_NUM AND US.SEASON_NUM = GR.SEASON_NUM
+            WHERE
+                    US.SEASON_NUM = (SELECT SEASON_NUM FROM TB_SEASON WHERE SEASON_NAME = #{season})
+              AND U.USER_NICKNAME LIKE '%${keyword}%'
+            GROUP BY
+                U.USER_NICKNAME, U.USER_PROFILE_IMG, US.RANK_NUM, US.RANK_SCORE, US.SEASON_NUM
+        )
+        SELECT
+            ROW_NUMBER() OVER (ORDER BY RU.RANK_SCORE DESC) AS RANK_ORDER,
+                RU.USER_NICKNAME,
+            RU.USER_PROFILE_IMG,
+            RU.RANK_NUM,
+            RU.RANK_SCORE,
+            RU.RECORD_PERCENTAGE,
+            RU.SEASON_NUM
+        FROM
+            RankedUsers RU
+        WHERE
+            RU.NicknameRank = 1
+        ORDER BY
+            RU.RANK_SCORE DESC
+            LIMIT 10 OFFSET #{rankingPageNum};
+
+    </select>
+
+    <select id="getKeywordTotalPage" resultType="PageNumDto">
+        WITH RankedResults AS (
+            WITH RankedUsers AS (
+                SELECT
+                    U.USER_NICKNAME,
+                    U.USER_PROFILE_IMG,
+                    US.RANK_NUM,
+                    US.RANK_SCORE,
+                    COUNT(CASE WHEN GR.GAME_RECORD IN (1, 2, 3, 4) THEN 1 END) / COUNT(GR.GAME_RECORD) * 100 AS RECORD_PERCENTAGE,
+                    US.SEASON_NUM,
+                    DENSE_RANK() OVER (PARTITION BY U.USER_NICKNAME ORDER BY US.RANK_SCORE DESC) AS NicknameRank
+                FROM
+                    TB_USER U
+                        JOIN TB_USER_SEASON US ON U.USER_NUM = US.USER_NUM
+                        JOIN TB_GAME_RECORD GR ON U.USER_NUM = GR.USER_NUM AND US.SEASON_NUM = GR.SEASON_NUM
+                WHERE
+                        US.SEASON_NUM = (SELECT SEASON_NUM FROM TB_SEASON WHERE SEASON_NAME = #{season})
+                  AND U.USER_NICKNAME LIKE '%${keyword}%'
+                GROUP BY
+                    U.USER_NICKNAME, U.USER_PROFILE_IMG, US.RANK_NUM, US.RANK_SCORE, US.SEASON_NUM
+            )
+            SELECT
+                ROW_NUMBER() OVER (ORDER BY RU.RANK_SCORE DESC) AS RANK_ORDER,
+                    RU.USER_NICKNAME,
+                RU.USER_PROFILE_IMG,
+                RU.RANK_NUM,
+                RU.RANK_SCORE,
+                RU.RECORD_PERCENTAGE,
+                RU.SEASON_NUM
+            FROM
+                RankedUsers RU
+            WHERE
+                RU.NicknameRank = 1
+            ORDER BY
+                RU.RANK_SCORE DESC
+        )
+        SELECT
+            CEIL(COUNT(*) / 10.0) AS TOTAL_PAGES
+        FROM
+            RankedResults;
     </select>
 
 
