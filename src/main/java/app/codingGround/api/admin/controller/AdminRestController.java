@@ -1,15 +1,13 @@
 package app.codingGround.api.admin.controller;
 
-import app.codingGround.api.admin.dto.response.AdminQuestionListDto;
+import app.codingGround.api.admin.dto.request.EditUserStatusDto;
+import app.codingGround.api.admin.dto.response.*;
 import app.codingGround.api.admin.service.*;
-import app.codingGround.api.contact.dto.response.ContactListDto;
-import app.codingGround.api.admin.dto.response.AdminNoticeListDto;
 import app.codingGround.api.admin.dto.request.AdminNoticeRegisterDto;
+import app.codingGround.api.contact.dto.response.ContactListWithTotalPageDto;
 import app.codingGround.api.contact.service.ContactService;
 import app.codingGround.api.admin.dto.request.AdminQuestionRegisterDto;
 import app.codingGround.api.admin.dto.request.ContactAnswerEditDto;
-import app.codingGround.api.admin.dto.response.ContactDetailDto;
-import app.codingGround.api.admin.dto.response.UserManageListDto;
 import app.codingGround.api.entity.Community;
 import app.codingGround.api.entity.Notice;
 import app.codingGround.api.notice.service.NoticeService;
@@ -36,8 +34,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminRestController {
 
+    // 공지사항
     private final AdminNoticeService adminNoticeService;
-    private final NoticeService noticeService;
 
     // 문의사항
     private final ContactService contactService;
@@ -55,7 +53,7 @@ public class AdminRestController {
         return ResponseEntity.ok(new ApiResponse<>(DefaultResultDto.builder().message("어드민페이지 테스트").success(true).build()));
     }
 
-    // notice
+    // 공지사항
 
     @PostMapping("/notice/register")
     public ResponseEntity<ApiResponse<DefaultResultDto>> postNotice
@@ -92,10 +90,11 @@ public class AdminRestController {
     // 관리자 문의사항 컨트롤러
     // inquiry
 
-    @GetMapping("/user/inquiry/list")
-    public List<ContactListDto> getContactList(
-            @RequestParam(name = "searchInput", defaultValue = "") String searchInput) {
-        return contactService.getContactList(searchInput);
+    @GetMapping("/user/inquiry/list/{pageNum}")
+    public ContactListWithTotalPageDto getContactList(
+            @RequestParam(name = "searchInput", defaultValue = "") String searchInput,
+            @PathVariable int pageNum) {
+        return contactService.getContactList(searchInput, pageNum);
     }
 
     @GetMapping("/user/inquiry/detail/{contactNum}")
@@ -111,10 +110,17 @@ public class AdminRestController {
     }
 
     // 관리자 유저관리 컨트롤러
-    @GetMapping("/user/list")
-    public List<UserManageListDto> getUserManageList(
-            @RequestParam(name = "searchInput", defaultValue = "") String searchInput) {
-        return userManageService.getUserManageList(searchInput);
+    @GetMapping("/user/list/{pageNum}")
+    public UserManageListWithTotalPageDto getUserManageList(
+            @RequestParam(name = "searchInput", defaultValue = "") String searchInput,
+            @PathVariable int pageNum) {
+        return userManageService.getUserManageList(searchInput, pageNum);
+    }
+
+    @PatchMapping("/user/changestatus")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> editUserStatus
+            (@RequestBody @Validated EditUserStatusDto editUserStatusDto) {
+        return ResponseEntity.ok(new ApiResponse<>(userManageService.editUserStatus(editUserStatusDto)));
     }
 
     // question
@@ -159,10 +165,26 @@ public class AdminRestController {
 
     @GetMapping("/community/list")
     public Page<Community> getcommunityList(
-            @PageableDefault(size = 10, sort = "postNum", direction = Sort.Direction.DESC) Pageable pageable) {
-        System.out.println("여기여기");
-        Page<Community> communityList = adminCommunityService.getcommunityList(pageable);
-        return communityList;
+            @PageableDefault(size = 10, sort = "postNum", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "type", required = false) String type) {
+        if (keyword == null) {
+            Page<Community> communityList = adminCommunityService.getCommunityList(pageable);
+            return communityList;
+        }else {
+            Page<Community> communityList =  adminCommunityService.getSearchCommunityList(pageable, keyword, type);
+            return communityList;
+        }
+    }
+
+    @GetMapping("/community/detail/{postNum}")
+    public AdminCommunityListDto getcommunityDetail(@PathVariable Long postNum) {
+        return adminCommunityService.getcommunityDetail(postNum);
+    }
+
+    @PatchMapping("/community/delete/{postNum}")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> deletecommunity(@PathVariable Long postNum) {
+        return ResponseEntity.ok(new ApiResponse<>(adminCommunityService.deleteCommunity(postNum)));
     }
 
 

@@ -7,5 +7,6 @@ import java.util.List;
 
 @Mapper
 public interface UserManageMapper {
-    List<UserManageListDto> getUserManageList(String searchInput);
+    List<UserManageListDto> getUserManageList(String searchInput, int pageNum);
+    int getTotalPage(String searchInput);
 }

@@ -1,7 +1,8 @@
 package app.codingGround.api.account.service;
 
 import app.codingGround.api.account.dto.request.UserRegisterDto;
-import app.codingGround.api.account.dto.response.SendEmailDto;
+import app.codingGround.api.account.dto.response.EditUserInfoDto;
+import app.codingGround.api.account.dto.response.EmailCertificationDto;
 import app.codingGround.api.account.dto.response.UserInfoFromToken;
 import app.codingGround.global.config.model.TokenInfo;
 import app.codingGround.api.entity.User;
@@ -12,6 +13,9 @@ import app.codingGround.global.config.exception.ErrorCode;
 import app.codingGround.global.utils.JwtTokenProvider;
 import app.codingGround.global.utils.SHA256Util;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -19,15 +23,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AccountService {
+
     private final AccountRepository accountRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JavaMailSender javaMailSender;
 
     @Transactional
     public TokenInfo login(String userId, String password) {
@@ -99,9 +107,98 @@ public class AccountService {
                 .userId(userId).build();
     }
 
-    public SendEmailDto sendEmail(String email) {
-        User user = accountRepository.findByUserEmailAndUserStatus(email, "ACTIVE");
-        SendEmailDto userDto = new SendEmailDto(user);
-        return userDto;
+    public EmailCertificationDto getEmail(UserRegisterDto userRegisterDto) {
+        User user = accountRepository.findByUserEmail(userRegisterDto.getUserEmail());
+
+        if (user == null) {
+            return null;
+        } else {
+            EmailCertificationDto userDto = new EmailCertificationDto(user);
+            return userDto;
+        }
+    }
+
+    public int sendEmail(SimpleMailMessage message) {
+        javaMailSender.send(message);
+        return 1;
+    }
+
+    public int checkUserId(String userId) {
+        Optional<User> user = accountRepository.findByUserId(userId);
+
+        if (user.isEmpty()) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    public int checkUserNickname(String userNickname) {
+        Optional<User> user = accountRepository.findByUserNickname(userNickname);
+
+        if (user.isEmpty()) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    public String checkUserEmail(String userEmail) {
+        User user = accountRepository.findByUserEmail(userEmail);
+
+        if (user == null) {
+            return null;
+        } else {
+            return user.getUserId();
+        }
+    }
+
+    public EmailCertificationDto getEmailAndId(UserRegisterDto userRegisterDto) {
+        User user = accountRepository.findByUserEmailAndUserId(userRegisterDto.getUserEmail(), userRegisterDto.getUserId());
+
+        if (user == null) {
+            return null;
+        } else {
+            EmailCertificationDto userDto = new EmailCertificationDto(user);
+            return userDto;
+        }
+    }
+
+    @Transactional
+    public void updatePassword(String userEmail, String key) {
+        User user = accountRepository.findByUserEmail(userEmail);
+        user.setUserPassword(key);
+        accountRepository.save(user);
+//        log.info("here!!!! user" + user.toString());
+    }
+
+    public EditUserInfoDto getUseInfoDetail(String accessToken) {
+        String userId = JwtTokenProvider.getUserId(accessToken);
+        Optional<User> user = accountRepository.findByUserId(userId);
+        EditUserInfoDto editUserInfoDto = new EditUserInfoDto(user.get());
+        return editUserInfoDto;
+    }
+
+    @Transactional
+    public int updateUserInfo(UserRegisterDto userRegisterDto) {
+        User user = accountRepository.findByUserEmail(userRegisterDto.getUserEmail());
+
+        if (userRegisterDto.getUserNickname() != null) {
+            Optional<User> userNickname = accountRepository.findByUserNickname(userRegisterDto.getUserNickname());
+            if (userNickname.isEmpty()) {
+               user.setUserNickname(userRegisterDto.getUserNickname());
+               user.setUserAffiliation(userRegisterDto.getUserAffiliation());
+               user.setUserAffiliationDetail(userRegisterDto.getUserAffiliationDetail());
+               accountRepository.save(user);
+               return 0;
+           } else {
+               return 1;
+           }
+        } else {
+            user.setUserAffiliation(userRegisterDto.getUserAffiliation());
+            user.setUserAffiliationDetail(userRegisterDto.getUserAffiliationDetail());
+            accountRepository.save(user);
+            return 0;
+        }
     }
 }

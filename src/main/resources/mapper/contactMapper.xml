@@ -24,10 +24,19 @@
         WHERE
             c.USE_STATUS = 1
           AND
-            c.CONTACT_TITLE LIKE CONCAT('%', #{saerchInput}, '%')
+            c.CONTACT_TITLE LIKE CONCAT('%', #{searchInput}, '%')
         ORDER BY
             ANSWER_STATUS ASC,
-            c.CONTACT_NUM DESC;
+            c.CONTACT_NUM DESC
+            LIMIT 10 OFFSET #{pageNum};
+    </select>
+
+    <select id="getTotalPage" resultType="int">
+        SELECT COUNT(*) AS TOTAL_PAGE
+        FROM TB_CONTACT c
+        INNER JOIN TB_USER u ON c.USER_NUM = u.USER_NUM
+        WHERE c.USE_STATUS = 1
+        AND c.CONTACT_TITLE LIKE CONCAT('%', #{saerchInput}, '%');
     </select>
 
     <select id="getContactDetail" resultType="ContactDetailDto">

@@ -29,7 +29,7 @@ public class AdminNoticeService {
 
     private final AdminNoticeRepository adminNoticeRepository;
     private final AccountRepository accountRepository;
-    private final AdminCommunityRepository admincommunityRepository;
+
 
     @Transactional
     public DefaultResultDto postNotice(String accessToken, AdminNoticeRegisterDto adminNoticeRegisterDto) {

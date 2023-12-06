@@ -1,6 +1,7 @@
 package app.codingGround.api.contact.service;
 
 import app.codingGround.api.contact.dto.response.ContactListDto;
+import app.codingGround.api.contact.dto.response.ContactListWithTotalPageDto;
 import app.codingGround.api.contact.mapper.ContactMapper;
 import app.codingGround.api.admin.dto.response.ContactDetailDto;
 import app.codingGround.global.config.exception.CustomException;
@@ -8,7 +9,10 @@ import app.codingGround.global.config.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -16,8 +20,18 @@ public class ContactService {
 
     private final ContactMapper contactMapper;
 
-    public List<ContactListDto> getContactList(String searchInput) {
-        return contactMapper.getContactList(searchInput);
+    public ContactListWithTotalPageDto getContactList(String searchInput, int pageNum) {
+        ContactListWithTotalPageDto contactListWithTotalPageDto = new ContactListWithTotalPageDto();
+
+        if(pageNum == 0) {
+            pageNum = 1;
+        } else {
+            pageNum = (pageNum-1)*10;
+        }
+        contactListWithTotalPageDto.setContactListDtoList(contactMapper.getContactList(searchInput, pageNum));
+        contactListWithTotalPageDto.setTotalPage(contactMapper.getTotalPage(searchInput));
+
+        return contactListWithTotalPageDto;
     }
 
     public ContactDetailDto getContactDetail(Long contactNum) {

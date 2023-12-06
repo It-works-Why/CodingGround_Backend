@@ -13,6 +13,7 @@ import java.util.Date;
 @Entity
 @Table(name = "TB_COMMUNITY")
 @Setter
+
 public class Community {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
