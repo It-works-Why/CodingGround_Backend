@@ -36,7 +36,6 @@ public class ProfileUploadService {
 
         String originalFilename = multipartFile.getOriginalFilename();
         String createFilename = "profile/" + UUID.randomUUID() + "." + originalFilename;
-//        String createFilename = "profile/" + UUID.randomUUID();
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());

@@ -27,16 +27,16 @@ public class SchedulerController {
         InsertSeasonDto insertSeasonDto = new InsertSeasonDto();
         LocalDateTime currentTime = LocalDateTime.now(clock);
 
-        log.info("ctrl + f 로 검색!");
-        log.info("스케쥴러 동작 중");
-        log.info("현재  시간 : " + currentTime);
-        log.info("season name : " + insertSeasonDto.getSeasonName());
-        log.info("season start time : " + insertSeasonDto.getSeasonStartTime());
-        log.info("season end time : " + insertSeasonDto.getSeasonEndTime());
+//        log.info("ctrl + f 로 검색!");
+//        log.info("스케쥴러 동작 중");
+//        log.info("현재  시간 : " + currentTime);
+//        log.info("season name : " + insertSeasonDto.getSeasonName());
+//        log.info("season start time : " + insertSeasonDto.getSeasonStartTime());
+//        log.info("season end time : " + insertSeasonDto.getSeasonEndTime());
 
         Long seasonNum = schedulerService.createSeason(insertSeasonDto);
 
-        log.info("season Num : " + seasonNum);
+//        log.info("season Num : " + seasonNum);
 
         schedulerService.createUserSeason(seasonNum);
 
