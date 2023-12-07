@@ -31,7 +31,9 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         String requestUri = httpRequest.getRequestURI();
-        if (requestUri.startsWith("/ws")) {
+        System.out.println(requestUri);
+        if (requestUri.startsWith("/ws") || requestUri.startsWith("/api/ranking")) {
+            System.out.println("왜여기 안들어옴");
             chain.doFilter(request, response); // WebSocket 요청이면 필터링 건너뛰기
             return;
         }

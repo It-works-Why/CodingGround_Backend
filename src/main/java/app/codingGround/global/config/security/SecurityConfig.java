@@ -15,6 +15,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.stream.Stream;
 
@@ -39,6 +40,7 @@ public class SecurityConfig {
                                 .map(Endpoint::getUrl)
                                 .toArray(String[]::new)
                 ).permitAll()
+                .antMatchers("/api/ranking/**").permitAll()
                 .antMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()

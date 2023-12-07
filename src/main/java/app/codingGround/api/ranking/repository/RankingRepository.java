@@ -1,4 +1,4 @@
-package app.codingGround.api.user.repository;
+package app.codingGround.api.ranking.repository;
 
 import app.codingGround.api.entity.Rank;
 import org.springframework.data.jpa.repository.JpaRepository;

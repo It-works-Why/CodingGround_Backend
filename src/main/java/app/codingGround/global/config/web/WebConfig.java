@@ -1,31 +1,32 @@
 
-// vue.js 를 사용하기때문에 lucy 사용하지않음
+
+package app.codingGround.global.config.web;
 
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-//package app.codingGround.global.config.web;
-//
-//import app.codingGround.global.config.xss.HtmlCharacterEscapes;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.navercorp.lucy.security.xss.servletfilter.XssEscapeServletFilter;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.boot.web.servlet.FilterRegistrationBean;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.http.converter.HttpMessageConverter;
-//import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-//import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-//import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-//
-//import java.util.Collections;
-//import java.util.List;
-//
-//@Configuration
-//@RequiredArgsConstructor
-//public class WebConfig implements WebMvcConfigurer {
-//
+@Configuration
+@RequiredArgsConstructor
+public class WebConfig implements WebMvcConfigurer {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**") // 모든 엔드포인트에 대해 CORS를 허용하도록 설정
+                .allowedOriginPatterns(
+                        "http://bsdev16-codingground-frontend.s3-website.ca-central-1.amazonaws.com",
+                        "http://localhost:8080"
+                )
+                .allowedMethods("GET", "POST", "PUT", "DELETE","PATCH", "get","post","put","delete","patch") // 허용할 HTTP 메소드 설정
+                .allowedHeaders("*") // 모든 헤더 허용
+                .allowCredentials(true) // 인증 정보 (쿠키, 인증 헤더 등) 전달 허용
+                .maxAge(3600); // CORS preflight 요청 결과를 캐시하는 시간 설정
+    }
+
+
 //    private final ObjectMapper objectMapper;
-//
+
 //    @Bean
 //    public FilterRegistrationBean<XssEscapeServletFilter> filterRegistrationBean() {
 //        FilterRegistrationBean<XssEscapeServletFilter> filterRegistration = new FilterRegistrationBean<>();
@@ -50,4 +51,4 @@
 //        copy.getFactory().setCharacterEscapes(new HtmlCharacterEscapes());
 //        return new MappingJackson2HttpMessageConverter();
 //    }
-//}
+}

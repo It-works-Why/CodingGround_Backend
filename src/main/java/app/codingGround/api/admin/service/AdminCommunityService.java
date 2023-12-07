@@ -27,14 +27,15 @@ public class AdminCommunityService {
         return adminCommunityRepository.findAllByUseStatus(pageable, 1);
     }
     public Page<Community> getSearchCommunityList(Pageable pageable, String keyword, String type) {
-
-        if (Objects.equals(type, "작성자")) {
-            return adminCommunityRepository.findAllByUseStatusAndUser_UserNickname(pageable, 1, keyword);
+        
+        if (Objects.equals(type, "제목")) {
+            return adminCommunityRepository.findAllByUseStatusAndPostTitleContaining(pageable, 1, keyword);
+        } else if (Objects.equals(type, "작성자")) {
+            return adminCommunityRepository.findAllByUseStatusAndUser_UserNicknameContaining(pageable, 1, keyword);
         } else if (Objects.equals(type, "내용")) {
-            return adminCommunityRepository.findAllByUseStatusAndPostContent(pageable, 1, keyword);
-        } else {
-            return adminCommunityRepository.findAllByUseStatusAndPostTitle(pageable, 1, keyword);
+            return adminCommunityRepository.findAllByUseStatusAndPostContentContaining(pageable, 1, keyword);
         }
+        return null;
     }
 
     public AdminCommunityListDto getcommunityDetail(Long postNum) {
