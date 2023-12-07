@@ -1,5 +1,7 @@
 package app.codingGround.api.account.service;
 
+import app.codingGround.api.account.dto.request.UserInfoEdit2Dto;
+import app.codingGround.api.account.dto.request.UserInfoEditDto;
 import app.codingGround.api.account.dto.request.UserRegisterDto;
 import app.codingGround.api.account.dto.response.EditUserInfoDto;
 import app.codingGround.api.account.dto.response.EmailCertificationDto;
@@ -168,26 +170,6 @@ public class AccountService {
         return 1;
     }
 
-    public int checkUserId(String userId) {
-        Optional<User> user = accountRepository.findByUserId(userId);
-
-        if (user.isEmpty()) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    public int checkUserNickname(String userNickname) {
-        Optional<User> user = accountRepository.findByUserNickname(userNickname);
-
-        if (user.isEmpty()) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
     public String checkUserEmail(String userEmail) {
         User user = accountRepository.findByUserEmail(userEmail);
 
@@ -225,25 +207,28 @@ public class AccountService {
     }
 
     @Transactional
-    public int updateUserInfo(UserRegisterDto userRegisterDto) {
-        User user = accountRepository.findByUserEmail(userRegisterDto.getUserEmail());
+    public int updateUserInfo(UserInfoEditDto userInfoEditDto) {
+        User user = accountRepository.findByUserEmail(userInfoEditDto.getUserEmail());
 
-        if (userRegisterDto.getUserNickname() != null) {
-            Optional<User> userNickname = accountRepository.findByUserNickname(userRegisterDto.getUserNickname());
-            if (userNickname.isEmpty()) {
-               user.setUserNickname(userRegisterDto.getUserNickname());
-               user.setUserAffiliation(userRegisterDto.getUserAffiliation());
-               user.setUserAffiliationDetail(userRegisterDto.getUserAffiliationDetail());
-               accountRepository.save(user);
-               return 0;
-           } else {
-               return 1;
-           }
-        } else {
-            user.setUserAffiliation(userRegisterDto.getUserAffiliation());
-            user.setUserAffiliationDetail(userRegisterDto.getUserAffiliationDetail());
+        Optional<User> userNickname = accountRepository.findByUserNickname(userInfoEditDto.getUserNickname());
+        if (userNickname.isEmpty()) {
+            user.setUserNickname(userInfoEditDto.getUserNickname());
+            user.setUserAffiliation(userInfoEditDto.getUserAffiliation());
+            user.setUserAffiliationDetail(userInfoEditDto.getUserAffiliationDetail());
             accountRepository.save(user);
             return 0;
+        } else {
+            return 1;
         }
+    }
+
+    @Transactional
+    public int updateUserInfo2(UserInfoEdit2Dto userInfoEditDto) {
+        User user = accountRepository.findByUserEmail(userInfoEditDto.getUserEmail());
+
+        user.setUserAffiliation(userInfoEditDto.getUserAffiliation());
+        user.setUserAffiliationDetail(userInfoEditDto.getUserAffiliationDetail());
+        accountRepository.save(user);
+        return 0;
     }
 }
