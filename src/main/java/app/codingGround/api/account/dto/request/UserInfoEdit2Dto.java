@@ -12,9 +12,6 @@ import javax.validation.constraints.NotNull;
 @ToString
 public class UserInfoEdit2Dto {
 
-    private String userId;
-    private String userPassword;
-    private String userNickname;
     private String userEmail;
 
     @NotNull(message = "소속을 선택해 주십시오.")
@@ -23,5 +20,4 @@ public class UserInfoEdit2Dto {
     @NotNull(message = "소속 상세는 입력해 주십시오.")
     @NotBlank(message = "소속 상세는 입력해 주십시오.")
     private String userAffiliationDetail;
-    private String userProfileImg;
 }

@@ -166,11 +166,9 @@ public class AccountRestController {
         Map map = new HashMap<>();
         int result = accountService.updateUserInfo(userInfoEditDto);
 
-        if (result == 1) {
-            map.put("fail", "이미 존재하는 닉네임입니다.");
-        } else {
-            map.put("success", "수정이 완료되었습니다.");
-        }
+        map.put("fail", "이미 존재하는 닉네임입니다.");
+        map.put("success", "수정이 완료되었습니다.");
+        map.put("result", result);
 
         return map;
     }
@@ -180,9 +178,8 @@ public class AccountRestController {
         Map map = new HashMap<>();
         int result = accountService.updateUserInfo2(userInfoEditDto);
 
-        if (result == 0) {
-            map.put("success", "수정이 완료되었습니다.");
-        }
+        map.put("success", "수정이 완료되었습니다.");
+        map.put("result", result);
 
         return map;
     }

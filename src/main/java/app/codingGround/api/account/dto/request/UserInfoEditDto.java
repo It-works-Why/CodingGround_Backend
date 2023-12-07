@@ -14,8 +14,6 @@ import javax.validation.constraints.Pattern;
 @ToString
 public class UserInfoEditDto {
 
-    private String userId;
-    private String userPassword;
 
     @NotBlank(message = "닉네임은 20자 이하, 5자이상 으로 작성 해주세요.")
     @NotNull(message = "닉네임은 20자 이하, 5자이상 으로 작성 해주세요.")
@@ -30,5 +28,5 @@ public class UserInfoEditDto {
     @NotNull(message = "소속 상세는 입력해 주십시오.")
     @NotBlank(message = "소속 상세는 입력해 주십시오.")
     private String userAffiliationDetail;
-    private String userProfileImg;
+
 }
