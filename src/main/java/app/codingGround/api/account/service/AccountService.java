@@ -147,7 +147,7 @@ public class AccountService {
         User user = accountRepository.findByUserEmail(userEmail);
 
         if (user == null) {
-            return null;
+            return "";
         } else {
             return user.getUserId();
         }

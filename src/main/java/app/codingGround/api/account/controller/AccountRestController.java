@@ -5,18 +5,20 @@ import app.codingGround.api.account.dto.request.UserRegisterDto;
 import app.codingGround.api.account.dto.response.EditUserInfoDto;
 import app.codingGround.api.account.dto.response.EmailCertificationDto;
 import app.codingGround.api.account.dto.response.UserInfoFromToken;
+import app.codingGround.api.account.service.ProfileUploadService;
 import app.codingGround.global.config.model.TokenInfo;
 import app.codingGround.api.account.service.AccountService;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.model.ApiResponse;
 import app.codingGround.global.utils.SHA256Util;
+import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +31,7 @@ import java.util.Random;
 public class AccountRestController {
 
     private final AccountService accountService;
+    private final ProfileUploadService profileUploadService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<DefaultResultDto>> register(@RequestBody @Validated UserRegisterDto userRegisterDto) {
@@ -183,6 +186,13 @@ public class AccountRestController {
         }
 
         return map;
+    }
+
+    @PostMapping("/upload/profile")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> uploadProfile(
+            @RequestParam(value = "profileImg") MultipartFile profileImg,
+            @RequestParam(value = "userEmail") String userEmail) throws IOException, java.io.IOException {
+        return ResponseEntity.ok(new ApiResponse<>(profileUploadService.uploadProfile(profileImg, userEmail)));
     }
 
 }
