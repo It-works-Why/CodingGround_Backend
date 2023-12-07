@@ -35,7 +35,8 @@ public class ProfileUploadService {
     public DefaultResultDto uploadProfile(MultipartFile multipartFile, String userEmail) throws IOException {
 
         String originalFilename = multipartFile.getOriginalFilename();
-        String createFilename = UUID.randomUUID() + "." + originalFilename;
+        String createFilename = "profile/" + UUID.randomUUID() + "." + originalFilename;
+//        String createFilename = "profile/" + UUID.randomUUID();
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());

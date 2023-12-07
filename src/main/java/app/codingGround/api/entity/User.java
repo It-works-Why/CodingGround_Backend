@@ -44,7 +44,7 @@ public class User implements UserDetails {
     @Column(name = "USER_AFFILIATION_DETAIL", length = 30, nullable = false)
     private String userAffiliationDetail;
 
-    @Column(name = "USER_PROFILE_IMG", length = 100, nullable = false)
+    @Column(name = "USER_PROFILE_IMG", length = 1000, nullable = false)
     private String userProfileImg;
 
     @Column(name = "USER_REGDATE", nullable = false)

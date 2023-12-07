@@ -83,6 +83,10 @@ public class AccountService {
             user.setUserAffiliationDetail(userRegisterDto.getUserAffiliationDetail());
             user.setUserProfileImg(userRegisterDto.getUserProfileImg());
             accountRepository.save(user);
+
+//            User user2 = accountRepository.findByUserEmail(userRegisterDto.getUserEmail());
+
+
         return DefaultResultDto.builder().success(true).message("성공").build();
     }
 
