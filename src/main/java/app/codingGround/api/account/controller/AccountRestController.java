@@ -1,22 +1,23 @@
 package app.codingGround.api.account.controller;
 
-import app.codingGround.api.account.dto.request.UserLoginRequestDto;
-import app.codingGround.api.account.dto.request.UserRegisterDto;
+import app.codingGround.api.account.dto.request.*;
 import app.codingGround.api.account.dto.response.EditUserInfoDto;
 import app.codingGround.api.account.dto.response.EmailCertificationDto;
 import app.codingGround.api.account.dto.response.UserInfoFromToken;
+import app.codingGround.api.account.service.ProfileUploadService;
 import app.codingGround.global.config.model.TokenInfo;
 import app.codingGround.api.account.service.AccountService;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.model.ApiResponse;
 import app.codingGround.global.utils.SHA256Util;
+import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.Random;
 public class AccountRestController {
 
     private final AccountService accountService;
+    private final ProfileUploadService profileUploadService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<DefaultResultDto>> register(@RequestBody @Validated UserRegisterDto userRegisterDto) {
@@ -139,18 +141,6 @@ public class AccountRestController {
         return map;
     }
 
-    @PostMapping("/check/userId")
-    public int checkUserId(@RequestBody UserRegisterDto userRegisterDto) {
-        String userId = userRegisterDto.getUserId();
-        return accountService.checkUserId(userId);
-    }
-
-    @PostMapping("/check/userNickname")
-    public int checkUserNickname(@RequestBody UserRegisterDto userRegisterDto) {
-        String userNickname = userRegisterDto.getUserNickname();
-        return accountService.checkUserNickname(userNickname);
-    }
-
     @PostMapping("/check/userEmail")
     public String checkUserNickname(@RequestBody EmailCertificationDto emailCertificationDto) {
         String userEmail = emailCertificationDto.getUserEmail();
@@ -163,26 +153,42 @@ public class AccountRestController {
     }
 
     @PatchMapping("/edit/password")
-    public Map editUserPassword(@RequestBody UserRegisterDto userRegisterDto) {
+    public Map editUserPassword(@RequestBody @Validated UserPasswordEditDto userPasswordEditDto) {
         Map map = new HashMap<>();
-        accountService.updatePassword(userRegisterDto.getUserEmail(), SHA256Util.encrypt(userRegisterDto.getUserPassword()));
+        accountService.updatePassword(userPasswordEditDto.getUserEmail(), SHA256Util.encrypt(userPasswordEditDto.getUserPassword()));
 
         map.put("success", "비밀번호를 변경했습니다.");
         return map;
     }
 
     @PatchMapping("/edit/myInfo")
-    public Map editUserInfo(@RequestBody UserRegisterDto userRegisterDto) {
+    public Map editUserInfo(@RequestBody @Validated UserInfoEditDto userInfoEditDto) {
         Map map = new HashMap<>();
-        int result = accountService.updateUserInfo(userRegisterDto);
+        int result = accountService.updateUserInfo(userInfoEditDto);
 
-        if (result == 1) {
-            map.put("fail", "이미 존재하는 닉네임입니다.");
-        } else {
-            map.put("success", "수정이 완료되었습니다.");
-        }
+        map.put("fail", "이미 존재하는 닉네임입니다.");
+        map.put("success", "수정이 완료되었습니다.");
+        map.put("result", result);
 
         return map;
+    }
+
+    @PatchMapping("/edit/myInfo2")
+    public Map editUserInfo(@RequestBody @Validated UserInfoEdit2Dto userInfoEditDto) {
+        Map map = new HashMap<>();
+        int result = accountService.updateUserInfo2(userInfoEditDto);
+
+        map.put("success", "수정이 완료되었습니다.");
+        map.put("result", result);
+
+        return map;
+    }
+
+    @PostMapping("/upload/profile")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> uploadProfile(
+            @RequestParam(value = "profileImg", required = false) MultipartFile profileImg,
+            @RequestParam(value = "userEmail", required = false) String userEmail) throws IOException, java.io.IOException {
+        return ResponseEntity.ok(new ApiResponse<>(profileUploadService.uploadProfile(profileImg, userEmail)));
     }
 
 }

@@ -14,12 +14,17 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 모든 엔드포인트에 대해 CORS를 허용하도록 설정
-                .allowedOriginPatterns("http://bsdev16-codingground-frontend.s3-website.ca-central-1.amazonaws.com") // Vue.js 애플리케이션의 도메인을 여기에 패턴으로 추가
-                .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메소드 설정
+                .allowedOriginPatterns(
+                        "http://bsdev16-codingground-frontend.s3-website.ca-central-1.amazonaws.com",
+                        "http://localhost:8080",
+                        "http://localhost:8081"
+                )
+                .allowedMethods("GET", "POST", "PUT", "DELETE","PATCH", "get","post","put","delete","patch") // 허용할 HTTP 메소드 설정
                 .allowedHeaders("*") // 모든 헤더 허용
                 .allowCredentials(true) // 인증 정보 (쿠키, 인증 헤더 등) 전달 허용
                 .maxAge(3600); // CORS preflight 요청 결과를 캐시하는 시간 설정
     }
+
 
 //    private final ObjectMapper objectMapper;
 

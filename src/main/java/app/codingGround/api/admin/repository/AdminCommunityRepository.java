@@ -14,9 +14,9 @@ public interface AdminCommunityRepository extends JpaRepository<Community, Long>
     Page<Community> findAllByUseStatus(Pageable pageable, int useStatus);
 
 
-    Page<Community> findAllByUseStatusAndPostTitle(Pageable pageable, int i, String keyword);
+    Page<Community> findAllByUseStatusAndPostTitleContaining(Pageable pageable, int i, String keyword);
 
-    Page<Community> findAllByUseStatusAndUser_UserNickname(Pageable pageable, int i, String keyword);
+    Page<Community> findAllByUseStatusAndUser_UserNicknameContaining(Pageable pageable, int i, String keyword);
 
-    Page<Community> findAllByUseStatusAndPostContent(Pageable pageable, int i, String keyword);
+    Page<Community> findAllByUseStatusAndPostContentContaining(Pageable pageable, int i, String keyword);
 }

@@ -28,7 +28,7 @@ task customJar(type: Jar) {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
@@ -80,7 +80,11 @@ dependencies {
     // websocketdas
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+    // spring mail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    // s3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }
 
 tasks.named('test') {

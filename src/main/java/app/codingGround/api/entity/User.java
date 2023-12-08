@@ -44,7 +44,7 @@ public class User implements UserDetails {
     @Column(name = "USER_AFFILIATION_DETAIL", length = 30, nullable = false)
     private String userAffiliationDetail;
 
-    @Column(name = "USER_PROFILE_IMG", length = 100, nullable = false)
+    @Column(name = "USER_PROFILE_IMG", length = 1000, nullable = false)
     private String userProfileImg;
 
     @Column(name = "USER_REGDATE", nullable = false)
@@ -93,6 +93,7 @@ public class User implements UserDetails {
         userRegDate = new Timestamp(new Date().getTime());
         userStatus = "ACTIVE";
         userRole = "USER";
+        userProfileImg = "https://bsdev16-codingground.s3.ca-central-1.amazonaws.com/asset/DefaultProfile.png";
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

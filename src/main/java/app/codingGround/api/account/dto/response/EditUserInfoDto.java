@@ -15,6 +15,7 @@ public class EditUserInfoDto {
     private String userEmail;
     private String userAffiliation;
     private String userAffiliationDetail;
+    private String userProfileImg;
 
     public EditUserInfoDto (User user) {
         this.userId = user.getUserId();
@@ -22,5 +23,6 @@ public class EditUserInfoDto {
         this.userEmail = user.getUserEmail();
         this.userAffiliation = user.getUserAffiliation();
         this.userAffiliationDetail = user.getUserAffiliationDetail();
+        this.userProfileImg = user.getUserProfileImg();
     }
 }

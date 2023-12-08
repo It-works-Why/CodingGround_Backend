@@ -1,4 +1,4 @@
-package app.codingGround.api.user.dto.response;
+package app.codingGround.api.ranking.dto.response;
 
 import lombok.*;
 import org.apache.ibatis.type.Alias;
@@ -17,4 +17,5 @@ public class RankListDto {
     private String rankNum;
     private String rankScore;
     private double recordPercentage;
+    private String seasonNum;
 }
