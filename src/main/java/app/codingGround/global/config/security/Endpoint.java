@@ -14,7 +14,8 @@ public enum Endpoint {
     CHECK_USER_ID_AND_EMAIL("/api/account/send/password"),
     CHECK_USER_ID("/api/account/check/userId"),
     CHECK_USER_NICKNAME("/api/account/check/userNickname"),
-    CHECK_USER_EMAIL("/api/account/check/userEmail");
+    CHECK_USER_EMAIL("/api/account/check/userEmail"),
+    UPLOAD_PROFILE("/api/account/upload/profile");
 
 
     private final String url;

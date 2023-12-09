@@ -40,6 +40,7 @@ public class SecurityConfig {
                                 .map(Endpoint::getUrl)
                                 .toArray(String[]::new)
                 ).permitAll()
+                .antMatchers("/api/ranking/**").permitAll()
                 .antMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
