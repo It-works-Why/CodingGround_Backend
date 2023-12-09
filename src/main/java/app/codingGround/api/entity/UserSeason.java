@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@ToString
 @Table(name = "TB_USER_SEASON")
 public class UserSeason {
 

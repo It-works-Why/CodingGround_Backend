@@ -3,6 +3,8 @@ package app.codingGround.api.admin.controller;
 import app.codingGround.api.admin.dto.request.EditUserStatusDto;
 import app.codingGround.api.admin.dto.response.*;
 import app.codingGround.api.admin.service.*;
+import app.codingGround.api.contact.dto.response.ContactListDto;
+import app.codingGround.api.admin.dto.response.AdminNoticeListDto;
 import app.codingGround.api.admin.dto.request.AdminNoticeRegisterDto;
 import app.codingGround.api.contact.dto.response.ContactListWithTotalPageDto;
 import app.codingGround.api.contact.service.ContactService;
@@ -36,6 +38,7 @@ public class AdminRestController {
 
     // 공지사항
     private final AdminNoticeService adminNoticeService;
+    private final NoticeService noticeService;
 
     // 문의사항
     private final ContactService contactService;

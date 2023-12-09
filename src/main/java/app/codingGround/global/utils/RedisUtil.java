@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Component
@@ -71,6 +73,7 @@ public class RedisUtil {
             }
             return null;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -118,6 +121,7 @@ public class RedisUtil {
                 return gameRooms.get(0);
             }
         } catch (NumberFormatException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -137,12 +141,15 @@ public class RedisUtil {
             gameRoom.put("gameLanguage", connectGameInfo.getGameLanguage());
             gameRoom.put("gameRound", "1");
             gameRoom.put("gameMaxParticipants", "8");
+            gameRoom.put("firstRoundEndTime", String.valueOf(Timestamp.valueOf(LocalDateTime.now())));
+            gameRoom.put("secondRoundEndTime", String.valueOf(Timestamp.valueOf(LocalDateTime.now())));
 //        gameRoom.put("gameParticipants", "0");
             gameRoom.put("gameStatus", "WAIT"); // WAIT PLAY
             gameRoom.put("gameNum", "0");
             jedis.hmset(gameId + "_gameRoom", gameRoom);
             return gameId;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -173,8 +180,9 @@ public class RedisUtil {
         Jedis jedis = null;
         try {
             jedis = getJedisInstance();
-            jedis.rpush(gameId + "_gameUsers", gameUserDto.getGameUser("DEFAULT")); // 1, 2, 3, 4, 5 OR 'DEFEAT', 'DEFAULT'
+            jedis.rpush(gameId + "_gameUsers", gameUserDto.getGameUser()); // 1, 2, 3, 4, 5 OR 'DEFEAT', 'DEFAULT'
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -191,6 +199,7 @@ public class RedisUtil {
             userKey.put("status", "PLAYING");
             jedis.hmset(userId, userKey);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -206,6 +215,7 @@ public class RedisUtil {
             jedis = getJedisInstance();
             jedis.del(userId);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -220,6 +230,7 @@ public class RedisUtil {
             long result = jedis.llen(gameId + "_gameUsers");
             return result;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -234,13 +245,14 @@ public class RedisUtil {
             List<GameUserDto> gameUserDtoList = GameUserDto.parseToGameUserList(jedis.lrange(listKey, 0, -1).toString());
             return gameUserDtoList;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
         }
     }
 
-    // 현재 게임중인 usersList에서 내가 존재하는지 AND 목록에 userGameResult가 DEFAULT 인지 확인 로직
+    // 현재 게임중인 usersList에서 내가 존재하는지
     // 악성유자가 gameId 를 탈취 했을때, 그방에 못들어가게하는 로직.
     public Boolean authJoinUser(String gameId, String userId) {
         Jedis jedis = null;
@@ -250,12 +262,13 @@ public class RedisUtil {
             List<GameUserDto> gameUserDtoList = GameUserDto.parseToGameUserList(jedis.lrange(listKey, 0, -1).toString());
 
             for (GameUserDto dto : gameUserDtoList) {
-                if (dto.getUserId().equals(userId) && dto.getUserGameResult().equals("DEFAULT")) {
+                if (dto.getUserId().equals(userId)) {
                     return true;
                 }
             }
             return false;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -270,6 +283,7 @@ public class RedisUtil {
             Map<String, String> personalGameData = jedis.hgetAll(userId);
             return PersonalGameDataDto.builder().userId(userId).gameId(personalGameData.get("gameId")).status(personalGameData.get("status")).build();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -284,6 +298,7 @@ public class RedisUtil {
             userKey.put("status", "DISCONNECT");
             jedis.hmset(userId, userKey);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -310,6 +325,7 @@ public class RedisUtil {
                 jedis.del(personalGameDataDto.getGameId() + "_gameRoom");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -328,6 +344,7 @@ public class RedisUtil {
             }
             return gameId;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -341,6 +358,7 @@ public class RedisUtil {
             Map<String, String> joiningGame = jedis.hgetAll(userId);
             return joiningGame.get("gameId");
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
@@ -362,20 +380,26 @@ public class RedisUtil {
             gameDto.setGameType(game.get("gameType"));
             gameDto.setGameNum(Long.valueOf(game.get("gameNum")));
             gameDto.setGameMaxParticipants(Long.parseLong(game.get("gameMaxParticipants")));
-
+            gameDto.setFirstRoundEndTime(Timestamp.valueOf(game.get("firstRoundEndTime")));
+            gameDto.setSecondRoundEndTime(Timestamp.valueOf(game.get("secondRoundEndTime")));
         } catch (NumberFormatException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
         }
-
-
         return gameDto;
     }
 
     public void updateGameData(GameDto gameDto) {
         Jedis jedis = null;
         try {
+            if(gameDto.getFirstRoundEndTime() == null){
+                gameDto.setFirstRoundEndTime(Timestamp.valueOf(LocalDateTime.now()));
+            }
+            if(gameDto.getSecondRoundEndTime() == null){
+                gameDto.setSecondRoundEndTime(Timestamp.valueOf(LocalDateTime.now()));
+            }
             jedis = getJedisInstance();
             Map<String, String> gameRoom = new HashMap<>();
             gameRoom.put("gameId", gameDto.getGameId());
@@ -385,24 +409,102 @@ public class RedisUtil {
             gameRoom.put("gameMaxParticipants", String.valueOf(gameDto.getGameMaxParticipants()));
             gameRoom.put("gameStatus", gameDto.getGameStatus()); // WAIT PLAY
             gameRoom.put("gameNum", String.valueOf(gameDto.getGameNum()));
+            gameRoom.put("firstRoundEndTime", String.valueOf(gameDto.getFirstRoundEndTime()));
+            gameRoom.put("secondRoundEndTime", String.valueOf(gameDto.getSecondRoundEndTime()));
             jedis.hmset(gameDto.getGameId() + "_gameRoom", gameRoom);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         } finally {
             closeJedisInstance(jedis);
         }
-
     }
 
     public void updateUserGameStatus(List<GameUserDto> list, String gameStatus, String gameId) {
         Jedis jedis = null;
-        Map<String, String> userGameInfo = null;
-        jedis = getJedisInstance();
-        for(GameUserDto dto : list){
-            userGameInfo = new HashMap<>();
-            userGameInfo.put("gameId", gameId);
-            userGameInfo.put("status", gameStatus);
-            jedis.hmset(dto.getUserId(),userGameInfo);
+        try {
+            Map<String, String> userGameInfo = null;
+            jedis = getJedisInstance();
+            for(GameUserDto dto : list){
+                userGameInfo = new HashMap<>();
+                userGameInfo.put("gameId", gameId);
+                userGameInfo.put("status", gameStatus);
+                jedis.hmset(dto.getUserId(),userGameInfo);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            closeJedisInstance(jedis);
+        }
+    }
+
+    public void updateUserStatus(String gameId, String userId, String number) {
+        Jedis jedis = null;
+
+        try {
+            jedis = getJedisInstance();
+            long length = jedis.llen(gameId+"_gameUsers");
+            for (long i = 0; i < length; i++) {
+                GameUserDto userDto = GameUserDto.parseToGameUser(jedis.lindex(gameId+"_gameUsers", i));
+                if(userDto.getUserId().equals(userId) && userDto.getUserGameResult().equals("DEFAULT") || userDto.getUserId().equals(userId) && userDto.getUserGameResult().equals("5")){
+                    userDto.setUserGameResult(number);
+
+                    String updateData = userDto.getGameUser();
+                    jedis.lset(gameId + "_gameUsers", i, updateData);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            closeJedisInstance(jedis);
+        }
+    }
+
+    public void updateUserStatus(String gameId, String userId, String number, String memory) {
+        Jedis jedis = null;
+        try {
+            System.out.println("u[dateUserStatus");
+            jedis = getJedisInstance();
+            long length = jedis.llen(gameId+"_gameUsers");
+            for (long i = 0; i < length; i++) {
+                GameUserDto userDto = GameUserDto.parseToGameUser(jedis.lindex(gameId+"_gameUsers", i));
+                if(userDto.getUserId().equals(userId)){
+                    userDto.setUserGameResult(number);
+                    userDto.setMemory(memory);
+                    String updateData = userDto.getGameUser();
+                    jedis.lset(gameId + "_gameUsers", i, updateData);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            closeJedisInstance(jedis);
+        }
+    }
+
+    public void updateRound(String gameId) {
+        GameDto gameDto = findGameByGameId(gameId);
+        gameDto.setGameRound(2);
+        updateGameData(gameDto);
+    }
+
+    public void removeGame(String gameId) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedisInstance();
+            List<GameUserDto> gameUserDtoList = getGameUserDtoList(gameId);
+            for (GameUserDto dto : gameUserDtoList) {
+                jedis.del(dto.getUserId());
+            }
+            jedis.del(gameId + "_gameUsers");
+            jedis.del(gameId + "_gameRoom");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeJedisInstance(jedis);
         }
     }
 

@@ -27,6 +27,10 @@ public class GameRecord {
     private Game game;
 
     @ManyToOne
+    @JoinColumn(name = "SEASON_NUM")
+    private Season season;
+
+    @ManyToOne
     @JoinColumn(name = "LANGUAGE_NUM")
     private Language language;
 

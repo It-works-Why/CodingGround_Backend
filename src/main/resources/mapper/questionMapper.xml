@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.codingGround.api.battle.mapper.QuestionMapper">
+    <select id="getQuestion" resultType="QuestionDto">
+        SELECT
+            L.LANGUAGE_CODE as languageCode,
+            L.LANGUAGE_NAME as languageName,
+            L.LANGUAGE_BASE_CODE as baseCode,
+            Q.QUESTION_TITLE as questionTitle,
+            Q.QUESTION_CONTENT as questionContent,
+            Q.QUESTION_DIFFICULT as questionDifficult,
+            Q.QUESTION_LIMIT_TIME as questionLimitTime
+        FROM
+            TB_LANGUAGE L
+                JOIN
+            TB_GAME G ON L.LANGUAGE_NUM = G.LANGUAGE_NUM
+                JOIN
+            TB_ROUND R ON G.GAME_NUM = R.GAME_NUM
+                JOIN
+            TB_QUESTION Q ON R.QUESTION_NUM = Q.QUESTION_NUM
+        WHERE
+            G.GAME_NUM = #{gameNum}
+          AND R.ROUND = #{gameRound};
+    </select>
+
+</mapper>

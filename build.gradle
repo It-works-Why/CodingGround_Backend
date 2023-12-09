@@ -80,6 +80,8 @@ dependencies {
     // websocketdas
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+    // okhttp
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
 }
 

@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface AdminTestCaseRepository extends JpaRepository<TestCase, Long> {
 
     List<TestCase> findAllByQuestion_UseStatusAndQuestion_QuestionNum(int useStatus, Long questionNum);
+
+    List<TestCase> findAllByQuestion_QuestionNum(Long questionNum);
 }
