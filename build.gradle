@@ -85,6 +85,9 @@ dependencies {
 
     // s3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    // okhttp
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 }
 
 tasks.named('test') {
