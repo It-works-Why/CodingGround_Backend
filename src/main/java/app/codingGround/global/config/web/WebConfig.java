@@ -15,6 +15,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 모든 엔드포인트에 대해 CORS를 허용하도록 설정
                 .allowedOriginPatterns(
+                        "http://k8s-backendgroup-faceca018f-1950602437.ca-central-1.elb.amazonaws.com",
+                        "https://k8s-backendgroup-faceca018f-1950602437.ca-central-1.elb.amazonaws.com",
                         "http://api.mzc-codingground.click",
                         "https://api.mzc-codingground.click",
                         "http://www.mzc-codingground.click",
