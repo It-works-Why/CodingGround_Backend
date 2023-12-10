@@ -73,7 +73,6 @@ public class MypageRestController {
 
     @PostMapping("/inquiry/register")
     public ResponseEntity<ApiResponse<DefaultResultDto>>postinquiry(@RequestHeader("Authorization") String accessToken, @RequestBody @Validated UserInquiryRegisterDto userInquiryRegisterDto) {
-        System.out.println(userInquiryRegisterDto.getInquiryContent());
         return ResponseEntity.ok(new ApiResponse<>(userService.postinquiry(accessToken, userInquiryRegisterDto)));
     }
 

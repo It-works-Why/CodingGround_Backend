@@ -7,9 +7,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @Builder
@@ -19,11 +17,12 @@ public class GameUserDto {
     private String userNickname;
     private String profileImg;
     private String userGameResult;
+    private String memory;
 
 
     public String getGameUser(String userGameResult) {
         Gson gson = new Gson();
-        return gson.toJson(new GameUserDto(this.userId, this.userNickname, this.profileImg, userGameResult));
+        return gson.toJson(new GameUserDto(this.userId, this.userNickname, this.profileImg, this.memory, userGameResult));
     }
 
     public String getGameUser() {
@@ -34,6 +33,12 @@ public class GameUserDto {
     public static List<GameUserDto> parseToGameUserList(String jsonString) {
         Gson gson = new Gson();
         Type listType = new TypeToken<List<GameUserDto>>() {}.getType();
+        return gson.fromJson(jsonString, listType);
+    }
+
+    public static GameUserDto parseToGameUser(String jsonString) {
+        Gson gson = new Gson();
+        Type listType = new TypeToken<GameUserDto>() {}.getType();
         return gson.fromJson(jsonString, listType);
     }
 

@@ -40,13 +40,10 @@ public class WebSocketEventListener {
 //        GenericMessage generic = (GenericMessage) accessor.getHeader("simpConnectMessage");
 //        Map nativeHeaders = (Map) generic.getHeaders().get("nativeHeaders");
 //        String gameId = (String) ((List) nativeHeaders.get("gameId")).get(0);
-//        System.out.println(gameId);
-//        System.out.println("herererererere");
 //        long totalUser = battleService.getUserCount(gameId);
 //        System.out.println(totalUser);
 //        System.out.println("hererererere");
 //        if(totalUser == 2){
-//            System.out.println("아이오옹");
 //            messagingTemplate.convertAndSend("/topic/public/gameStart/"+gameId, true);
 //        }
         logger.info("Received a new web socket connection");

@@ -89,6 +89,9 @@ dependencies {
     implementation 'software.amazon.awssdk:s3'
     implementation 'software.amazon.awssdk:sso'
     implementation 'software.amazon.awssdk:sts'
+
+    // okhttp
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 }
 
 tasks.named('test') {
