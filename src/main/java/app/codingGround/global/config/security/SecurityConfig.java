@@ -7,7 +7,6 @@ import app.codingGround.global.utils.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,7 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 @Configuration
@@ -26,15 +29,45 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("https://www.mzc-codingground.click");
+        config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
+        config.addAllowedHeader("*"); // 모든 헤더 허용
+        config.setAllowCredentials(true);
+
+        config.setAllowedOrigins(Arrays.asList("http://localhost:8080", "https://www.mzc-codingground.click"));
+
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "https://www.mzc-codingground.click"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors();
         http
                 .httpBasic().disable()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                // 로그인이 필요없는 URI Endpoint 에서 열거형으로 관리
                 .antMatchers(
                         Stream.of(Endpoint.values())
                                 .map(Endpoint::getUrl)
@@ -54,4 +87,6 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
+
+
 }
