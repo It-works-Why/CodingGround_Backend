@@ -272,7 +272,7 @@ public class BattleService {
                         count++;
                     }
                 } else {
-                    Jedis jedis = new Jedis("airspirk.asuscomm.com", 46379); // Redis 서버에 연결
+                    Jedis jedis = new Jedis("bsdev16-redis-test.ydfwq4.ng.0001.cac1.cache.amazonaws.com", 6379); // Redis 서버에 연결
                     jedis.auth("root");
                     String lockKey = "game_user_lock:" + gameId; // gameId에 따른 락 키 생성
                     int maxRetries = 5; // 최대 재시도 횟수
