@@ -89,9 +89,6 @@ jwt:
 # cloud
 cloud:
   aws:
-    credentials:
-      accessKey: ${AWS_ACCESS_KEY_ID}
-      secretKey: ${AWS_SECRET_ACCESS_KEY}
     s3:
       bucket: bsdev16-codingground
     region:
