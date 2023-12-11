@@ -57,7 +57,7 @@ public class Judge0Util {
         try {
             Thread.sleep(5000);
             for (String token : tokens) {
-                String url = "https://bsdev16-jugd0-lb-1b4457839ee804dc.elb.ca-central-1.amazonaws.com:2358/submissions/" + token + "?base64_encoded=false&fields=*";
+                String url = "http://bsdev16-jugd0-lb-1b4457839ee804dc.elb.ca-central-1.amazonaws.com:2358/submissions/" + token + "?base64_encoded=false&fields=*";
                 Request request = new Request.Builder().url(url).get().build();
                 Response response = client.newCall(request).execute();
                 TestCaseResultDto testCaseResultDto = TestCaseResultDto.changeTestCaseResultDto(response.body().string(), testCaseDtos.get(i));
