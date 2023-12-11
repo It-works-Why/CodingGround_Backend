@@ -3,6 +3,7 @@ spring:
     host: airspirk.asuscomm.com
     port: 46379
     password: root
+
 #  redis:
 #    host: bsdev16-codingground-redis-ydfwq4.serverless.cac1.cache.amazonaws.com
 #    port: 6379
