@@ -4,7 +4,7 @@ spring:
 #    port: 46379
 #    password: root
   redis:
-    host: bsdev16-test-redis-ydfwq4.serverless.cac1.cache.amazonaws.com
+    host: bsdev16-codingground-redis-ydfwq4.serverless.cac1.cache.amazonaws.com
     port: 6379
 #    username: bsdev16-redis-user
 #    password: projectredispassword
