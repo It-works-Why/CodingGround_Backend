@@ -50,10 +50,26 @@ public class AdminRestController {
 
     //커뮤니티
     private final AdminCommunityService adminCommunityService;
+    //gha
+    private final AdminHomeService adminHomeService;
 
     @GetMapping("/check/token")
     public ResponseEntity<ApiResponse<DefaultResultDto>> securityAdminTest() {
         return ResponseEntity.ok(new ApiResponse<>(DefaultResultDto.builder().message("어드민페이지 테스트").success(true).build()));
+    }
+
+    //홈
+    @GetMapping ("/home")
+    public ResponseEntity<ApiResponse<AdminHomeDataDto>> adminHomeData() {
+        AdminHomeDataDto adminHomeDataDto = new AdminHomeDataDto();
+
+        adminHomeDataDto.setNoAnswerCount(adminHomeService.getNoAnswerCount());
+        adminHomeDataDto.setSignUpCount(adminHomeService.getSignUpCount());
+        adminHomeDataDto.setRankGameCount(adminHomeService.getRankGameCount());
+        adminHomeDataDto.setMatchingGameCount(adminHomeService.getMatchingGameCount());
+        adminHomeDataDto.setAdminInquiryDtos(adminHomeService.getAdminInquiry());
+
+        return ResponseEntity.ok(new ApiResponse<>(adminHomeDataDto));
     }
 
     // 공지사항
