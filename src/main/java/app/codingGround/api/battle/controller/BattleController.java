@@ -1,14 +1,15 @@
 package app.codingGround.api.battle.controller;
 
-
 import app.codingGround.api.battle.dto.request.CodeData;
 import app.codingGround.api.battle.dto.response.*;
 import app.codingGround.api.battle.service.BattleService;
 import app.codingGround.api.entity.Question;
+import app.codingGround.global.config.model.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
@@ -89,6 +90,7 @@ public class BattleController {
         }
     }
 
+
     @MessageMapping("/get/question/{gameId}")
     public void getQuestion(@DestinationVariable String gameId, @Payload String userId) {
         // gameId 의 현재 라운드수, gameNum 을 redis에서 조회 후 RDS에서 조회후 리턴
@@ -116,40 +118,21 @@ public class BattleController {
         }
     }
 
-    @MessageMapping("/send/1/{gameId}")
-    public void sendCodeRound1(@DestinationVariable String gameId, @Payload CodeData codeData) {
-        ResultDto resultDto = battleService.runCode(codeData, gameId, 1);
-        List<TestCaseResultDto> testCaseResultDtos = resultDto.getTestCaseResultDtos();
-        messagingTemplate.convertAndSend("/topic/public/get/result/" + gameId + "/" + codeData.getUserId(), testCaseResultDtos);
 
-        PlayUserInfo playUserInfo = new PlayUserInfo();
-        List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
-        messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
-    }
-    @MessageMapping("/send/2/{gameId}")
-    public void sendCodeRound2(@DestinationVariable String gameId, @Payload CodeData codeData) {
-        ResultDto resultDto = battleService.runCode(codeData, gameId, 2);
-        List<TestCaseResultDto> testCaseResultDtos = resultDto.getTestCaseResultDtos();
-        messagingTemplate.convertAndSend("/topic/public/get/result/" + gameId + "/" + codeData.getUserId(), testCaseResultDtos);
+    @MessageMapping("/chat.sendMessage")
+    @SendTo("/topic/public")
+    public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
+        return chatMessage;
     }
 
-    @MessageMapping("/round1/end/{gameId}")
-    public void round1End(@DestinationVariable String gameId, @Payload String userId) {
-        Boolean isDisconnect = battleService.getFailedUser(gameId, userId);
-        if (!isDisconnect) {
-            messagingTemplate.convertAndSend("/topic/public/disconnect/user/" + gameId + "/" + userId, userId);
-        } else {
-            messagingTemplate.convertAndSend("/topic/public/round1/url/" + gameId + "/" + userId, userId);
+    @MessageMapping("/chat.addUser")
+    @SendTo("/topic/public")
+    public ChatMessage addUser(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
+        // Add username in web socket session
+        headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
+        return chatMessage;
 
-            List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
-            messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
-        }
     }
 
-    // 내 게임정보저장
-    @MessageMapping("/round2/end/{gameId}")
-        public void round2End(@DestinationVariable String gameId, @Payload String userId) {
-            String myRank = battleService.addGameRecord(gameId, userId);
-            messagingTemplate.convertAndSend("/topic/public/round2/url/" + gameId + "/" + userId, myRank);
-    }
+
 }
