@@ -32,6 +32,8 @@ public class AccountRestController {
     private final AccountService accountService;
     private final ProfileUploadService profileUploadService;
 
+    String emailKey;
+
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<DefaultResultDto>> register(@RequestBody @Validated UserRegisterDto userRegisterDto) {
         return ResponseEntity.ok(new ApiResponse<>(accountService.register(userRegisterDto)));
@@ -87,6 +89,7 @@ public class AccountRestController {
             message.setSubject("Coding-Ground 이메일 인증을 완료해주세요!"); // 이메일 제목
             String mail = "\n          안녕하세요. Coding-Ground ⚙️ 입니다. \n\n ----------------------------------------------------------------------- \n\n";
             message.setText(mail + "            인증번호는 🌟 " + key + " 🌟 입니다."); // 이메일 내용
+            emailKey = key;
 
             try {
                 accountService.sendEmail(message);
@@ -136,6 +139,19 @@ public class AccountRestController {
             }
         } else {
             map.put("notExist", "존재하지 않는 사용자입니다.");
+        }
+
+        return map;
+    }
+
+    @PostMapping("/certification/email")
+    public Map certificateEmail(@RequestBody String certificationNumber) {
+        Map map = new HashMap<>();
+
+        if (!certificationNumber.equals(emailKey)) {
+            map.put("success", "인증번호가 일치합니다.");
+        } else {
+            map.put("fail", "인증번호가 불일치합니다.");
         }
 
         return map;
