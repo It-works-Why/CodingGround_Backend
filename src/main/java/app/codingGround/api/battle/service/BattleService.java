@@ -378,7 +378,7 @@ public class BattleService {
                                 count++;
                             }
                         }
-                        if (count < 5) {
+                        if (count < 4) {
                             redisUtil.updateUserStatus(gameId, codeData.getUserId(), "5");
                             count++;
                         }
