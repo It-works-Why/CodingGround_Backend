@@ -17,7 +17,7 @@ public class Judge0Util {
     public static List<String> runCode(CodeData codeData, List<TestCaseDto> testCaseDtos) {
 
         try {
-            String url = "http://bsdev16-jugd0-lb-1b4457839ee804dc.elb.ca-central-1.amazonaws.com:2358";
+            String url = "http://bsdev16-jugd0-lb-1b4457839ee804dc.elb.ca-central-1.amazonaws.com:2358/submissions/";
             OkHttpClient client = new OkHttpClient();
             Response response = null;
             List<String> tokens = new ArrayList<>();
