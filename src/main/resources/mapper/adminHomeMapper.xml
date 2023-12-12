@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.codingGround.api.admin.mapper.AdminHomeMapper">
+    <select id="getNoAnswerCount" resultType="int">
+        SELECT COUNT(*) AS NO_ANSWER_COUNT
+        FROM TB_CONTACT
+        WHERE CONTACT_ANSWER IS NULL;
+    </select>
+
+    <select id="getSignUpCount" resultType="int">
+        SELECT COUNT(*) AS SIGN_UP_COUNT
+        FROM TB_USER
+        WHERE USER_STATUS = 'ACTIVE';
+    </select>
+    <select id="getRankGameCount" resultType="int">
+        SELECT COUNT(*) AS RANK_GAME_COUNT
+        FROM TB_GAME
+        WHERE GAME_TYPE = 'RANK';
+    </select>
+    <select id="getMatchingGameCount" resultType="int">
+        SELECT COUNT(*) AS MATCHING_GAME_COUNT
+        FROM TB_GAME
+        WHERE GAME_TYPE = 'MATCHING';
+    </select>
+    <select id="getAdminInquiry" resultType="AdminInquiryDto">
+        SELECT C.CONTACT_NUM, C.CONTACT_TITLE, C.CONTACT_TIME, U.USER_NICKNAME
+        FROM TB_CONTACT C
+                 JOIN TB_USER U ON C.USER_NUM = U.USER_NUM
+        WHERE C.CONTACT_ANSWER IS NULL
+        ORDER BY C.CONTACT_TIME DESC
+            LIMIT 5;
+
+    </select>
+
+</mapper>
