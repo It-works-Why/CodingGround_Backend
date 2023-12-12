@@ -349,12 +349,6 @@ public class BattleService {
             if (testCaseResultDtos.get(0).getIsCorrect() && testCaseResultDtos.get(1).getIsCorrect() && testCaseResultDtos.get(2).getIsCorrect()) {
                 answerCorrect = 1;
                 if (game.getGameRound() == 1) {
-                    List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoResult(gameId);
-                    for (GameUserDto dto : gameUserDtos) {
-                        if (dto.getUserGameResult().equals("5")) {
-                            count++;
-                        }
-                    }
 
                     Jedis jedis = null;
                     jedis = getJedisInstance();
@@ -377,8 +371,13 @@ public class BattleService {
                             }
                         }
                     }
-
                     if (lockResult != null) {
+                        List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoResult(gameId);
+                        for (GameUserDto dto : gameUserDtos) {
+                            if (dto.getUserGameResult().equals("5")) {
+                                count++;
+                            }
+                        }
                         if (count < 5) {
                             redisUtil.updateUserStatus(gameId, codeData.getUserId(), "5");
                             count++;
