@@ -76,7 +76,7 @@ public class BattleController {
 //      게임 타입이 WAIT 이고, 유저 인원수가 8명일때! 게임시작 전송
         String gameStatus = battleService.getGameStatus(gameId);
 
-        if (gameStatus.equals("WAIT") && userCount == 4) { // 테스트를 위해 2로 해놓음
+        if (gameStatus.equals("WAIT") && userCount == 6) { // 테스트를 위해 2로 해놓음
             battleService.startGame(gameId);
             LocalDateTime currentTime = LocalDateTime.now();
             LocalDateTime futureTime = currentTime.plusSeconds(10);

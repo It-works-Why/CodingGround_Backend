@@ -279,7 +279,6 @@ public class BattleService {
             testCaseDto.setOutput(dto.getTestCaseOutput());
             result.add(testCaseDto);
         }
-
         return result;
     }
 
@@ -329,35 +328,10 @@ public class BattleService {
                         }
                     }
 
-                    Jedis jedis = null;
-                    jedis = getJedisInstance();
-                    String lockKey = "runRock:" + gameId; // gameId에 따른 락 키 생성
-                    int maxRetries = 7; // 최대 재시도 횟수
-                    int waitTimeMs = 3000; // 재시도 간격 (5초)
-
-                    String lockResult = null;
-                    int retries = 0;
-
-                    while (lockResult == null && retries < maxRetries) {
-                        lockResult = jedis.set(lockKey, "LOCKED", SetParams.setParams().nx().ex(10)); // 락의 만료 시간을 설정합니다. (예: 10초)
-                        if (lockResult == null) {
-                            retries++;
-                            try {
-                                Thread.sleep(waitTimeMs); // 일정 시간 대기 후 재시도
-                            } catch (InterruptedException e) {
-                                Thread.currentThread().interrupt();
-                                // 스레드 인터럽트 발생 시 처리
-                            }
-                        }
-                    }
-
-                    if (lockResult != null) {
-                        if (count < 5) {
-                            redisUtil.updateUserStatus(gameId, codeData.getUserId(), "5");
-                            count++;
-                        }
-                    }
-                    closeJedisInstance(jedis);
+                if (count < 5) {
+                    redisUtil.updateUserStatus(gameId, codeData.getUserId(), "5");
+                    count++;
+                }
                 } else {
 //                        List<RoundRecord> roundRecords = roundRecordRepository.findAllByRoundNum(round);
                     List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoList(gameId);
