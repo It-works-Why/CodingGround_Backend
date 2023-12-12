@@ -105,6 +105,7 @@
             gr.GAME_NUM,
             g.GAME_TYPE,
             l.LANGUAGE_NAME,
+            l.LANGUAGE_IMG,
             CASE
                 WHEN g.GAME_DATE >= CURDATE() - INTERVAL 1 DAY THEN CONCAT(HOUR(TIMEDIFF(NOW(), g.GAME_DATE)), '시간 전')
             WHEN g.GAME_DATE >= CURDATE() - INTERVAL 7 DAY THEN CONCAT(DATEDIFF(NOW(), g.GAME_DATE), '일 전')
@@ -134,6 +135,7 @@ LIMIT 20;
         SELECT
             g.GAME_TYPE,
             l.LANGUAGE_NAME,
+            l.LANGUAGE_IMG,
             CASE
                 WHEN g.GAME_DATE >= CURDATE() - INTERVAL 1 DAY THEN CONCAT(HOUR(TIMEDIFF(NOW(), g.GAME_DATE)), '시간 전')
             WHEN g.GAME_DATE >= CURDATE() - INTERVAL 7 DAY THEN CONCAT(DATEDIFF(NOW(), g.GAME_DATE), '일 전')
