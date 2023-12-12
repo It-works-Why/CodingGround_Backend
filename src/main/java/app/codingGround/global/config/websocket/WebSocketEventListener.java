@@ -1,5 +1,6 @@
 package app.codingGround.global.config.websocket;
 
+import app.codingGround.api.battle.dto.response.GameUserDto;
 import app.codingGround.api.battle.service.BattleService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -41,8 +42,6 @@ public class WebSocketEventListener {
 //        Map nativeHeaders = (Map) generic.getHeaders().get("nativeHeaders");
 //        String gameId = (String) ((List) nativeHeaders.get("gameId")).get(0);
 //        long totalUser = battleService.getUserCount(gameId);
-//        System.out.println(totalUser);
-//        System.out.println("hererererere");
 //        if(totalUser == 2){
 //            messagingTemplate.convertAndSend("/topic/public/gameStart/"+gameId, true);
 //        }
@@ -59,8 +58,11 @@ public class WebSocketEventListener {
         if(userId != null) {
             logger.info("User Disconnected : " + userId);
             battleService.escapeGame(userId);
-
             messagingTemplate.convertAndSend("/topic/public/disconnect", "");
+            String gameId = battleService.getGameId(userId);
+            List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
+            messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
         }
+
     }
 }

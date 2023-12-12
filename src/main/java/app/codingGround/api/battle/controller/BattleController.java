@@ -45,7 +45,8 @@ public class BattleController {
         }
 //      게임 타입이 WAIT 이고, 유저 인원수가 8명일때! 게임시작 전송
         String gameStatus = battleService.getGameStatus(gameId);
-        if (gameStatus.equals("WAIT") && userCount == 2) { // 테스트를 위해 2로 해놓음
+
+        if (gameStatus.equals("WAIT") && userCount == 8) { // 테스트를 위해 2로 해놓음
             battleService.startGame(gameId);
             LocalDateTime currentTime = LocalDateTime.now();
             LocalDateTime futureTime = currentTime.plusSeconds(10);
@@ -54,26 +55,38 @@ public class BattleController {
             messagingTemplate.convertAndSend("/topic/public/gameStart/" + gameId, futureTime);
             ScheduledExecutorService scheduler1 = Executors.newScheduledThreadPool(1);
             int round1LimitMinutes = questions.get(0).getQuestionLimitTime();
+            long delayInSeconds1 = round1LimitMinutes * 60L + 5L; // 현재 분을 초로 환산 후 5초를 추가합니다.
             Runnable eventTask1 = () -> {
                 System.out.println("1라운드 끝!");
                 battleService.endRound1(gameId);
                 messagingTemplate.convertAndSend("/topic/public/round1/end/front/" + gameId, gameId);
+                try {
+                    Thread.sleep(5000);
+                    battleService.addRound1Record(gameId);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
             };
-            scheduler1.schedule(eventTask1, round1LimitMinutes, TimeUnit.MINUTES);
+            scheduler1.schedule(eventTask1, delayInSeconds1, TimeUnit.SECONDS);
 
             ScheduledExecutorService scheduler2 = Executors.newScheduledThreadPool(1);
             int round2LimitMinutes = questions.get(1).getQuestionLimitTime() + questions.get(0).getQuestionLimitTime();
+            long delayInSeconds2 = round2LimitMinutes * 60L + 5L; // 현재 분을 초로 환산 후 5초를 추가합니다.
             Runnable eventTask2 = () -> {
                 messagingTemplate.convertAndSend("/topic/public/round2/end/front/" + gameId, gameId);
                 System.out.println("2라운드 끝!");
                 try {
                     Thread.sleep(10000);
+                    battleService.addRound2Record(gameId);
+                    battleService.addGameRecord(gameId);
                     battleService.endRound2(gameId);
                 } catch (InterruptedException e) {
+                    e.printStackTrace();
                     throw new RuntimeException(e);
                 }
             };
-            scheduler2.schedule(eventTask2, round2LimitMinutes, TimeUnit.MINUTES);
+            scheduler2.schedule(eventTask2, delayInSeconds2, TimeUnit.SECONDS);
         }
     }
 
@@ -146,10 +159,9 @@ public class BattleController {
         }
     }
 
-    // 내 게임정보저장
     @MessageMapping("/round2/end/{gameId}")
         public void round2End(@DestinationVariable String gameId, @Payload String userId) {
-            String myRank = battleService.addGameRecord(gameId, userId);
+            String myRank = battleService.getMyRank(gameId, userId);
             messagingTemplate.convertAndSend("/topic/public/round2/url/" + gameId + "/" + userId, myRank);
     }
 }
