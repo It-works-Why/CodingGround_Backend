@@ -124,9 +124,9 @@ public class BattleController {
         List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
         messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
 
-        if (resultDto.getIsRoundEnd()) {
-            messagingTemplate.convertAndSend("/topic/public/round1/end/front/" + gameId, codeData.getUserId());
-        }
+//        if (resultDto.getIsRoundEnd()) {
+//            messagingTemplate.convertAndSend("/topic/public/round1/end/front/" + gameId, codeData.getUserId());
+//        }
     }
 
     @MessageMapping("/send/1/{gameId}")

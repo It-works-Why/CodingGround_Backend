@@ -608,6 +608,7 @@ public class BattleService {
                         userSeason.setRankScore(score + 2);
                         break;
                     case "defeat":
+                    case "DEFEAT":
                         gameRecord.setGameRecord(6);
                         gameRecord.setChangeScore(-5);
                         userSeason.setRankScore(score - 5);
