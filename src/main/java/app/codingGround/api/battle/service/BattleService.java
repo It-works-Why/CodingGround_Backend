@@ -17,6 +17,7 @@ import app.codingGround.global.utils.JwtTokenProvider;
 import app.codingGround.global.utils.RedisUtil;
 import io.lettuce.core.ScriptOutputType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,41 @@ public class BattleService {
     private final GameRecordRepository gameRecordRepository;
     private final RedisUtil redisUtil;
 
+    @Value("${spring.redis.host}")
+    private String redisHost;
+
+    @Value("${spring.redis.port}")
+    private int redisPort;
+
+    @Value("${spring.redis.password}")
+    private String redisPassword;
+
+    public String getRedisHost() {
+        return redisHost;
+    }
+
+    public int getRedisPort() {
+        return redisPort;
+    }
+
+    public String getRedisPassword() {
+        return redisPassword;
+    }
+
+    private Jedis getJedisInstance() {
+        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        jedis.auth(getRedisPassword());
+        return jedis;
+    }
+
+    private void closeJedisInstance(Jedis jedis) {
+        if (jedis != null) {
+            jedis.close();
+        }
+    }
+
+
+
 //    userId { gameRoomId }, userId { gameRoomId }
 
     public List<Language> getLanguage() {
@@ -76,13 +112,41 @@ public class BattleService {
             return QueueInfoDto.builder().gameId(isWaiting).connectType("failed").build();
         }
 
+
         // 여기서부터는 재접속이 필요없는 유저
         String gameId = redisUtil.findGameRoom(connectGameInfo);
         if (gameId == null) {
             gameId = redisUtil.createRoom(connectGameInfo);
         }
-        redisUtil.createUserKey(gameId, gameUserDto);
-        redisUtil.joinGameRoom(gameId, gameUserDto);
+        Jedis jedis = null;
+        String lockKey = null;
+        try {
+            jedis = getJedisInstance();
+            lockKey = "game_room_lock:" + gameId;
+            int maxRetries = 7; // 최대 재시도 횟수
+            int waitTimeMs = 3000; // 재시도 간격 (5초)
+
+            String lockResult = null;
+            int retries = 0;
+
+            while (lockResult == null && retries < maxRetries) {
+                lockResult = jedis.set(lockKey, "LOCKED", SetParams.setParams().nx().ex(10)); // 락의 만료 시간을 설정합니다. (예: 10초)
+                if (lockResult == null) {
+                    retries++;
+                    try {
+                        Thread.sleep(waitTimeMs); // 일정 시간 대기 후 재시도
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        // 스레드 인터럽트 발생 시 처리
+                    }
+                }
+            }
+            redisUtil.createUserKey(gameId, gameUserDto);
+            redisUtil.joinGameRoom(gameId, gameUserDto);
+        } finally {
+            jedis.del(lockKey);
+            closeJedisInstance(jedis);
+        }
         return QueueInfoDto.builder().gameId(gameId).connectType("succeed").build();
     }
 
@@ -133,7 +197,38 @@ public class BattleService {
     }
 
     public String getGameStatus(String gameId) {
-        GameDto gameDto = redisUtil.findGameByGameId(gameId);
+        Jedis jedis = null;
+        GameDto gameDto;
+        String lockKey = null;
+        try {
+            jedis = getJedisInstance();
+            lockKey = "game_room_lock:" + gameId;
+            int maxRetries = 7; // 최대 재시도 횟수
+            int waitTimeMs = 3000; // 재시도 간격 (5초)
+
+            String lockResult = null;
+            int retries = 0;
+
+            while (lockResult == null && retries < maxRetries) {
+                lockResult = jedis.set(lockKey, "LOCKED", SetParams.setParams().nx().ex(10)); // 락의 만료 시간을 설정합니다. (예: 10초)
+                if (lockResult == null) {
+                    retries++;
+                    try {
+                        Thread.sleep(waitTimeMs); // 일정 시간 대기 후 재시도
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        // 스레드 인터럽트 발생 시 처리
+                    }
+                }
+            }
+            gameDto = null;
+            if (lockResult != null) {
+                gameDto = redisUtil.findGameByGameId(gameId);
+            }
+        } finally {
+            jedis.del(lockKey);
+            closeJedisInstance(jedis);
+        }
         return gameDto.getGameStatus();
     }
 
@@ -151,7 +246,7 @@ public class BattleService {
         gameDto.setGameNum(game.getGameNum());
         gameDto.setGameStatus("PLAY");
         redisUtil.updateGameData(gameDto);
-        List<GameUserDto> usersGameDtoList = redisUtil.getGameUserDtoList(gameDto.getGameId());
+        List<GameUserDto> usersGameDtoList = redisUtil.getGameUserDtoResult(gameDto.getGameId());
         redisUtil.updateUserGameStatus(usersGameDtoList, "PLAYING", gameDto.getGameId());
     }
 
@@ -179,8 +274,8 @@ public class BattleService {
         round2.setQuestionNum(question2);
         round2.setRound(2);
         roundRepository.save(round2);
-        gameDto.setFirstRoundEndTime(Timestamp.valueOf(LocalDateTime.now().plusMinutes(question.getQuestionLimitTime())));
-        gameDto.setSecondRoundEndTime(Timestamp.valueOf(LocalDateTime.now().plusMinutes(question.getQuestionLimitTime() + question2.getQuestionLimitTime())));
+        gameDto.setFirstRoundEndTime(Timestamp.valueOf(LocalDateTime.now().plusMinutes(question.getQuestionLimitTime()).plusSeconds(5)));
+        gameDto.setSecondRoundEndTime(Timestamp.valueOf(LocalDateTime.now().plusMinutes(question.getQuestionLimitTime() + question2.getQuestionLimitTime()).plusSeconds(5)));
 
         redisUtil.updateGameData(gameDto);
 
@@ -261,7 +356,7 @@ public class BattleService {
             if (testCaseResultDtos.get(0).getIsCorrect() && testCaseResultDtos.get(1).getIsCorrect() && testCaseResultDtos.get(2).getIsCorrect()) {
                 answerCorrect = 1;
                 if (game.getGameRound() == 1) {
-                    List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoList(gameId);
+                    List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoResult(gameId);
                     for (GameUserDto dto : gameUserDtos) {
                         if (dto.getUserGameResult().equals("5")) {
                             count++;
@@ -272,11 +367,11 @@ public class BattleService {
                         count++;
                     }
                 } else {
-                    Jedis jedis = new Jedis("bsdev16-redis-test.ydfwq4.ng.0001.cac1.cache.amazonaws.com", 6379); // Redis 서버에 연결
-                    jedis.auth("root");
+                    Jedis jedis = null;
+                    jedis = getJedisInstance();
                     String lockKey = "game_user_lock:" + gameId; // gameId에 따른 락 키 생성
-                    int maxRetries = 5; // 최대 재시도 횟수
-                    int waitTimeMs = 5000; // 재시도 간격 (5초)
+                    int maxRetries = 7; // 최대 재시도 횟수
+                    int waitTimeMs = 3000; // 재시도 간격 (5초)
 
                     String lockResult = null;
                     int retries = 0;
@@ -301,16 +396,19 @@ public class BattleService {
                                 if (dto.getUserId().equals(codeData.getUserId())) {
                                     dto.setMemory(testCaseResultDtos.get(2).getMemory());
                                 }
-                            }
+                            }//500000
                             Collections.sort(gameUserDtos, Comparator.comparingInt(dto -> Integer.parseInt(dto.getMemory())));
 
                             for (GameUserDto gameUserDto : gameUserDtos) {
                                 // 정렬된 순서의 인덱스를 이용하여 순위를 부여합니다.
-                                int rank = gameUserDtos.indexOf(gameUserDto) + 1;
-                                redisUtil.updateUserStatus(gameId, gameUserDto.getUserId(), rank + "", gameUserDto.getMemory());
+                                if(!gameUserDto.getMemory().equals("500000")){
+                                    int rank = gameUserDtos.indexOf(gameUserDto) + 1;
+                                    redisUtil.updateUserStatus(gameId, gameUserDto.getUserId(), rank + "", gameUserDto.getMemory());
+                                }
                             }
                         } finally {
                             jedis.del(lockKey); // 작업 완료 후 락을 해제합니다.
+                            closeJedisInstance(jedis);
                         }
                     }
                 }
@@ -347,6 +445,7 @@ public class BattleService {
 
     @Transactional
     public ResultDto runCode(CodeData codeData, String gameId, int roundCount) {
+
         GameDto game = redisUtil.findGameByGameId(gameId);
         User user = userRepository.findByUserId(codeData.getUserId());
         Round round = roundRepository.findByGameNumAndRound(gameRepository.findByGameNum(game.getGameNum()), roundCount);
@@ -361,6 +460,7 @@ public class BattleService {
             testCaseDto.setOutput(dto.getTestCaseOutput());
             result.add(testCaseDto);
         }
+
 
         if (codeData.getType().equals("run")) {
             result.remove(2);
@@ -381,8 +481,8 @@ public class BattleService {
 
             if (testCaseResultDtos.get(0).getIsCorrect() && testCaseResultDtos.get(1).getIsCorrect() && testCaseResultDtos.get(2).getIsCorrect()) {
                 answerCorrect = 1;
-                if (roundCount == 1) {
-                    List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoList(gameId);
+                if (game.getGameRound() == 1) {
+                    List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoResult(gameId);
                     for (GameUserDto dto : gameUserDtos) {
                         if (dto.getUserGameResult().equals("5")) {
                             count++;
@@ -398,19 +498,17 @@ public class BattleService {
                     for (GameUserDto dto : gameUserDtos) {
                         if (dto.getUserId().equals(codeData.getUserId())) {
                             dto.setMemory(testCaseResultDtos.get(2).getMemory());
-
                         }
                     }
                     Collections.sort(gameUserDtos, Comparator.comparingInt(dto -> Integer.parseInt(dto.getMemory())));
 
                     for (GameUserDto gameUserDto : gameUserDtos) {
                         // 정렬된 순서의 인덱스를 이용하여 순위를 부여합니다.
-                        int rank = gameUserDtos.indexOf(gameUserDto) + 1;
-
-                        // 여기서 gameId, codeData.getUserId() 등은 적절한 값으로 대체되어야 합니다.
-                        redisUtil.updateUserStatus(gameId, gameUserDto.getUserId(), rank + "", gameUserDto.getMemory());
+                        if(!gameUserDto.getMemory().equals("500000")){
+                            int rank = gameUserDtos.indexOf(gameUserDto) + 1;
+                            redisUtil.updateUserStatus(gameId, gameUserDto.getUserId(), rank + "", gameUserDto.getMemory());
+                        }
                     }
-
                 }
             }
             if (testCaseResultDtos.get(testCaseResultDtos.size() - 1).getMemory() == null) {
@@ -448,7 +546,7 @@ public class BattleService {
     }
 
     public Boolean getFailedUser(String gameId, String userId) {
-        List<GameUserDto> gameUserDtoList = redisUtil.getGameUserDtoList(gameId);
+        List<GameUserDto> gameUserDtoList = redisUtil.getGameUserDtoResult(gameId);
         String result = "";
         for (GameUserDto dto : gameUserDtoList) {
             if (dto.getUserId().equals(userId)) {
@@ -470,65 +568,158 @@ public class BattleService {
         redisUtil.removeGame(gameId);
     }
 
-    @Transactional
-    public String addGameRecord(String gameId, String userId) {
-        List<GameUserDto> gameUserDtoList = redisUtil.getGameUserDtoList(gameId);
 
-        GameUserDto gameUserDto = null;
+    // 게임 레코드는 게임이 끝났을때 일관적으로 레디스 뜯어서 들어가게 만듦 for문돌려서
+    @Transactional
+    public void addGameRecord(String gameId) {
+        List<GameUserDto> gameUserDtoList = redisUtil.getGameUserDtoResult(gameId);
+        String userResult = "";
+        for (GameUserDto dto : gameUserDtoList) {
+            GameDto gameDto = redisUtil.findGameByGameId(gameId);
+            Game game = gameRepository.findByGameNum(gameDto.getGameNum());
+            User user = userRepository.findByUserId(dto.getUserId());
+            UserSeason userSeason = userSeasonRepository.findBySeasonAndUser(game.getSeasonNum(), user);
+            GameRecord gameRecord = new GameRecord();
+            gameRecord.setLanguage(game.getLanguageNum());
+            gameRecord.setGame(game);
+            gameRecord.setUser(user);
+            gameRecord.setSeason(game.getSeasonNum());
+            int score = userSeason.getRankScore();
+            System.out.println(dto.getUserGameResult());
+            System.out.println("여기 결과값 나열중");
+            if(gameDto.getGameType().equals("RANK")){
+                switch (dto.getUserGameResult()) {
+                    case "1":
+                        gameRecord.setGameRecord(1);
+                        gameRecord.setChangeScore(10);
+                        userSeason.setRankScore(score + 10);
+                        break;
+                    case "2":
+                        gameRecord.setGameRecord(2);
+                        gameRecord.setChangeScore(8);
+                        userSeason.setRankScore(score + 8);
+                        break;
+                    case "3":
+                        gameRecord.setGameRecord(3);
+                        gameRecord.setChangeScore(6);
+                        userSeason.setRankScore(score + 6);
+                        break;
+                    case "4":
+                        gameRecord.setGameRecord(4);
+                        gameRecord.setChangeScore(4);
+                        userSeason.setRankScore(score + 4);
+                        break;
+                    case "5":
+                        gameRecord.setGameRecord(5);
+                        gameRecord.setChangeScore(2);
+                        userSeason.setRankScore(score + 2);
+                        break;
+                    case "defeat":
+                        gameRecord.setGameRecord(6);
+                        gameRecord.setChangeScore(-5);
+                        userSeason.setRankScore(score - 5);
+                        break;
+                }
+                userSeasonRepository.save(userSeason);
+            }else{
+                switch (dto.getUserGameResult()) {
+                    case "1":
+                        gameRecord.setGameRecord(1);
+                        break;
+                    case "2":
+                        gameRecord.setGameRecord(2);
+                        break;
+                    case "3":
+                        gameRecord.setGameRecord(3);
+                        break;
+                    case "4":
+                        gameRecord.setGameRecord(4);
+                        break;
+                    case "5":
+                        gameRecord.setGameRecord(5);
+                        break;
+                    case "defeat":
+                        gameRecord.setGameRecord(6);
+                        break;
+                }
+                gameRecord.setChangeScore(0);
+            }
+            gameRecordRepository.save(gameRecord);
+        }
+    }
+
+    public String getMyRank(String gameId, String userId) {
+        List<GameUserDto> gameUserDtoList = redisUtil.getGameUserDtoResult(gameId);
         String userResult = "";
         for (GameUserDto dto : gameUserDtoList) {
             if (dto.getUserId().equals(userId)) {
                 userResult = dto.getUserGameResult();
-                gameUserDto = dto;
                 break;
             }
         }
-        GameDto gameDto = redisUtil.findGameByGameId(gameId);
-        Game game = gameRepository.findByGameNum(gameDto.getGameNum());
-        User user = userRepository.findByUserId(userId);
-        UserSeason userSeason = userSeasonRepository.findBySeasonAndUser(game.getSeasonNum(), user);
-        GameRecord gameRecord = new GameRecord();
-        gameRecord.setLanguage(game.getLanguageNum());
-        gameRecord.setGame(game);
-        gameRecord.setUser(user);
-        gameRecord.setSeason(game.getSeasonNum());
-        int score = userSeason.getRankScore();
-        switch (gameUserDto.getUserGameResult()) {
-            case "1":
-                gameRecord.setGameRecord(1);
-                gameRecord.setChangeScore(10);
-                userSeason.setRankScore(score + 10);
-                break;
-            case "2":
-                gameRecord.setGameRecord(2);
-                gameRecord.setChangeScore(8);
-                userSeason.setRankScore(score + 8);
-                break;
-            case "3":
-                gameRecord.setGameRecord(3);
-                gameRecord.setChangeScore(6);
-                userSeason.setRankScore(score + 6);
-                break;
-            case "4":
-                gameRecord.setGameRecord(4);
-                gameRecord.setChangeScore(4);
-                userSeason.setRankScore(score + 4);
-                break;
-            case "5":
-                gameRecord.setGameRecord(5);
-                gameRecord.setChangeScore(2);
-                userSeason.setRankScore(score + 2);
-                break;
-            case "defeat":
-                gameRecord.setGameRecord(6);
-                gameRecord.setChangeScore(-5);
-                userSeason.setRankScore(score - 5);
-                break;
-        }
-        gameRecordRepository.save(gameRecord);
-        userSeasonRepository.save(userSeason);
-
         return userResult;
+    }
+
+
+    // 리스트에 존재 하지만 RDS에 결과를 안넣은 놈들 그냥 싹! 다 구속시켜!
+    @Transactional
+    public void addRound1Record(String gameId) {
+        try {
+            List<GameUserDto> gameUserDtoList = redisUtil.getGameUserDtoResult(gameId);
+            GameDto gameDto = redisUtil.findGameByGameId(gameId);
+            Game game = gameRepository.findByGameNum(gameDto.getGameNum());
+            Round round = roundRepository.findByGameNumAndRound(game, 1);
+            for (GameUserDto dto : gameUserDtoList) {
+                User user = userRepository.findByUserId(dto.getUserId());
+                RoundRecord roundRecord = roundRecordRepository.findByRoundNumAndUserNum(round, user);
+                System.out.println(roundRecord == null);
+                if (roundRecord == null) {
+                    roundRecord = new RoundRecord();
+                    roundRecord.setRoundRecordAnswer("EMPTY");
+                    roundRecord.setRoundNum(round);
+                    roundRecord.setRoundRecordSubmitTime(Timestamp.valueOf(LocalDateTime.now()));
+                    roundRecord.setRoundRecordToken(null);
+                    roundRecord.setUserNum(user);
+                    roundRecord.setRoundRecordAnswerCorrect(0);
+                    roundRecord.setRoundRecordRanking(null);
+                    roundRecord.setRoundRecordMemory(null);
+                    roundRecordRepository.save(roundRecord);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Transactional
+    public void addRound2Record(String gameId) {
+        try {
+            List<GameUserDto> gameUserDtoList = redisUtil.getGameUserDtoResult(gameId);
+            GameDto gameDto = redisUtil.findGameByGameId(gameId);
+            Game game = gameRepository.findByGameNum(gameDto.getGameNum());
+            Round round = roundRepository.findByGameNumAndRound(game, 2);
+            for (GameUserDto dto : gameUserDtoList) {
+                User user = userRepository.findByUserId(dto.getUserId());
+                RoundRecord roundRecord = roundRecordRepository.findByRoundNumAndUserNum(round, user);
+                System.out.println(roundRecord == null);
+                if (roundRecord == null) {
+                    roundRecord = new RoundRecord();
+                    roundRecord.setRoundRecordAnswer("EMPTY");
+                    roundRecord.setRoundNum(round);
+                    roundRecord.setRoundRecordSubmitTime(Timestamp.valueOf(LocalDateTime.now()));
+                    roundRecord.setRoundRecordToken(null);
+                    roundRecord.setUserNum(user);
+                    roundRecord.setRoundRecordAnswerCorrect(0);
+                    roundRecord.setRoundRecordRanking(null);
+                    roundRecord.setRoundRecordMemory(null);
+                    roundRecordRepository.save(roundRecord);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 }
 

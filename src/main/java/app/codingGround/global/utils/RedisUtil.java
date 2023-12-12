@@ -237,7 +237,7 @@ public class RedisUtil {
         }
     }
 
-    public List<GameUserDto> getGameUserDtoList(String gameId) {
+    public List<GameUserDto> getGameUserDtoResult(String gameId) {
         Jedis jedis = null;
         try {
             jedis = getJedisInstance();
@@ -251,6 +251,33 @@ public class RedisUtil {
             closeJedisInstance(jedis);
         }
     }
+
+    public List<GameUserDto> getGameUserDtoList(String gameId) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedisInstance();
+            String listKey = gameId + "_gameUsers";
+            List<GameUserDto> gameUserDtoList = GameUserDto.parseToGameUserList(jedis.lrange(listKey, 0, -1).toString());
+            int i = 0;
+            for(GameUserDto dto : gameUserDtoList){
+                Map<String, String> personalGameData = jedis.hgetAll(dto.getUserId());
+                if (personalGameData.get("gameId") != null) {
+                    String userKeyGameStatus = personalGameData.get("status");
+                    if (userKeyGameStatus.equals("DISCONNECT")) {
+                        gameUserDtoList.get(i).setUserGameResult("DISCONNECT");
+                    }
+                }
+                i++;
+            }
+            return gameUserDtoList;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            closeJedisInstance(jedis);
+        }
+    }
+
 
     // 현재 게임중인 usersList에서 내가 존재하는지
     // 악성유자가 gameId 를 탈취 했을때, 그방에 못들어가게하는 로직.
@@ -310,7 +337,7 @@ public class RedisUtil {
         try {
             jedis = getJedisInstance();
 
-            List<GameUserDto> gameUserDtoList = getGameUserDtoList(personalGameDataDto.getGameId());
+            List<GameUserDto> gameUserDtoList = getGameUserDtoResult(personalGameDataDto.getGameId());
             String gameUserDtoToString = null;
             for (GameUserDto dto : gameUserDtoList) {
                 if (dto.getUserId().equals(personalGameDataDto.getUserId())) {
@@ -465,7 +492,6 @@ public class RedisUtil {
     public void updateUserStatus(String gameId, String userId, String number, String memory) {
         Jedis jedis = null;
         try {
-            System.out.println("u[dateUserStatus");
             jedis = getJedisInstance();
             long length = jedis.llen(gameId+"_gameUsers");
             for (long i = 0; i < length; i++) {
@@ -495,7 +521,7 @@ public class RedisUtil {
         Jedis jedis = null;
         try {
             jedis = getJedisInstance();
-            List<GameUserDto> gameUserDtoList = getGameUserDtoList(gameId);
+            List<GameUserDto> gameUserDtoList = getGameUserDtoResult(gameId);
             for (GameUserDto dto : gameUserDtoList) {
                 jedis.del(dto.getUserId());
             }

@@ -30,8 +30,6 @@ public class CommunityRestController {
     public Page<Community> getCommunityList(
             @PageableDefault(size = 10, sort = "postNum", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(name = "searchInput", required = false) String searchInput) {
-        System.out.println("TEST TEST TEST");
-        System.out.println("searchInput : " + searchInput);
         if (searchInput == null) {
             Page<Community> communityList = communityService.getCommunityList(pageable);
             return communityList;
