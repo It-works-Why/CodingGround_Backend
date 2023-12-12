@@ -1,13 +1,7 @@
 spring:
-#  redis:
-#    host: airspirk.asuscomm.com
-#    port: 46379
-#    password: root
   redis:
     host: bsdev16-redis-test.ydfwq4.ng.0001.cac1.cache.amazonaws.com
     port: 6379
-#    username: bsdev16-redis-user
-#    password: projectredispassword
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
