@@ -14,6 +14,7 @@ public class GameInfoDto {
     private String gameNum;
     private String gameType;
     private String languageName;
+    private String languageImg;
     private String timeDifference;
     private String userNicknames;
     private String userProfileImgs;
