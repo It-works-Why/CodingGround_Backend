@@ -104,14 +104,42 @@ public class BattleService {
         }
 
 
+
         // 여기서부터는 재접속이 필요없는 유저
         String gameId = redisUtil.findGameRoom(connectGameInfo);
         if (gameId == null) {
             gameId = redisUtil.createRoom(connectGameInfo);
         }
 
-        redisUtil.createUserKey(gameId, gameUserDto);
-        redisUtil.joinGameRoom(gameId, gameUserDto);
+        Jedis jedis = null;
+        String lockKey = null;
+        QueueInfoDto queueInfoDto = null;
+        try {
+            jedis = getJedisInstance();
+            lockKey = "game_room_lock:" + gameId;
+            int maxRetries = 7; // 최대 재시도 횟수
+            int waitTimeMs = 3000; // 재시도 간격 (5초)
+            String lockResult = null;
+            int retries = 0;
+            while (lockResult == null && retries < maxRetries) {
+                lockResult = jedis.set(lockKey, "LOCKED", SetParams.setParams().nx().ex(10)); // 락의 만료 시간을 설정합니다. (예: 10초)
+                if (lockResult == null) {
+                    retries++;
+                    try {
+                        Thread.sleep(waitTimeMs); // 일정 시간 대기 후 재시도
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+            if (lockResult != null) {
+                redisUtil.createUserKey(gameId, gameUserDto);
+                redisUtil.joinGameRoom(gameId, gameUserDto);
+            }
+        } finally {
+            jedis.del(lockKey);
+            closeJedisInstance(jedis);
+        }
 
         return QueueInfoDto.builder().gameId(gameId).connectType("succeed").build();
     }

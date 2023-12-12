@@ -77,6 +77,11 @@ public class BattleController {
         String gameStatus = battleService.getGameStatus(gameId);
 
         if (gameStatus.equals("WAIT") && userCount == 6) { // 테스트를 위해 2로 해놓음
+            try {
+                Thread.sleep(4000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             battleService.startGame(gameId);
             LocalDateTime currentTime = LocalDateTime.now();
             LocalDateTime futureTime = currentTime.plusSeconds(10);
