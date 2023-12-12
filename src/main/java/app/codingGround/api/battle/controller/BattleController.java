@@ -5,6 +5,7 @@ import app.codingGround.api.battle.dto.request.CodeData;
 import app.codingGround.api.battle.dto.response.*;
 import app.codingGround.api.battle.service.BattleService;
 import app.codingGround.api.entity.Question;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -157,14 +158,12 @@ public class BattleController {
 //            messagingTemplate.convertAndSend("/topic/public/round1/end/front/" + gameId, codeData.getUserId());
 //        }
     }
-
     @MessageMapping("/send/1/{gameId}")
     public void sendCodeRound1(@DestinationVariable String gameId, @Payload CodeData codeData) {
         ResultDto resultDto = battleService.runCode(codeData, gameId, 1);
         List<TestCaseResultDto> testCaseResultDtos = resultDto.getTestCaseResultDtos();
         messagingTemplate.convertAndSend("/topic/public/get/result/" + gameId + "/" + codeData.getUserId(), testCaseResultDtos);
 
-        PlayUserInfo playUserInfo = new PlayUserInfo();
         List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
         messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
     }
@@ -173,6 +172,9 @@ public class BattleController {
         ResultDto resultDto = battleService.runCode(codeData, gameId, 2);
         List<TestCaseResultDto> testCaseResultDtos = resultDto.getTestCaseResultDtos();
         messagingTemplate.convertAndSend("/topic/public/get/result/" + gameId + "/" + codeData.getUserId(), testCaseResultDtos);
+
+        List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
+        messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
     }
 
     @MessageMapping("/round1/end/{gameId}")

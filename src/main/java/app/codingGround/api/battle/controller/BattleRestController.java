@@ -8,10 +8,14 @@ import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.exception.CustomException;
 import app.codingGround.global.config.exception.ErrorCode;
 import app.codingGround.global.config.model.ApiResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.params.SetParams;
 
 import java.util.List;
 
@@ -22,6 +26,26 @@ import java.util.List;
 public class BattleRestController {
 
     private final BattleService battleService;
+
+    @Value("${spring.redis.host}")
+    @Getter
+    private String redisHost;
+
+    @Value("${spring.redis.port}")
+    @Getter
+    private int redisPort;
+
+    private Jedis getJedisInstance() {
+        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        return jedis;
+    }
+
+    private void closeJedisInstance(Jedis jedis) {
+        if (jedis != null) {
+            jedis.close();
+        }
+    }
+
     @GetMapping("/get/language")
     public List<Language> getLanguage() {
         return battleService.getLanguage();
@@ -30,8 +54,35 @@ public class BattleRestController {
     @PostMapping("/join/game")
     public ResponseEntity<ApiResponse<QueueInfoDto>> tryGameConnect(@RequestHeader("Authorization") String accessToken, @RequestBody ConnectGameInfo connectGameInfo) {
         // 게임방 생성 또는 빈 방 확인 로직
-        QueueInfoDto queueInfoDto = battleService.tryGameConnect(connectGameInfo, accessToken);
 
+        Jedis jedis = null;
+        String lockKey = null;
+        QueueInfoDto queueInfoDto = null;
+        try {
+            jedis = getJedisInstance();
+            lockKey = "connectionLock";
+            int maxRetries = 7; // 최대 재시도 횟수
+            int waitTimeMs = 3000; // 재시도 간격 (5초)
+            String lockResult = null;
+            int retries = 0;
+            while (lockResult == null && retries < maxRetries) {
+                lockResult = jedis.set(lockKey, "LOCKED", SetParams.setParams().nx().ex(10)); // 락의 만료 시간을 설정합니다. (예: 10초)
+                if (lockResult == null) {
+                    retries++;
+                    try {
+                        Thread.sleep(waitTimeMs); // 일정 시간 대기 후 재시도
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+            if (lockResult != null) {
+                queueInfoDto = battleService.tryGameConnect(connectGameInfo, accessToken);
+            }
+        } finally {
+            jedis.del(lockKey);
+            closeJedisInstance(jedis);
+        }
         if (queueInfoDto != null) {
             return ResponseEntity.ok(new ApiResponse<>(queueInfoDto));
         } else {

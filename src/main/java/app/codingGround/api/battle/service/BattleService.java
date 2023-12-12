@@ -76,8 +76,6 @@ public class BattleService {
         }
     }
 
-
-
 //    userId { gameRoomId }, userId { gameRoomId }
 
     public List<Language> getLanguage() {
@@ -111,38 +109,10 @@ public class BattleService {
         if (gameId == null) {
             gameId = redisUtil.createRoom(connectGameInfo);
         }
-        Jedis jedis = null;
-        String lockKey = null;
-        try {
-            jedis = getJedisInstance();
-            lockKey = "game_room_lock:" + gameId;
-            int maxRetries = 7; // 최대 재시도 횟수
-            int waitTimeMs = 3000; // 재시도 간격 (5초)
 
-            String lockResult = null;
-            int retries = 0;
+        redisUtil.createUserKey(gameId, gameUserDto);
+        redisUtil.joinGameRoom(gameId, gameUserDto);
 
-            while (lockResult == null && retries < maxRetries) {
-                lockResult = jedis.set(lockKey, "LOCKED", SetParams.setParams().nx().ex(10)); // 락의 만료 시간을 설정합니다. (예: 10초)
-                if (lockResult == null) {
-                    retries++;
-                    try {
-                        Thread.sleep(waitTimeMs); // 일정 시간 대기 후 재시도
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        // 스레드 인터럽트 발생 시 처리
-                    }
-                }
-            }
-            if(lockResult != null){
-                redisUtil.createUserKey(gameId, gameUserDto);
-                redisUtil.joinGameRoom(gameId, gameUserDto);
-            }
-
-        } finally {
-            jedis.del(lockKey);
-            closeJedisInstance(jedis);
-        }
         return QueueInfoDto.builder().gameId(gameId).connectType("succeed").build();
     }
 
@@ -352,16 +322,40 @@ public class BattleService {
             if (testCaseResultDtos.get(0).getIsCorrect() && testCaseResultDtos.get(1).getIsCorrect() && testCaseResultDtos.get(2).getIsCorrect()) {
                 answerCorrect = 1;
                 if (game.getGameRound() == 1) {
-                    List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoResult(gameId);
-                    for (GameUserDto dto : gameUserDtos) {
-                        if (dto.getUserGameResult().equals("5")) {
-                            count++;
+
+                    Jedis jedis = null;
+                    jedis = getJedisInstance();
+                    String lockKey = "game_user_lock:" + gameId; // gameId에 따른 락 키 생성
+                    int maxRetries = 7; // 최대 재시도 횟수
+                    int waitTimeMs = 3000; // 재시도 간격 (5초)
+
+                    String lockResult = null;
+                    int retries = 0;
+
+                    while (lockResult == null && retries < maxRetries) {
+                        lockResult = jedis.set(lockKey, "LOCKED", SetParams.setParams().nx().ex(10)); // 락의 만료 시간을 설정합니다. (예: 10초)
+                        if (lockResult == null) {
+                            retries++;
+                            try {
+                                Thread.sleep(waitTimeMs); // 일정 시간 대기 후 재시도
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                                // 스레드 인터럽트 발생 시 처리
+                            }
                         }
                     }
-                    if (count < 5) {
-                        redisUtil.updateUserStatus(gameId, codeData.getUserId(), "5");
-                        count++;
+                    if (lockResult != null) {
+                        List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoResult(gameId);
+                        for (GameUserDto dto : gameUserDtos) {
+                            if (dto.getUserGameResult().equals("5")) {
+                                count++;
+                            }
+                        }
+                        if (count < 4) {
+                            redisUtil.updateUserStatus(gameId, codeData.getUserId(), "5");
+                        }
                     }
+
                 } else {
                     Jedis jedis = null;
                     jedis = getJedisInstance();
@@ -397,7 +391,7 @@ public class BattleService {
 
                             for (GameUserDto gameUserDto : gameUserDtos) {
                                 // 정렬된 순서의 인덱스를 이용하여 순위를 부여합니다.
-                                if(!gameUserDto.getMemory().equals("500000")){
+                                if (!gameUserDto.getMemory().equals("500000")) {
                                     int rank = gameUserDtos.indexOf(gameUserDto) + 1;
                                     redisUtil.updateUserStatus(gameId, gameUserDto.getUserId(), rank + "", gameUserDto.getMemory());
                                 }
@@ -507,7 +501,7 @@ public class BattleService {
                         }
                     }
 
-                    if(lockResult != null){
+                    if (lockResult != null) {
                         if (count < 5) {
                             redisUtil.updateUserStatus(gameId, codeData.getUserId(), "5");
                             count++;
@@ -526,7 +520,7 @@ public class BattleService {
 
                     for (GameUserDto gameUserDto : gameUserDtos) {
                         // 정렬된 순서의 인덱스를 이용하여 순위를 부여합니다.
-                        if(!gameUserDto.getMemory().equals("500000")){
+                        if (!gameUserDto.getMemory().equals("500000")) {
                             int rank = gameUserDtos.indexOf(gameUserDto) + 1;
                             redisUtil.updateUserStatus(gameId, gameUserDto.getUserId(), rank + "", gameUserDto.getMemory());
                         }
@@ -609,7 +603,7 @@ public class BattleService {
             int score = userSeason.getRankScore();
             System.out.println(dto.getUserGameResult());
             System.out.println("여기 결과값 나열중");
-            if(gameDto.getGameType().equals("RANK")){
+            if (gameDto.getGameType().equals("RANK")) {
                 switch (dto.getUserGameResult()) {
                     case "1":
                         gameRecord.setGameRecord(1);
@@ -644,7 +638,7 @@ public class BattleService {
                         break;
                 }
                 userSeasonRepository.save(userSeason);
-            }else{
+            } else {
                 switch (dto.getUserGameResult()) {
                     case "1":
                         gameRecord.setGameRecord(1);
