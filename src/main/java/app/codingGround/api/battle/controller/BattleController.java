@@ -76,7 +76,7 @@ public class BattleController {
 //      게임 타입이 WAIT 이고, 유저 인원수가 8명일때! 게임시작 전송
         String gameStatus = battleService.getGameStatus(gameId);
 
-        if (gameStatus.equals("WAIT") && userCount == 8) { // 테스트를 위해 2로 해놓음
+        if (gameStatus.equals("WAIT") && userCount == 4) { // 테스트를 위해 2로 해놓음
             battleService.startGame(gameId);
             LocalDateTime currentTime = LocalDateTime.now();
             LocalDateTime futureTime = currentTime.plusSeconds(10);
@@ -146,18 +146,6 @@ public class BattleController {
         messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
     }
 
-    @MessageMapping("/send/{gameId}")
-    public void sendCode(@DestinationVariable String gameId, @Payload CodeData codeData) {
-        ResultDto resultDto = battleService.runCode(codeData, gameId);
-        List<TestCaseResultDto> testCaseResultDtos = resultDto.getTestCaseResultDtos();
-        messagingTemplate.convertAndSend("/topic/public/get/result/" + gameId + "/" + codeData.getUserId(), testCaseResultDtos);
-        List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
-        messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
-
-//        if (resultDto.getIsRoundEnd()) {
-//            messagingTemplate.convertAndSend("/topic/public/round1/end/front/" + gameId, codeData.getUserId());
-//        }
-    }
     @MessageMapping("/send/1/{gameId}")
     public void sendCodeRound1(@DestinationVariable String gameId, @Payload CodeData codeData) {
         ResultDto resultDto = battleService.runCode(codeData, gameId, 1);
