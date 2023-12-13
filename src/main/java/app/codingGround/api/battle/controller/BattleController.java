@@ -190,14 +190,5 @@ public class BattleController {
         messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
     }
 
-    @MessageMapping("/round1/end/{gameId}")
-    public void round1End(@DestinationVariable String gameId, @Payload String userId) {
-        Boolean isDisconnect = battleService.getFailedUser(gameId, userId);
 
-    }
-
-    @MessageMapping("/round2/end/{gameId}")
-        public void round2End(@DestinationVariable String gameId, @Payload String userId) {
-
-    }
 }
