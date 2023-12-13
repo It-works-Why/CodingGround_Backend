@@ -33,7 +33,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         String requestUri = httpRequest.getRequestURI();
         System.out.println(requestUri);
         if (requestUri.startsWith("/ws") || requestUri.startsWith("/api/ranking")) {
-            System.out.println("왜여기 안들어옴");
             chain.doFilter(request, response); // WebSocket 요청이면 필터링 건너뛰기
             return;
         }

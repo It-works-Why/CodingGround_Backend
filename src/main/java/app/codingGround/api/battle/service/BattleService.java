@@ -348,7 +348,7 @@ public class BattleService {
 
             if (testCaseResultDtos.get(0).getIsCorrect() && testCaseResultDtos.get(1).getIsCorrect() && testCaseResultDtos.get(2).getIsCorrect()) {
                 answerCorrect = 1;
-                if (game.getGameRound() == 1) {
+                if (roundCount == 1) {
 
                     Jedis jedis = null;
                     jedis = getJedisInstance();
@@ -397,7 +397,7 @@ public class BattleService {
 
                     for (GameUserDto gameUserDto : gameUserDtos) {
                         // 정렬된 순서의 인덱스를 이용하여 순위를 부여합니다.
-                        if (!gameUserDto.getMemory().equals("500000")) {
+                        if (!gameUserDto.getMemory().equals("500000") && !gameUserDto.getMemory().equals("0") && !(gameUserDto.getMemory().isEmpty())) {
                             int rank = gameUserDtos.indexOf(gameUserDto) + 1;
                             redisUtil.updateUserStatus(gameId, gameUserDto.getUserId(), rank + "", gameUserDto.getMemory());
                         }
