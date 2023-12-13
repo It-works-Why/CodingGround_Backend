@@ -8,11 +8,13 @@ import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.exception.CustomException;
 import app.codingGround.global.config.exception.ErrorCode;
 import app.codingGround.global.config.model.ApiResponse;
+import app.codingGround.global.utils.JwtTokenProvider;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.params.SetParams;
@@ -26,6 +28,8 @@ import java.util.List;
 public class BattleRestController {
 
     private final BattleService battleService;
+    private final SimpMessageSendingOperations messagingTemplate;
+
 
     @Value("${spring.redis.host}")
     @Getter
@@ -78,6 +82,10 @@ public class BattleRestController {
             }
             if (lockResult != null) {
                 queueInfoDto = battleService.tryGameConnect(connectGameInfo, accessToken);
+                if(queueInfoDto.getConnectType().equals("failed") && queueInfoDto.getGameId() != null){
+                    battleService.denyReconnect(accessToken);
+                    messagingTemplate.convertAndSend("/topic/public/disconnect/user/"+queueInfoDto.getGameId()+"/"+ JwtTokenProvider.getUserId(accessToken), queueInfoDto);
+                }
             }
         } finally {
             jedis.del(lockKey);
