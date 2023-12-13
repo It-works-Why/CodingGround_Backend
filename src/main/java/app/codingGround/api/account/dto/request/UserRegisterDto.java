@@ -30,7 +30,7 @@ public class UserRegisterDto {
 
     @NotBlank(message = "닉네임은 20자 이하, 5자이상 으로 작성 해주세요.")
     @NotNull(message = "닉네임은 20자 이하, 5자이상 으로 작성 해주세요.")
-    @Length(max = 20,min = 5, message = "닉네임은 20자 이하, 5자이상 으로 작성 해주세요.")
+    @Length(max = 8,min = 5, message = "닉네임은 20자 이하, 5자이상 으로 작성 해주세요.")
     private String userNickname;
 
     @Email(message = "이메일을 다시 입력해 주십시오.")
