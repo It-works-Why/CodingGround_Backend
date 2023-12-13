@@ -466,7 +466,6 @@ public class BattleService {
     @Transactional
     public void addGameRecord(String gameId) {
         List<GameUserDto> gameUserDtoList = redisUtil.getGameUserDtoResult(gameId);
-        String userResult = "";
         for (GameUserDto dto : gameUserDtoList) {
             GameDto gameDto = redisUtil.findGameByGameId(gameId);
             Game game = gameRepository.findByGameNum(gameDto.getGameNum());
@@ -509,6 +508,7 @@ public class BattleService {
                         break;
                     case "defeat":
                     case "DEFEAT":
+                    case "0":
                         gameRecord.setGameRecord(6);
                         gameRecord.setChangeScore(-5);
                         userSeason.setRankScore(score - 5);
@@ -533,6 +533,8 @@ public class BattleService {
                         gameRecord.setGameRecord(5);
                         break;
                     case "defeat":
+                    case "DEFEAT":
+                    case "0":
                         gameRecord.setGameRecord(6);
                         break;
                 }
