@@ -126,11 +126,15 @@ public class AccountService {
     public UserInfoFromToken getUserInfo(String accessToken) {
         String userId = JwtTokenProvider.getUserId(accessToken);
         Optional<User> user = accountRepository.findByUserId(userId);
+        UserSeason userSeason = userSeasonRepository.findFirstByUserOrderByUserSeasonNumDesc(user);
+        Long rankNum = userSeason.getRank().getRankNum();
 
         return UserInfoFromToken.builder()
                 .userNickname(user.get().getUserNickname())
                 .userRole(user.get().getUserRole())
-                .userId(userId).build();
+                .userId(userId)
+                .rankNum(rankNum)
+                .build();
     }
 
     public EmailCertificationDto getEmail(UserRegisterDto userRegisterDto) {
