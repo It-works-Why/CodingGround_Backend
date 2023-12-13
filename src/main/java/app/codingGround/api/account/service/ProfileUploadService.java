@@ -33,6 +33,9 @@ public class ProfileUploadService {
         String originalFilename = multipartFile.getOriginalFilename();
         String createFilename = "profile/" + UUID.randomUUID() + "." + originalFilename;
 
+        System.out.println("여기당");
+        System.out.println("createFilename : " + createFilename);
+
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(createFilename)
