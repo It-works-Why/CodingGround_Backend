@@ -3,12 +3,14 @@ package app.codingGround.api.account.controller;
 import app.codingGround.api.account.dto.request.*;
 import app.codingGround.api.account.dto.response.EditUserInfoDto;
 import app.codingGround.api.account.dto.response.EmailCertificationDto;
+import app.codingGround.api.account.dto.response.EmailCheckDto;
 import app.codingGround.api.account.dto.response.UserInfoFromToken;
 import app.codingGround.api.account.service.ProfileUploadService;
 import app.codingGround.global.config.model.TokenInfo;
 import app.codingGround.api.account.service.AccountService;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
 import app.codingGround.global.config.model.ApiResponse;
+import app.codingGround.global.utils.RedisUtil;
 import app.codingGround.global.utils.SHA256Util;
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +33,7 @@ public class AccountRestController {
 
     private final AccountService accountService;
     private final ProfileUploadService profileUploadService;
-
-    String emailKey;
+    private final RedisUtil redisUtil;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<DefaultResultDto>> register(@RequestBody @Validated UserRegisterDto userRegisterDto) {
@@ -65,7 +66,7 @@ public class AccountRestController {
     public Map sendEmail(@RequestBody UserRegisterDto userRegisterDto) {
 
         Map map = new HashMap<>();
-        EmailCertificationDto dto = accountService.getEmail(userRegisterDto);
+        EmailCheckDto dto = accountService.getEmail(userRegisterDto);
 
         if (dto != null) {
             map.put("exist", "이미 존재하는 이메일입니다.");
@@ -89,7 +90,8 @@ public class AccountRestController {
             message.setSubject("Coding-Ground 이메일 인증을 완료해주세요!"); // 이메일 제목
             String mail = "\n          안녕하세요. Coding-Ground ⚙️ 입니다. \n\n ----------------------------------------------------------------------- \n\n";
             message.setText(mail + "            인증번호는 🌟 " + key + " 🌟 입니다."); // 이메일 내용
-            emailKey = key;
+
+            redisUtil.setDataExpire(userRegisterDto.getUserEmail(), key, 60 * 5L);
 
             try {
                 accountService.sendEmail(message);
@@ -107,7 +109,7 @@ public class AccountRestController {
     public Map sendEmailAndId(@RequestBody UserRegisterDto userRegisterDto) {
 
         Map map = new HashMap<>();
-        EmailCertificationDto dto = accountService.getEmailAndId(userRegisterDto);
+        EmailCheckDto dto = accountService.getEmailAndId(userRegisterDto);
 
         if (dto != null) {
             Random random = new Random(); // 난수 생성을 위한 랜덤 클래스
@@ -145,21 +147,23 @@ public class AccountRestController {
     }
 
     @PostMapping("/certification/email")
-    public Map certificateEmail(@RequestBody String certificationNumber) {
+    public Map certificateEmail(@RequestBody EmailCertificationDto emailCertificationDto) {
         Map map = new HashMap<>();
 
-        if (!certificationNumber.equals(emailKey)) {
+        int result = redisUtil.checkEmail(emailCertificationDto);
+
+        if (result == 0) {
             map.put("success", "인증번호가 일치합니다.");
         } else {
-            map.put("fail", "인증번호가 불일치합니다.");
+            map.put("fail", "인증번호가 만료되었습니다.");
         }
 
         return map;
     }
 
     @PostMapping("/check/userEmail")
-    public String checkUserNickname(@RequestBody EmailCertificationDto emailCertificationDto) {
-        String userEmail = emailCertificationDto.getUserEmail();
+    public String checkUserNickname(@RequestBody EmailCheckDto emailCheckDto) {
+        String userEmail = emailCheckDto.getUserEmail();
         return accountService.checkUserEmail(userEmail);
     }
 

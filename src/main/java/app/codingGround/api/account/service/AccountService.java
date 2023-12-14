@@ -4,7 +4,7 @@ import app.codingGround.api.account.dto.request.UserInfoEdit2Dto;
 import app.codingGround.api.account.dto.request.UserInfoEditDto;
 import app.codingGround.api.account.dto.request.UserRegisterDto;
 import app.codingGround.api.account.dto.response.EditUserInfoDto;
-import app.codingGround.api.account.dto.response.EmailCertificationDto;
+import app.codingGround.api.account.dto.response.EmailCheckDto;
 import app.codingGround.api.account.dto.response.UserInfoFromToken;
 import app.codingGround.api.entity.Rank;
 import app.codingGround.api.entity.Season;
@@ -31,9 +31,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -137,13 +134,13 @@ public class AccountService {
                 .build();
     }
 
-    public EmailCertificationDto getEmail(UserRegisterDto userRegisterDto) {
+    public EmailCheckDto getEmail(UserRegisterDto userRegisterDto) {
         User user = accountRepository.findByUserEmail(userRegisterDto.getUserEmail());
 
         if (user == null) {
             return null;
         } else {
-            EmailCertificationDto userDto = new EmailCertificationDto(user);
+            EmailCheckDto userDto = new EmailCheckDto(user);
             return userDto;
         }
     }
@@ -163,13 +160,13 @@ public class AccountService {
         }
     }
 
-    public EmailCertificationDto getEmailAndId(UserRegisterDto userRegisterDto) {
+    public EmailCheckDto getEmailAndId(UserRegisterDto userRegisterDto) {
         User user = accountRepository.findByUserEmailAndUserId(userRegisterDto.getUserEmail(), userRegisterDto.getUserId());
 
         if (user == null) {
             return null;
         } else {
-            EmailCertificationDto userDto = new EmailCertificationDto(user);
+            EmailCheckDto userDto = new EmailCheckDto(user);
             return userDto;
         }
     }
