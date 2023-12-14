@@ -5,12 +5,14 @@ import app.codingGround.api.battle.dto.request.CodeData;
 import app.codingGround.api.battle.dto.response.*;
 import app.codingGround.api.battle.service.BattleService;
 import app.codingGround.api.entity.Question;
+import app.codingGround.global.config.model.ChatMessage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.core.parameters.P;
@@ -189,6 +191,26 @@ public class BattleController {
         List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
         messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
     }
+
+
+    @MessageMapping("/chat.sendMessage")
+    @SendTo("/topic/public")
+    public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
+        return chatMessage;
+    }
+
+    @MessageMapping("/chat.addUser")
+    @SendTo("/topic/public")
+    public ChatMessage addUser(@Payload ChatMessage chatMessage,
+                               SimpMessageHeaderAccessor headerAccessor) {
+        // Add username in web socket session
+        headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
+        return chatMessage;
+    }
+
+
+
+
 
 
 }
