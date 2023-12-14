@@ -15,7 +15,11 @@ import java.sql.Timestamp;
 public class UserRegisterDto {
 
     @NotBlank(message = "아이디는 최소 5자 이상 20자 이하로 작성 해주세요.")
-    @Length(max = 20,min = 5, message = "아이디는 최소 5자 이상 20자 이하로 작성 해주세요.")
+    @Pattern(
+            regexp = "^[A-Za-z\\d]+$",
+            message = "아이디는 최소 5자 이상 20자 이하로 작성 해주세요."
+    )
+    @Length(max = 20, min = 5, message = "아이디는 최소 5자 이상 20자 이하로 작성 해주세요.")
     @NotNull(message = "아이디는 최소 5자 이상 20자 이하로 작성 해주세요.")
     private String userId;
 
@@ -23,6 +27,10 @@ public class UserRegisterDto {
     @Length(min = 8, message = "패스워드는 최소 8자 이상, 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.")
     @Pattern(
             regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+            message = "패스워드는 최소 8자 이상, 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다."
+    )
+    @Pattern(
+            regexp = "^[A-Za-z\\d@$!%*?&]{8,}$",
             message = "패스워드는 최소 8자 이상, 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다."
     )
     @NotNull

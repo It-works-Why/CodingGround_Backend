@@ -1,7 +1,7 @@
 package app.codingGround.api.battle.controller;
 
 import app.codingGround.api.battle.dto.request.ConnectGameInfo;
-import app.codingGround.api.battle.dto.response.QueueInfoDto;
+import app.codingGround.api.battle.dto.response.*;
 import app.codingGround.api.battle.service.BattleService;
 import app.codingGround.api.entity.Language;
 import app.codingGround.domain.common.dto.response.DefaultResultDto;
@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.Jedis;
@@ -108,5 +111,14 @@ public class BattleRestController {
         return ResponseEntity.ok(new ApiResponse<>(battleService.denyReconnect(accessToken)));
     }
 
-
+    @PostMapping("/get/question/{gameId}")
+    public ResponseEntity<ApiResponse<BattleData>> getQuestion(@PathVariable String gameId) {
+        // gameId 의 현재 라운드수, gameNum 을 redis에서 조회 후 RDS에서 조회후 리턴
+        BattleData battleData = new BattleData();
+        QuestionDto questionDto = battleService.getQuestion(gameId);
+        List<TestCaseDto> testCase = battleService.getTestcase(gameId);
+        battleData.setQuestionDto(questionDto);
+        battleData.setTestCase(testCase);
+        return ResponseEntity.ok(new ApiResponse<>(battleData));
+    }
 }

@@ -80,7 +80,7 @@ public class BattleController {
 //      게임 타입이 WAIT 이고, 유저 인원수가 8명일때! 게임시작 전송
         String gameStatus = battleService.getGameStatus(gameId);
 
-        if (gameStatus.equals("WAIT") && userCount == 8) { // 테스트를 위해 2로 해놓음
+        if (gameStatus.equals("WAIT") && userCount == 8) {
             try {
                 Thread.sleep(4000);
             } catch (InterruptedException e) {
@@ -159,19 +159,7 @@ public class BattleController {
         }
     }
 
-    @MessageMapping("/get/question/{gameId}")
-    public void getQuestion(@DestinationVariable String gameId, @Payload String userId) {
-        // gameId 의 현재 라운드수, gameNum 을 redis에서 조회 후 RDS에서 조회후 리턴
 
-        BattleData battleData = new BattleData();
-        QuestionDto questionDto = battleService.getQuestion(gameId);
-        List<TestCaseDto> testCase = battleService.getTestcase(gameId);
-        battleData.setQuestionDto(questionDto);
-        battleData.setTestCase(testCase);
-        messagingTemplate.convertAndSend("/topic/public/get/question/" + gameId + "/" + userId, battleData);
-        List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
-        messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
-    }
 
     @MessageMapping("/send/1/{gameId}")
     public void sendCodeRound1(@DestinationVariable String gameId, @Payload CodeData codeData) {
