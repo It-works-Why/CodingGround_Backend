@@ -8,8 +8,8 @@ permissions:
   contents: write
 
 env:
-  ecr_url: 503237308475.dkr.ecr.ca-central-1.amazonaws.com
-  aws_region: ca-central-1
+  ecr_url: 503237308475.dkr.ecr.ap-east-1.amazonaws.com
+  aws_region: ap-east-1
 
 jobs:
   build:
