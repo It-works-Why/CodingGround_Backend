@@ -98,30 +98,9 @@ public class AccountService {
         user.setUserProfileImg(userRegisterDto.getUserProfileImg());
         accountRepository.save(user);
 
-        // user season 테이블 데이터 생성
-        LocalDateTime nowDate = LocalDateTime.now();
-
-        DateTimeFormatter dateFormatYear =  DateTimeFormatter.ofPattern("yyyy");
-        String year = dateFormatYear.format(nowDate);
-
-        DateTimeFormatter dateFormatMonth = DateTimeFormatter.ofPattern("MM");
-        String month = dateFormatMonth.format(nowDate);
-
-        String seasonName = null;
-
-        if (month.equals("1") || month.equals("2") || month.equals("3")) {
-            seasonName = year + "-1";
-        } else if (month.equals("4") || month.equals("5") || month.equals("6")) {
-            seasonName = year + "-2";
-        } else if (month.equals("7") || month.equals("8") || month.equals("9")) {
-            seasonName = year + "-3";
-        } else {
-            seasonName = year + "-4";
-        }
-
         User user2 = accountRepository.findByUserEmail(userRegisterDto.getUserEmail());
         Rank rank = rankingRepository.findByRankNum(5L);
-        Season season = seasonRepository.findBySeasonName(seasonName);
+        Season season = seasonRepository.findFirstByOrderBySeasonNumDesc();
 
         UserSeason userSeason = new UserSeason();
         userSeason.setUser(user2);
@@ -147,11 +126,15 @@ public class AccountService {
     public UserInfoFromToken getUserInfo(String accessToken) {
         String userId = JwtTokenProvider.getUserId(accessToken);
         Optional<User> user = accountRepository.findByUserId(userId);
+        UserSeason userSeason = userSeasonRepository.findFirstByUserOrderByUserSeasonNumDesc(user);
+        Long rankNum = userSeason.getRank().getRankNum();
 
         return UserInfoFromToken.builder()
                 .userNickname(user.get().getUserNickname())
                 .userRole(user.get().getUserRole())
-                .userId(userId).build();
+                .userId(userId)
+                .rankNum(rankNum)
+                .build();
     }
 
     public EmailCertificationDto getEmail(UserRegisterDto userRegisterDto) {

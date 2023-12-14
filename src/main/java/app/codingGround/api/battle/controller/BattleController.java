@@ -5,19 +5,23 @@ import app.codingGround.api.battle.dto.request.CodeData;
 import app.codingGround.api.battle.dto.response.*;
 import app.codingGround.api.battle.service.BattleService;
 import app.codingGround.api.entity.Question;
+import app.codingGround.global.config.model.ChatMessage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.params.SetParams;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -76,7 +80,12 @@ public class BattleController {
 //      게임 타입이 WAIT 이고, 유저 인원수가 8명일때! 게임시작 전송
         String gameStatus = battleService.getGameStatus(gameId);
 
-        if (gameStatus.equals("WAIT") && userCount == 8) { // 테스트를 위해 2로 해놓음
+        if (gameStatus.equals("WAIT") && userCount == 2) {
+            try {
+                Thread.sleep(4000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             battleService.startGame(gameId);
             LocalDateTime currentTime = LocalDateTime.now();
             LocalDateTime futureTime = currentTime.plusSeconds(10);
@@ -86,8 +95,21 @@ public class BattleController {
             ScheduledExecutorService scheduler1 = Executors.newScheduledThreadPool(1);
             int round1LimitMinutes = questions.get(0).getQuestionLimitTime();
             long delayInSeconds1 = round1LimitMinutes * 60L + 5L; // 현재 분을 초로 환산 후 5초를 추가합니다.
+
+            List<GameUserDto> gameUserDtos = battleService.getGameUserDtoList(gameId);
             Runnable eventTask1 = () -> {
                 System.out.println("1라운드 끝!");
+                for(GameUserDto dto : gameUserDtos) {
+                    Boolean isDisconnect = battleService.getFailedUser(gameId, dto.getUserId());
+                    if (!isDisconnect) {
+                        messagingTemplate.convertAndSend("/topic/public/disconnect/user/" + gameId + "/" + dto.getUserId(), dto.getUserId());
+                    } else {
+                        messagingTemplate.convertAndSend("/topic/public/round1/url/" + gameId + "/" + dto.getUserId(), dto.getUserId());
+
+                        List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
+                        messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
+                    }
+                }
                 battleService.endRound1(gameId);
                 messagingTemplate.convertAndSend("/topic/public/round1/end/front/" + gameId, gameId);
                 try {
@@ -105,6 +127,11 @@ public class BattleController {
             long delayInSeconds2 = round2LimitMinutes * 60L + 5L; // 현재 분을 초로 환산 후 5초를 추가합니다.
             Runnable eventTask2 = () -> {
                 messagingTemplate.convertAndSend("/topic/public/round2/end/front/" + gameId, gameId);
+                for(GameUserDto dto : gameUserDtos){
+                    String myRank = battleService.getMyRank(gameId, dto.getUserId());
+                    messagingTemplate.convertAndSend("/topic/public/round2/url/" + gameId + "/" + dto.getUserId(), myRank);
+                }
+
                 System.out.println("2라운드 끝!");
                 try {
                     Thread.sleep(10000);
@@ -132,32 +159,8 @@ public class BattleController {
         }
     }
 
-    @MessageMapping("/get/question/{gameId}")
-    public void getQuestion(@DestinationVariable String gameId, @Payload String userId) {
-        // gameId 의 현재 라운드수, gameNum 을 redis에서 조회 후 RDS에서 조회후 리턴
 
-        BattleData battleData = new BattleData();
-        QuestionDto questionDto = battleService.getQuestion(gameId);
-        List<TestCaseDto> testCase = battleService.getTestcase(gameId);
-        battleData.setQuestionDto(questionDto);
-        battleData.setTestCase(testCase);
-        messagingTemplate.convertAndSend("/topic/public/get/question/" + gameId + "/" + userId, battleData);
-        List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
-        messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
-    }
 
-    @MessageMapping("/send/{gameId}")
-    public void sendCode(@DestinationVariable String gameId, @Payload CodeData codeData) {
-        ResultDto resultDto = battleService.runCode(codeData, gameId);
-        List<TestCaseResultDto> testCaseResultDtos = resultDto.getTestCaseResultDtos();
-        messagingTemplate.convertAndSend("/topic/public/get/result/" + gameId + "/" + codeData.getUserId(), testCaseResultDtos);
-        List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
-        messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
-
-//        if (resultDto.getIsRoundEnd()) {
-//            messagingTemplate.convertAndSend("/topic/public/round1/end/front/" + gameId, codeData.getUserId());
-//        }
-    }
     @MessageMapping("/send/1/{gameId}")
     public void sendCodeRound1(@DestinationVariable String gameId, @Payload CodeData codeData) {
         ResultDto resultDto = battleService.runCode(codeData, gameId, 1);
@@ -177,22 +180,25 @@ public class BattleController {
         messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
     }
 
-    @MessageMapping("/round1/end/{gameId}")
-    public void round1End(@DestinationVariable String gameId, @Payload String userId) {
-        Boolean isDisconnect = battleService.getFailedUser(gameId, userId);
-        if (!isDisconnect) {
-            messagingTemplate.convertAndSend("/topic/public/disconnect/user/" + gameId + "/" + userId, userId);
-        } else {
-            messagingTemplate.convertAndSend("/topic/public/round1/url/" + gameId + "/" + userId, userId);
 
-            List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
-            messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
-        }
+    @MessageMapping("/chat.sendMessage")
+    @SendTo("/topic/public")
+    public ChatMessage sendMessage(@Payload ChatMessage chatMessage) {
+        return chatMessage;
     }
 
-    @MessageMapping("/round2/end/{gameId}")
-        public void round2End(@DestinationVariable String gameId, @Payload String userId) {
-            String myRank = battleService.getMyRank(gameId, userId);
-            messagingTemplate.convertAndSend("/topic/public/round2/url/" + gameId + "/" + userId, myRank);
+    @MessageMapping("/chat.addUser")
+    @SendTo("/topic/public")
+    public ChatMessage addUser(@Payload ChatMessage chatMessage,
+                               SimpMessageHeaderAccessor headerAccessor) {
+        // Add username in web socket session
+        headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
+        return chatMessage;
     }
+
+
+
+
+
+
 }

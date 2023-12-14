@@ -104,14 +104,42 @@ public class BattleService {
         }
 
 
+
         // 여기서부터는 재접속이 필요없는 유저
         String gameId = redisUtil.findGameRoom(connectGameInfo);
         if (gameId == null) {
             gameId = redisUtil.createRoom(connectGameInfo);
         }
 
-        redisUtil.createUserKey(gameId, gameUserDto);
-        redisUtil.joinGameRoom(gameId, gameUserDto);
+        Jedis jedis = null;
+        String lockKey = null;
+        QueueInfoDto queueInfoDto = null;
+        try {
+            jedis = getJedisInstance();
+            lockKey = "game_room_lock:" + gameId;
+            int maxRetries = 7; // 최대 재시도 횟수
+            int waitTimeMs = 3000; // 재시도 간격 (5초)
+            String lockResult = null;
+            int retries = 0;
+            while (lockResult == null && retries < maxRetries) {
+                lockResult = jedis.set(lockKey, "LOCKED", SetParams.setParams().nx().ex(10)); // 락의 만료 시간을 설정합니다. (예: 10초)
+                if (lockResult == null) {
+                    retries++;
+                    try {
+                        Thread.sleep(waitTimeMs); // 일정 시간 대기 후 재시도
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+            if (lockResult != null) {
+                redisUtil.createUserKey(gameId, gameUserDto);
+                redisUtil.joinGameRoom(gameId, gameUserDto);
+            }
+        } finally {
+            jedis.del(lockKey);
+            closeJedisInstance(jedis);
+        }
 
         return QueueInfoDto.builder().gameId(gameId).connectType("succeed").build();
     }
@@ -279,159 +307,8 @@ public class BattleService {
             testCaseDto.setOutput(dto.getTestCaseOutput());
             result.add(testCaseDto);
         }
-
         return result;
     }
-
-    @Transactional
-    public ResultDto runCode(CodeData codeData, String gameId) {
-
-        GameDto game = redisUtil.findGameByGameId(gameId);
-        User user = userRepository.findByUserId(codeData.getUserId());
-        Round round = roundRepository.findByGameNumAndRound(gameRepository.findByGameNum(game.getGameNum()), game.getGameRound());
-        int answerCorrect = 0;
-        int count = 0;
-        Long questionNum = round.getQuestionNum().getQuestionNum();
-        List<TestCase> testCases = adminTestCaseRepository.findAllByQuestion_QuestionNum(questionNum);
-        List<TestCaseDto> result = new ArrayList<>();
-        for (TestCase dto : testCases) {
-            TestCaseDto testCaseDto = new TestCaseDto();
-            testCaseDto.setInput(dto.getTestCaseInput());
-            testCaseDto.setOutput(dto.getTestCaseOutput());
-            result.add(testCaseDto);
-        }
-
-
-        if (codeData.getType().equals("run")) {
-            result.remove(2);
-        }
-        List<String> tokens = Judge0Util.runCode(codeData, result);
-        List<TestCaseResultDto> testCaseResultDtos = null;
-        ResultDto resultDto = new ResultDto();
-        if (codeData.getType().equals("run")) {
-            testCaseResultDtos = Judge0Util.readTokens(tokens, result);
-        } else {
-            testCaseResultDtos = Judge0Util.readTokens(tokens, result);
-            RoundRecord roundRecord = roundRecordRepository.findByRoundNumAndUserNum(round, user);
-            if (roundRecord == null) {
-                roundRecord = new RoundRecord();
-                roundRecord.setRoundNum(round);
-                roundRecord.setUserNum(user);
-            }
-
-            if (testCaseResultDtos.get(0).getIsCorrect() && testCaseResultDtos.get(1).getIsCorrect() && testCaseResultDtos.get(2).getIsCorrect()) {
-                answerCorrect = 1;
-                if (game.getGameRound() == 1) {
-
-                    Jedis jedis = null;
-                    jedis = getJedisInstance();
-                    String lockKey = "game_user_lock:" + gameId; // gameId에 따른 락 키 생성
-                    int maxRetries = 7; // 최대 재시도 횟수
-                    int waitTimeMs = 3000; // 재시도 간격 (5초)
-
-                    String lockResult = null;
-                    int retries = 0;
-
-                    while (lockResult == null && retries < maxRetries) {
-                        lockResult = jedis.set(lockKey, "LOCKED", SetParams.setParams().nx().ex(10)); // 락의 만료 시간을 설정합니다. (예: 10초)
-                        if (lockResult == null) {
-                            retries++;
-                            try {
-                                Thread.sleep(waitTimeMs); // 일정 시간 대기 후 재시도
-                            } catch (InterruptedException e) {
-                                Thread.currentThread().interrupt();
-                                // 스레드 인터럽트 발생 시 처리
-                            }
-                        }
-                    }
-                    if (lockResult != null) {
-                        List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoResult(gameId);
-                        for (GameUserDto dto : gameUserDtos) {
-                            if (dto.getUserGameResult().equals("5")) {
-                                count++;
-                            }
-                        }
-                        if (count < 4) {
-                            redisUtil.updateUserStatus(gameId, codeData.getUserId(), "5");
-                        }
-                    }
-
-                } else {
-                    Jedis jedis = null;
-                    jedis = getJedisInstance();
-                    String lockKey = "game_user_lock:" + gameId; // gameId에 따른 락 키 생성
-                    int maxRetries = 7; // 최대 재시도 횟수
-                    int waitTimeMs = 3000; // 재시도 간격 (5초)
-
-                    String lockResult = null;
-                    int retries = 0;
-
-                    while (lockResult == null && retries < maxRetries) {
-                        lockResult = jedis.set(lockKey, "LOCKED", SetParams.setParams().nx().ex(10)); // 락의 만료 시간을 설정합니다. (예: 10초)
-                        if (lockResult == null) {
-                            retries++;
-                            try {
-                                Thread.sleep(waitTimeMs); // 일정 시간 대기 후 재시도
-                            } catch (InterruptedException e) {
-                                Thread.currentThread().interrupt();
-                                // 스레드 인터럽트 발생 시 처리
-                            }
-                        }
-                    }
-                    if (lockResult != null) {
-                        // 락을 획득한 경우에만 로직 수행
-                        try {
-                            List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoList(gameId);
-                            for (GameUserDto dto : gameUserDtos) {
-                                if (dto.getUserId().equals(codeData.getUserId())) {
-                                    dto.setMemory(testCaseResultDtos.get(2).getMemory());
-                                }
-                            }//500000
-                            Collections.sort(gameUserDtos, Comparator.comparingInt(dto -> Integer.parseInt(dto.getMemory())));
-
-                            for (GameUserDto gameUserDto : gameUserDtos) {
-                                // 정렬된 순서의 인덱스를 이용하여 순위를 부여합니다.
-                                if (!gameUserDto.getMemory().equals("500000")) {
-                                    int rank = gameUserDtos.indexOf(gameUserDto) + 1;
-                                    redisUtil.updateUserStatus(gameId, gameUserDto.getUserId(), rank + "", gameUserDto.getMemory());
-                                }
-                            }
-                        } finally {
-                            jedis.del(lockKey); // 작업 완료 후 락을 해제합니다.
-                            closeJedisInstance(jedis);
-                        }
-                    }
-                }
-            }
-            if (testCaseResultDtos.get(testCaseResultDtos.size() - 1).getMemory() == null) {
-                roundRecord.setRoundRecordMemory(null);
-            } else {
-                roundRecord.setRoundRecordMemory(Integer.valueOf(testCaseResultDtos.get(testCaseResultDtos.size() - 1).getMemory()));
-            }
-            roundRecord.setRoundRecordAnswer(codeData.getCode());
-            roundRecord.setRoundRecordAnswerCorrect(answerCorrect);
-            roundRecord.setRoundRecordRanking(null);
-            roundRecord.setRoundRecordSubmitTime(Timestamp.valueOf(LocalDateTime.now()));
-            roundRecord.setRoundRecordToken(testCaseResultDtos.get(testCaseResultDtos.size() - 1).getToken());
-            roundRecordRepository.save(roundRecord);
-        }
-        if (game.getGameRound() == 1) {
-            resultDto.setRound(1);
-            if (count == 5) {
-                resultDto.setIsRoundEnd(true);
-            } else {
-                resultDto.setIsRoundEnd(false);
-            }
-        }
-        if (game.getGameRound() == 2) {
-            resultDto.setRound(2);
-            resultDto.setIsRoundEnd(false);
-        }
-
-        resultDto.setTestCaseResultDtos(testCaseResultDtos);
-        return resultDto;
-    }
-
 
     @Transactional
     public ResultDto runCode(CodeData codeData, String gameId, int roundCount) {
@@ -471,17 +348,11 @@ public class BattleService {
 
             if (testCaseResultDtos.get(0).getIsCorrect() && testCaseResultDtos.get(1).getIsCorrect() && testCaseResultDtos.get(2).getIsCorrect()) {
                 answerCorrect = 1;
-                if (game.getGameRound() == 1) {
-                    List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoResult(gameId);
-                    for (GameUserDto dto : gameUserDtos) {
-                        if (dto.getUserGameResult().equals("5")) {
-                            count++;
-                        }
-                    }
+                if (roundCount == 1) {
 
                     Jedis jedis = null;
                     jedis = getJedisInstance();
-                    String lockKey = "locker:" + gameId; // gameId에 따른 락 키 생성
+                    String lockKey = "runRock:" + gameId; // gameId에 따른 락 키 생성
                     int maxRetries = 7; // 최대 재시도 횟수
                     int waitTimeMs = 3000; // 재시도 간격 (5초)
 
@@ -500,13 +371,19 @@ public class BattleService {
                             }
                         }
                     }
-
                     if (lockResult != null) {
-                        if (count < 5) {
+                        List<GameUserDto> gameUserDtos = redisUtil.getGameUserDtoResult(gameId);
+                        for (GameUserDto dto : gameUserDtos) {
+                            if (dto.getUserGameResult().equals("5")) {
+                                count++;
+                            }
+                        }
+                        if (count < 4) {
                             redisUtil.updateUserStatus(gameId, codeData.getUserId(), "5");
                             count++;
                         }
                     }
+                    jedis.del(lockKey);
                     closeJedisInstance(jedis);
                 } else {
 //                        List<RoundRecord> roundRecords = roundRecordRepository.findAllByRoundNum(round);
@@ -520,7 +397,7 @@ public class BattleService {
 
                     for (GameUserDto gameUserDto : gameUserDtos) {
                         // 정렬된 순서의 인덱스를 이용하여 순위를 부여합니다.
-                        if (!gameUserDto.getMemory().equals("500000")) {
+                        if (!gameUserDto.getMemory().equals("500000") && !gameUserDto.getMemory().equals("0") && !(gameUserDto.getMemory().isEmpty())) {
                             int rank = gameUserDtos.indexOf(gameUserDto) + 1;
                             redisUtil.updateUserStatus(gameId, gameUserDto.getUserId(), rank + "", gameUserDto.getMemory());
                         }
@@ -589,7 +466,6 @@ public class BattleService {
     @Transactional
     public void addGameRecord(String gameId) {
         List<GameUserDto> gameUserDtoList = redisUtil.getGameUserDtoResult(gameId);
-        String userResult = "";
         for (GameUserDto dto : gameUserDtoList) {
             GameDto gameDto = redisUtil.findGameByGameId(gameId);
             Game game = gameRepository.findByGameNum(gameDto.getGameNum());
@@ -632,6 +508,7 @@ public class BattleService {
                         break;
                     case "defeat":
                     case "DEFEAT":
+                    case "0":
                         gameRecord.setGameRecord(6);
                         gameRecord.setChangeScore(-5);
                         userSeason.setRankScore(score - 5);
@@ -656,6 +533,8 @@ public class BattleService {
                         gameRecord.setGameRecord(5);
                         break;
                     case "defeat":
+                    case "DEFEAT":
+                    case "0":
                         gameRecord.setGameRecord(6);
                         break;
                 }

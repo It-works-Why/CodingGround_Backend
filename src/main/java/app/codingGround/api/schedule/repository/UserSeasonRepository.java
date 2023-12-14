@@ -6,7 +6,11 @@ import app.codingGround.api.entity.UserSeason;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserSeasonRepository extends JpaRepository<UserSeason, Long> {
     UserSeason findBySeasonAndUser(Season seasonNum, User user);
+
+    UserSeason findFirstByUserOrderByUserSeasonNumDesc(Optional<User> user);
 }
