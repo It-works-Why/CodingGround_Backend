@@ -1,6 +1,6 @@
 spring:
   redis:
-    host: bsdev16-redis-test.ydfwq4.ng.0001.cac1.cache.amazonaws.com
+    host: bsdev16-codingground-redis.ymqfqi.ng.0001.ape1.cache.amazonaws.com
     port: 6379
   mvc:
     pathmatch:
