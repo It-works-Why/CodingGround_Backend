@@ -80,7 +80,7 @@ public class BattleController {
 //      게임 타입이 WAIT 이고, 유저 인원수가 8명일때! 게임시작 전송
         String gameStatus = battleService.getGameStatus(gameId);
 
-        if (gameStatus.equals("WAIT") && userCount == 8) {
+        if (gameStatus.equals("WAIT") && userCount == 2) {
             try {
                 Thread.sleep(4000);
             } catch (InterruptedException e) {
