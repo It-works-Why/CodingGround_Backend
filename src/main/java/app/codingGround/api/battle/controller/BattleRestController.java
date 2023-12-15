@@ -119,6 +119,7 @@ public class BattleRestController {
         List<TestCaseDto> testCase = battleService.getTestcase(gameId);
         battleData.setQuestionDto(questionDto);
         battleData.setTestCase(testCase);
+
         return ResponseEntity.ok(new ApiResponse<>(battleData));
     }
 }

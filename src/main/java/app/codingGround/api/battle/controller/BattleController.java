@@ -105,13 +105,13 @@ public class BattleController {
                         messagingTemplate.convertAndSend("/topic/public/disconnect/user/" + gameId + "/" + dto.getUserId(), dto.getUserId());
                     } else {
                         messagingTemplate.convertAndSend("/topic/public/round1/url/" + gameId + "/" + dto.getUserId(), dto.getUserId());
-
-                        List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
-                        messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
                     }
                 }
                 battleService.endRound1(gameId);
                 messagingTemplate.convertAndSend("/topic/public/round1/end/front/" + gameId, gameId);
+                List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
+                messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
+
                 try {
                     Thread.sleep(5000);
                     battleService.addRound1Record(gameId);
