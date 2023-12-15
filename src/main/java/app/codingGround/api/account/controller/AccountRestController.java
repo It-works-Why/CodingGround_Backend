@@ -148,6 +148,8 @@ public class AccountRestController {
 
     @PostMapping("/certification/email")
     public Map certificateEmail(@RequestBody EmailCertificationDto emailCertificationDto) {
+        System.out.println(emailCertificationDto.getUserEmail());
+        System.out.println("ㅡㅡ");
         Map map = new HashMap<>();
 
         int result = redisUtil.checkEmail(emailCertificationDto);
