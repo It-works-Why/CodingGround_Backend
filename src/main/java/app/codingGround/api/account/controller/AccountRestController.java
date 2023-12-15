@@ -154,8 +154,10 @@ public class AccountRestController {
 
         if (result == 0) {
             map.put("success", "인증번호가 일치합니다.");
-        } else {
-            map.put("fail", "인증번호가 만료되었습니다.");
+        } else if (result == 1) {
+            map.put("expire", "인증번호가 만료되었습니다.");
+        } else if (result == 2) {
+            map.put("fail", "인증번호를 다시 입력해주세요.");
         }
 
         return map;
