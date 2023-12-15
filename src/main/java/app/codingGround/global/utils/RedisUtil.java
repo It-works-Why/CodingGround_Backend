@@ -6,6 +6,7 @@ import app.codingGround.api.battle.dto.response.GameDto;
 import app.codingGround.api.battle.dto.response.GameUserDto;
 import app.codingGround.api.battle.dto.response.PersonalGameDataDto;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
@@ -579,6 +580,21 @@ public class RedisUtil {
             closeJedisInstance(jedis);
         }
 
+    }
+
+    public void removeUser(String userId) {
+        String gameId = getGameId(userId);
+
+        List<GameUserDto> gameUserDtos = getGameUserDtoResult(userId);
+        int i = 0;
+        for(GameUserDto dto : gameUserDtos){
+            if(dto.getUserId().equals(userId)){
+                gameUserDtos.remove(i);
+            }else{
+                joinGameRoom(gameId, dto);
+            }
+            i++;
+        }
     }
 
     //

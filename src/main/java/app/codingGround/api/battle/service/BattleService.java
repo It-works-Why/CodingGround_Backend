@@ -617,6 +617,11 @@ public class BattleService {
             throw new RuntimeException(e);
         }
     }
+
+    public void removeUser(String accessToken) {
+        String userId = JwtTokenProvider.getUserId(accessToken);
+        redisUtil.removeUser(userId);
+    }
 }
 
 
