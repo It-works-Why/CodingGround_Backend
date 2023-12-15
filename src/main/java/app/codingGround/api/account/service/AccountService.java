@@ -31,6 +31,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -39,11 +40,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AccountService {
 
-    private final AccountRepository accountRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final JavaMailSender javaMailSender;
 
+    private final AccountRepository accountRepository;
     private final UserSeasonRepository userSeasonRepository;
     private final RankingRepository rankingRepository;
     private final SeasonRepository seasonRepository;
@@ -51,6 +52,14 @@ public class AccountService {
     @Transactional
     public TokenInfo login(String userId, String password) {
         try {
+
+            Optional<User> user = accountRepository.findByUserId(userId);
+
+            String userStatus = user.get().getUserStatus();
+
+            if (Objects.equals(userStatus, "BLOCK")) throw new CustomException("블랙 처리된 회원입니다.", ErrorCode.BLOCK_USER);
+            if (Objects.equals(userStatus, "DELETED")) throw new CustomException("탈퇴 처리된 회원입니다.", ErrorCode.DELETED_USER);
+
             // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
             // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, password);
@@ -61,6 +70,7 @@ public class AccountService {
             TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
 
             return tokenInfo;
+
         } catch (BadCredentialsException e) {
             throw new CustomException("로그인 정보가 올바르지 않습니다.", ErrorCode.INVALID_INPUT_ACCOUNT_INFO);
         }
