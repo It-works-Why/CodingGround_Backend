@@ -180,6 +180,14 @@ public class BattleController {
         messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
     }
 
+    @MessageMapping("/reconnect")
+    public void reConnect(@Payload String userId, SimpMessageHeaderAccessor headerAccessor) {
+        if (userId != null) {
+            headerAccessor.getSessionAttributes().put("userId", userId);
+        }
+    }
+
+
 
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/public")
