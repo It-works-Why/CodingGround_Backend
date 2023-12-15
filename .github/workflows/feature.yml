@@ -73,8 +73,8 @@ jobs:
       - name: Update image in Kubernetes mainfest
         run: |
           sed -i -e \
-          "s|503237308475.dkr.ecr.ca-central-1.amazonaws.com/codingground-backend:v[0-9.]*|\
-          503237308475.dkr.ecr.ca-central-1.amazonaws.com/codingground-backend:${{steps.version.outputs.version}}|g" \
+          "s|503237308475.dkr.ecr.ap-east-1.amazonaws.com/codingground-backend:v[0-9.]*|\
+          503237308475.dkr.ecr.ap-east-1.amazonaws.com/codingground-backend:${{steps.version.outputs.version}}|g" \
           ./deploy.yaml
 
       - name: Commit and push changes
