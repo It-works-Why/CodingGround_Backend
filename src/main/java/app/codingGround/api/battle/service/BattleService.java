@@ -618,7 +618,6 @@ public class BattleService {
         }
     }
 
-
 }
 
 
