@@ -111,7 +111,7 @@ public class BattleRestController {
         return ResponseEntity.ok(new ApiResponse<>(battleService.denyReconnect(accessToken)));
     }
 
-    @PostMapping("/get/question/{gameId}")
+    @GetMapping("/get/question/{gameId}")
     public ResponseEntity<ApiResponse<BattleData>> getQuestion(@PathVariable String gameId) {
         // gameId 의 현재 라운드수, gameNum 을 redis에서 조회 후 RDS에서 조회후 리턴
         BattleData battleData = new BattleData();
