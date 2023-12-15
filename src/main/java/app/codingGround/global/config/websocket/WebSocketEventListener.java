@@ -57,6 +57,8 @@ public class WebSocketEventListener {
         String userId = (String) headerAccessor.getSessionAttributes().get("userId");
         if(userId != null) {
             logger.info("User Disconnected : " + userId);
+            System.out.println(userId);
+            System.out.println("hererererere");
             battleService.escapeGame(userId);
             messagingTemplate.convertAndSend("/topic/public/disconnect", "");
             String gameId = battleService.getGameId(userId);
