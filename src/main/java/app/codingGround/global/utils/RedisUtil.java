@@ -1,5 +1,6 @@
 package app.codingGround.global.utils;
 
+import app.codingGround.api.account.dto.response.EmailCertificationDto;
 import app.codingGround.api.battle.dto.request.ConnectGameInfo;
 import app.codingGround.api.battle.dto.response.GameDto;
 import app.codingGround.api.battle.dto.response.GameUserDto;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -21,8 +23,8 @@ public class RedisUtil {
     @Value("${spring.redis.port}")
     private int redisPort;
 
-//    @Value("${spring.redis.password}")
-//    private String redisPassword;
+    @Value("${spring.redis.password}")
+    private String redisPassword;
 
     public String getRedisHost() {
         return redisHost;
@@ -32,14 +34,14 @@ public class RedisUtil {
         return redisPort;
     }
 
-//    public String getRedisPassword() {
-//        return redisPassword;
-//    }
+    public String getRedisPassword() {
+        return redisPassword;
+    }
 
 
     private Jedis getJedisInstance() {
         Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
-//        jedis.auth(getRedisPassword());
+        jedis.auth(getRedisPassword());
         return jedis;
     }
 
@@ -533,6 +535,48 @@ public class RedisUtil {
             closeJedisInstance(jedis);
         }
     }
+
+    // 이메일 전송
+    public void setDataExpire(String userEmail, String key, long duration) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedisInstance();
+
+            jedis.hset(userEmail, "key", key);
+            jedis.expire(userEmail, (int)duration);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            closeJedisInstance(jedis);
+        }
+
+    }
+
+    // 이메일 검증
+    public int checkEmail(EmailCertificationDto emailCertificationDto) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedisInstance();
+
+            String mailKey = jedis.hget(emailCertificationDto.getUserEmail(), "key");
+            if (mailKey.equals(emailCertificationDto.getCertificationNumber())) {
+                return 0;
+            } else {
+                return 1;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            closeJedisInstance(jedis);
+        }
+
+    }
+
+    //
 
 
     // 탈주 (탈주처리)
