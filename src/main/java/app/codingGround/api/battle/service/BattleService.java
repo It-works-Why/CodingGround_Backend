@@ -618,10 +618,7 @@ public class BattleService {
         }
     }
 
-    public void removeUser(String accessToken) {
-        String userId = JwtTokenProvider.getUserId(accessToken);
-        redisUtil.removeUser(userId);
-    }
+
 }
 
 

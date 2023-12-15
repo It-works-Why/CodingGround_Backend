@@ -86,9 +86,6 @@ public class BattleRestController {
             if (lockResult != null) {
                 queueInfoDto = battleService.tryGameConnect(connectGameInfo, accessToken);
                 if(queueInfoDto.getConnectType().equals("failed") && queueInfoDto.getGameId() != null){
-
-                    battleService.removeUser(accessToken);
-                    battleService.denyReconnect(accessToken);
                     messagingTemplate.convertAndSend("/topic/public/disconnect/user/"+queueInfoDto.getGameId()+"/"+ JwtTokenProvider.getUserId(accessToken), queueInfoDto);
                 }
             }

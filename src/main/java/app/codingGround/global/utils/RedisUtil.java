@@ -184,6 +184,7 @@ public class RedisUtil {
         try {
             jedis = getJedisInstance();
             jedis.rpush(gameId + "_gameUsers", gameUserDto.getGameUser()); // 1, 2, 3, 4, 5 OR 'DEFEAT', 'DEFAULT'
+            jedis.expire(gameId+"_gameUsers", 1800);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -581,30 +582,6 @@ public class RedisUtil {
         }
 
     }
-
-    public void removeUser(String userId) {
-        Jedis jedis = null;
-
-        try {
-            jedis = getJedisInstance();
-            String gameId = getGameId(userId);
-
-            List<GameUserDto> gameUserDtos = getGameUserDtoResult(userId);
-            for(GameUserDto dto : gameUserDtos){
-                if(dto.getUserId().equals(userId)){
-                    jedis.lrem(gameId+"_gameUsers", 0, dto.getGameUser());
-                }
-            }
-        } finally {
-            closeJedisInstance(jedis);
-        }
-
-    }
-
-    //
-
-
-    // 탈주 (탈주처리)
 
 
 }
