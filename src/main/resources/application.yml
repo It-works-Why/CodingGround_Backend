@@ -87,8 +87,8 @@ jwt:
 cloud:
   aws:
     s3:
-      bucket: bsdev16-codingground
+      bucket: bsdev16-img-bucket
     region:
-      static: ca-central-1
+      static: ap-east-1
     stack:
       auto: false

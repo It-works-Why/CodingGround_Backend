@@ -93,7 +93,7 @@ public class User implements UserDetails {
         userRegDate = new Timestamp(new Date().getTime());
         userStatus = "ACTIVE";
         userRole = "USER";
-        userProfileImg = "https://bsdev16-codingground.s3.ca-central-1.amazonaws.com/asset/DefaultProfile.png";
+        userProfileImg = "https://bsdev16-img-bucket.s3.ap-east-1.amazonaws.com/asset/DefaultProfile.png";
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
