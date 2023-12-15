@@ -561,10 +561,15 @@ public class RedisUtil {
             jedis = getJedisInstance();
 
             String mailKey = jedis.hget(emailCertificationDto.getUserEmail(), "key");
-            if (mailKey.equals(emailCertificationDto.getCertificationNumber())) {
-                return 0;
-            } else {
+
+            if(mailKey == null) {
                 return 1;
+            } else {
+                if (mailKey.equals(emailCertificationDto.getCertificationNumber())) {
+                    return 0;
+                } else {
+                    return 2;
+                }
             }
 
         } catch (Exception e) {
