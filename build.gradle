@@ -77,7 +77,7 @@ dependencies {
     // jedis
     implementation 'redis.clients:jedis:5.1.0'
 
-    // websocketdas
+    // websocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     // spring mail
