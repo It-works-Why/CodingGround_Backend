@@ -17,7 +17,7 @@ public class Judge0Util {
     public static List<String> runCode(CodeData codeData, List<TestCaseDto> testCaseDtos) {
 
         try {
-            String url = "http://BSDEV16-Judge0-NLB-3c2de7db46272b30.elb.ap-east-1.amazonaws.com:2358/submissions/";
+            String url = "http://BSDEV16-Judge0-NLB-48a8c6e34fa5d6bd.elb.ap-east-1.amazonaws.com:2358/submissions/";
             OkHttpClient client = new OkHttpClient();
             Response response = null;
             List<String> tokens = new ArrayList<>();
@@ -57,7 +57,7 @@ public class Judge0Util {
         try {
             Thread.sleep(5000);
             for (String token : tokens) {
-                String url = "http://BSDEV16-Judge0-NLB-3c2de7db46272b30.elb.ap-east-1.amazonaws.com:2358/submissions/" + token + "?base64_encoded=false&fields=*";
+                String url = "http://BSDEV16-Judge0-NLB-48a8c6e34fa5d6bd.elb.ap-east-1.amazonaws.com:2358/submissions/" + token + "?base64_encoded=false&fields=*";
                 Request request = new Request.Builder().url(url).get().build();
                 Response response = client.newCall(request).execute();
                 TestCaseResultDto testCaseResultDto = TestCaseResultDto.changeTestCaseResultDto(response.body().string(), testCaseDtos.get(i));
