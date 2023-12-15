@@ -52,14 +52,21 @@ public class AccountService {
     @Transactional
     public TokenInfo login(String userId, String password) {
         try {
-
             Optional<User> user = accountRepository.findByUserId(userId);
 
-            String userStatus = user.get().getUserStatus();
+            if (user.isPresent()) {
+                String userStatus = user.get().getUserStatus();
 
-            if (Objects.equals(userStatus, "BLOCK")) throw new CustomException("블랙 처리된 회원입니다.", ErrorCode.BLOCK_USER);
-            if (Objects.equals(userStatus, "DELETED")) throw new CustomException("탈퇴 처리된 회원입니다.", ErrorCode.DELETED_USER);
-
+                if (Objects.equals(userStatus, "BLOCK")) {
+                    throw new CustomException("블랙 처리된 회원입니다.", ErrorCode.BLOCK_USER);
+                }
+                if (Objects.equals(userStatus, "DELETED")) {
+                    throw new CustomException("탈퇴 처리된 회원입니다.", ErrorCode.DELETED_USER);
+                }
+            } else {
+                // 아이디가 틀려서 user가 존재하지 않는 경우
+                throw new CustomException("로그인 정보가 올바르지 않습니다.", ErrorCode.INVALID_INPUT_ACCOUNT_INFO);
+            }
             // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
             // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, password);
