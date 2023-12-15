@@ -583,18 +583,22 @@ public class RedisUtil {
     }
 
     public void removeUser(String userId) {
-        String gameId = getGameId(userId);
+        Jedis jedis = null;
 
-        List<GameUserDto> gameUserDtos = getGameUserDtoResult(userId);
-        int i = 0;
-        for(GameUserDto dto : gameUserDtos){
-            if(dto.getUserId().equals(userId)){
-                gameUserDtos.remove(i);
-            }else{
-                joinGameRoom(gameId, dto);
+        try {
+            jedis = getJedisInstance();
+            String gameId = getGameId(userId);
+
+            List<GameUserDto> gameUserDtos = getGameUserDtoResult(userId);
+            for(GameUserDto dto : gameUserDtos){
+                if(dto.getUserId().equals(userId)){
+                    jedis.lrem(gameId+"_gameUsers", 0, dto.getGameUser());
+                }
             }
-            i++;
+        } finally {
+            closeJedisInstance(jedis);
         }
+
     }
 
     //
