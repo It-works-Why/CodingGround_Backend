@@ -93,10 +93,6 @@ dependencies {
     // okhttp
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
-
-    // rabbitMQ
-    implementation 'org.springframework.boot:spring-boot-starter-amqp:2.6.4'
-    implementation 'org.springframework.boot:spring-boot-starter-reactor-netty:2.6.4'
 }
 
 
