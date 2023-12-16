@@ -53,11 +53,11 @@ public class RabbitConfig {
     @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory factory = new CachingConnectionFactory();
-        factory.setHost("http://a20dd3dc2fc6b4f43ab7b95ed3cd32fd-2047385114.ap-east-1.elb.amazonaws.com");
+        factory.setHost("a20dd3dc2fc6b4f43ab7b95ed3cd32fd-2047385114.ap-east-1.elb.amazonaws.com");
         factory.setPort(5672);
         factory.setVirtualHost("/");
-        factory.setUsername("guest");
-        factory.setPassword("guest");
+        factory.setUsername("user");
+        factory.setPassword("userpassword");
         return factory;
     }
 

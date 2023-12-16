@@ -95,7 +95,8 @@ dependencies {
 
 
     // rabbitMQ
-    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp:2.6.4'
+    implementation 'org.springframework.boot:spring-boot-starter-reactor-netty:2.6.4'
 }
 
 
