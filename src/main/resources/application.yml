@@ -1,10 +1,10 @@
 spring:
   redis:
-#    host: bsdev16-project-redis-001.ymqfqi.0001.ape1.cache.amazonaws.com
-#    port: 6379
-    host: airspirk.asuscomm.com
-    port: 46379
-    password: root
+    host: bsdev16-project-redis-001.ymqfqi.0001.ape1.cache.amazonaws.com
+    port: 6379
+#    host: airspirk.asuscomm.com
+#    port: 46379
+#    password: root
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -21,10 +21,14 @@ spring:
   freemarker:
     cache: false
   datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://airspirk.asuscomm.com:43306/coding-ground?characterEncoding=UTF-8&useTimezone=true&serverTimezone=Asia/Seoul
-    username: root
-    password: root
+#    driver-class-name: org.mariadb.jdbc.Driver
+#    url: jdbc:mariadb://airspirk.asuscomm.com:43306/coding-ground?characterEncoding=UTF-8&useTimezone=true&serverTimezone=Asia/Seoul
+#    username: root
+#    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://bsdev16-codingground-rds.cfi5hrv2zbgc.ap-east-1.rds.amazonaws.com:3306/coding-ground?characterEncoding=UTF-8
+    username: admin
+    password: adminpassword
   jpa:
     hibernate:
       ddl-auto: none
