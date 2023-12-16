@@ -92,8 +92,10 @@ dependencies {
 
     // okhttp
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+
+    // rabbitMQ
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
+

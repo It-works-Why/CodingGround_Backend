@@ -1,6 +1,8 @@
 package app.codingGround.api.battle.controller;
 
+import app.codingGround.api.battle.dto.request.CodeData;
 import app.codingGround.api.battle.dto.request.ConnectGameInfo;
+import app.codingGround.api.battle.dto.request.Message;
 import app.codingGround.api.battle.dto.response.*;
 import app.codingGround.api.battle.service.BattleService;
 import app.codingGround.api.entity.Language;
@@ -12,6 +14,7 @@ import app.codingGround.global.utils.JwtTokenProvider;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -31,6 +34,7 @@ import java.util.List;
 public class BattleRestController {
 
     private final BattleService battleService;
+    private final RabbitTemplate rabbitTemplate;
     private final SimpMessageSendingOperations messagingTemplate;
 
 
@@ -61,7 +65,7 @@ public class BattleRestController {
     @PostMapping("/join/game")
     public ResponseEntity<ApiResponse<QueueInfoDto>> tryGameConnect(@RequestHeader("Authorization") String accessToken, @RequestBody ConnectGameInfo connectGameInfo) {
         // 게임방 생성 또는 빈 방 확인 로직
-
+        Message message = new Message();
         Jedis jedis = null;
         String lockKey = null;
         QueueInfoDto queueInfoDto = null;
@@ -89,7 +93,11 @@ public class BattleRestController {
 
                     battleService.escapeGame(JwtTokenProvider.getUserId(accessToken));
                     battleService.denyReconnect(accessToken);
-                    messagingTemplate.convertAndSend("/topic/public/disconnect/user/"+queueInfoDto.getGameId()+"/"+ JwtTokenProvider.getUserId(accessToken), queueInfoDto);
+                    message.setUrl("/topic/public/disconnect/user/"+queueInfoDto.getGameId()+"/"+ JwtTokenProvider.getUserId(accessToken));
+                    message.setData(queueInfoDto);
+                    message.setType("disconnect");
+                    message.setGameId(queueInfoDto.getGameId());
+                    rabbitTemplate.convertAndSend("game.exchange", "*.room.1", message);
                 }
             }
         } finally {
@@ -123,5 +131,51 @@ public class BattleRestController {
         battleData.setTestCase(testCase);
 
         return ResponseEntity.ok(new ApiResponse<>(battleData));
+    }
+
+
+    @GetMapping("/check/{gameId}")
+    public ResponseEntity<ApiResponse<DefaultResultDto>> userCheck(@PathVariable String gameId, @RequestHeader("Authorization") String accessToken) {
+        String userId = JwtTokenProvider.getUserId(accessToken);
+        String failed = battleService.authJoinUser(gameId, userId);
+        if (failed.equals("failed")) {
+            return ResponseEntity.ok(new ApiResponse<>(DefaultResultDto.builder().message("잘못된 접근입니다.").success(false).build()));
+        } else {
+            refreshUserList(gameId);
+            return ResponseEntity.ok(new ApiResponse<>(DefaultResultDto.builder().message("허용").success(true).build()));
+        }
+    }
+
+    @PostMapping("/send/1/{gameId}")
+    public ResponseEntity<ApiResponse<List<TestCaseResultDto>>> sendCodeRound1(@PathVariable String gameId, @RequestBody CodeData codeData) {
+        ResultDto resultDto = battleService.runCode(codeData, gameId, 1);
+        List<TestCaseResultDto> testCaseResultDtos = resultDto.getTestCaseResultDtos();
+
+        refreshUserList(gameId);
+
+        return  ResponseEntity.ok(new ApiResponse<>(testCaseResultDtos));
+    }
+    @PostMapping("/send/2/{gameId}")
+    public ResponseEntity<ApiResponse<List<TestCaseResultDto>>> sendCodeRound2(@PathVariable String gameId, @RequestBody CodeData codeData) {
+        ResultDto resultDto = battleService.runCode(codeData, gameId, 2);
+        List<TestCaseResultDto> testCaseResultDtos = resultDto.getTestCaseResultDtos();
+
+        refreshUserList(gameId);
+
+        return  ResponseEntity.ok(new ApiResponse<>(testCaseResultDtos));
+    }
+
+
+
+
+    public void refreshUserList(String gameId) {
+        List<GameUserDto> gamePlayers = battleService.getGameUserDtoList(gameId);
+        Message message = new Message();
+        message.setType("refresh");
+        message.setUrl("/topic/public/refresh/user/" + gameId);
+        message.setData(gamePlayers);
+        message.setGameId(gameId);
+        rabbitTemplate.convertAndSend("game.exchange", "*.room."+gameId, message);
+
     }
 }
