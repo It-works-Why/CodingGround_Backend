@@ -56,7 +56,7 @@ public class BattleController {
         Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
         return jedis;
     }
-//
+
     private void closeJedisInstance(Jedis jedis) {
         if (jedis != null) {
             jedis.close();
