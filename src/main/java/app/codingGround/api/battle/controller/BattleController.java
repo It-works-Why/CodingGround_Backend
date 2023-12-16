@@ -184,6 +184,7 @@ public class BattleController {
     public void reConnect(@Payload String userId, SimpMessageHeaderAccessor headerAccessor) {
         System.out.println(userId);
         System.out.println("여기여기");
+        System.out.println("여길디릳네[리ㅏㄷ네ㅏ래ㅔㅁㄷ장ㅁ재ㅔ");
         if (userId != null) {
             headerAccessor.getSessionAttributes().put("userId", userId);
         }
