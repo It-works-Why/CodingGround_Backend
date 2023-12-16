@@ -182,6 +182,8 @@ public class BattleController {
 
     @MessageMapping("/reconnect")
     public void reConnect(@Payload String userId, SimpMessageHeaderAccessor headerAccessor) {
+        System.out.println(userId);
+        System.out.println("여기여기");
         if (userId != null) {
             headerAccessor.getSessionAttributes().put("userId", userId);
         }
