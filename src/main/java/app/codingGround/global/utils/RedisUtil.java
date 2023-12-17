@@ -588,4 +588,19 @@ public class RedisUtil {
     }
 
 
+    public void setExpire(String gameId, int time) {
+        Jedis jedis = null;
+        try {
+            jedis = getJedisInstance();
+
+            jedis.expire(gameId+"_gameRoom", (time * 60L) + 10);
+            jedis.expire(gameId+"_gameUsers", (time * 60L) + 10);
+            List<GameUserDto> gameUserDtoList = getGameUserDtoResult(gameId);
+            for(GameUserDto dto : gameUserDtoList){
+                jedis.expire(dto.getUserId(), (time * 60L) + 10);
+            }
+        } finally {
+            closeJedisInstance(jedis);
+        }
+    }
 }
