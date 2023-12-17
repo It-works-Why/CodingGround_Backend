@@ -283,7 +283,7 @@ public class BattleService {
         gameDto.setSecondRoundEndTime(Timestamp.valueOf(LocalDateTime.now().plusMinutes(question.getQuestionLimitTime() + question2.getQuestionLimitTime()).plusSeconds(5)));
 
         redisUtil.updateGameData(gameDto);
-        redisUtil.setExpire(gameId,round.getQuestionNum().getQuestionLimitTime() + round2.getQuestionNum().getQuestionLimitTime());
+        redisUtil.setExpire(gameId,round.getQuestionNum().getQuestionLimitTime() + round2.getQuestionNum().getQuestionLimitTime() + 10);
 
         questions.add(question);
         questions.add(question2);
