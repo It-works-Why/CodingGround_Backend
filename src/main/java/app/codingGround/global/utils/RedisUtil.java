@@ -593,8 +593,11 @@ public class RedisUtil {
         try {
             jedis = getJedisInstance();
 
-            jedis.expire(gameId+"_gameRoom", (time * 60L) + 10);
-            jedis.expire(gameId+"_gameUsers", (time * 60L) + 10);
+            long expireTime = time * 60L + 10;
+            System.out.println(expireTime);
+            System.out.println("하하");
+            jedis.expire(gameId+"_gameRoom", expireTime);
+            jedis.expire(gameId+"_gameUsers", expireTime);
             List<GameUserDto> gameUserDtoList = getGameUserDtoResult(gameId);
             for(GameUserDto dto : gameUserDtoList){
                 jedis.expire(dto.getUserId(), (time * 60L) + 10);
