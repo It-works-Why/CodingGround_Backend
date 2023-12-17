@@ -1,10 +1,10 @@
 spring:
   redis:
-#    host: bsdev16-project-redis-001.ymqfqi.0001.ape1.cache.amazonaws.com
-#    port: 6379
-    host: airspirk.asuscomm.com
-    port: 46379
-    password: root
+    host: bsdev16-project-redis-001.ymqfqi.0001.ape1.cache.amazonaws.com
+    port: 6379
+#    host: airspirk.asuscomm.com
+#    port: 46379
+#    password: root
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher

@@ -34,40 +34,6 @@ public class BattleController {
     private final BattleService battleService;
     private final SimpMessageSendingOperations messagingTemplate;
 
-    @Value("${spring.redis.host}")
-    private String redisHost;
-
-    @Value("${spring.redis.port}")
-    private int redisPort;
-
-    @Value("${spring.redis.password}")
-    private String redisPassword;
-
-    public String getRedisHost() {
-        return redisHost;
-    }
-
-    public int getRedisPort() {
-        return redisPort;
-    }
-
-    public String getRedisPassword() {
-        return redisPassword;
-    }
-
-
-    private Jedis getJedisInstance() {
-        Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
-        jedis.auth(getRedisPassword());
-        return jedis;
-    }
-
-    private void closeJedisInstance(Jedis jedis) {
-        if (jedis != null) {
-            jedis.close();
-        }
-    }
-
 
     @MessageMapping("/join/queue/{gameId}")
     public void sendMessage(@DestinationVariable String gameId, @Payload String userId, SimpMessageHeaderAccessor headerAccessor) {

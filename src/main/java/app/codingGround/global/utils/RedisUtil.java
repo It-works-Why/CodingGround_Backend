@@ -24,8 +24,8 @@ public class RedisUtil {
     @Value("${spring.redis.port}")
     private int redisPort;
 
-    @Value("${spring.redis.password}")
-    private String redisPassword;
+//    @Value("${spring.redis.password}")
+//    private String redisPassword;
 
     public String getRedisHost() {
         return redisHost;
@@ -35,14 +35,14 @@ public class RedisUtil {
         return redisPort;
     }
 
-    public String getRedisPassword() {
-        return redisPassword;
-    }
+//    public String getRedisPassword() {
+//        return redisPassword;
+//    }
 
 
     private Jedis getJedisInstance() {
         Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
-        jedis.auth(getRedisPassword());
+//        jedis.auth(getRedisPassword());
         return jedis;
     }
 
@@ -593,11 +593,11 @@ public class RedisUtil {
         try {
             jedis = getJedisInstance();
 
-            jedis.expire(gameId+"_gameRoom", 130);
-            jedis.expire(gameId+"_gameUsers", 130);
+            jedis.expire(gameId+"_gameRoom", 260);
+            jedis.expire(gameId+"_gameUsers", 260);
             List<GameUserDto> gameUserDtoList = getGameUserDtoResult(gameId);
             for(GameUserDto dto : gameUserDtoList){
-                jedis.expire(dto.getUserId(), 130);
+                jedis.expire(dto.getUserId(), 260);
             }
         } finally {
             closeJedisInstance(jedis);
