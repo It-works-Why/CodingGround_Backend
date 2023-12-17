@@ -35,15 +35,30 @@ public class BattleRestController {
 
 
     @Value("${spring.redis.host}")
-    @Getter
     private String redisHost;
 
     @Value("${spring.redis.port}")
-    @Getter
     private int redisPort;
+
+    @Value("${spring.redis.password}")
+    private String redisPassword;
+
+    public String getRedisHost() {
+        return redisHost;
+    }
+
+    public int getRedisPort() {
+        return redisPort;
+    }
+
+    public String getRedisPassword() {
+        return redisPassword;
+    }
+
 
     private Jedis getJedisInstance() {
         Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        jedis.auth(getRedisPassword());
         return jedis;
     }
 
@@ -52,6 +67,7 @@ public class BattleRestController {
             jedis.close();
         }
     }
+
 
     @GetMapping("/get/language")
     public List<Language> getLanguage() {

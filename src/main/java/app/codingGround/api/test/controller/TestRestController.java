@@ -27,7 +27,6 @@ public class TestRestController {
 
     @GetMapping("/success/test")
     public ResponseEntity<ApiResponse<DefaultResultDto>> successTest() {
-        System.out.println("테스트 입니다.!!!!!");
         return ResponseEntity.ok(new ApiResponse<>(DefaultResultDto.builder().success(true).message("성공 하셨습니다.").build()));
     }
 

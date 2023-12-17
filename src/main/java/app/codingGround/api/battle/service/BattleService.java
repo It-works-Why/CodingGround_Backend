@@ -50,12 +50,16 @@ public class BattleService {
     private final GameRecordRepository gameRecordRepository;
     private final RedisUtil redisUtil;
 
+
+
     @Value("${spring.redis.host}")
     private String redisHost;
 
     @Value("${spring.redis.port}")
     private int redisPort;
 
+    @Value("${spring.redis.password}")
+    private String redisPassword;
 
     public String getRedisHost() {
         return redisHost;
@@ -65,8 +69,14 @@ public class BattleService {
         return redisPort;
     }
 
+    public String getRedisPassword() {
+        return redisPassword;
+    }
+
+
     private Jedis getJedisInstance() {
         Jedis jedis = new Jedis(getRedisHost(), getRedisPort());
+        jedis.auth(getRedisPassword());
         return jedis;
     }
 
@@ -75,6 +85,7 @@ public class BattleService {
             jedis.close();
         }
     }
+
 
 //    userId { gameRoomId }, userId { gameRoomId }
 
