@@ -522,11 +522,15 @@ public class RedisUtil {
 
     public void removeGame(String gameId) {
         Jedis jedis = null;
+        String gameId2 = null;
         try {
             jedis = getJedisInstance();
             List<GameUserDto> gameUserDtoList = getGameUserDtoResult(gameId);
             for (GameUserDto dto : gameUserDtoList) {
-                jedis.del(dto.getUserId());
+                gameId2 = getGameId(dto.getUserId());
+                if (gameId2.equals(gameId)) {
+                    jedis.del(dto.getUserId());
+                }
             }
             jedis.del(gameId + "_gameUsers");
             jedis.del(gameId + "_gameRoom");
