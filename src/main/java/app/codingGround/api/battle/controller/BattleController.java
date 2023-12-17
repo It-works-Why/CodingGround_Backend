@@ -75,6 +75,7 @@ public class BattleController {
         if (userId != null) {
             headerAccessor.getSessionAttributes().put("userId", userId);
         }
+
         String failed = battleService.authJoinUser(gameId, userId);
         List<GameUserDto> gameUserDtoList = battleService.getGameUserDtoList(gameId);
         long userCount = gameUserDtoList.size();
@@ -189,8 +190,8 @@ public class BattleController {
         messagingTemplate.convertAndSend("/topic/public/refresh/user/" + gameId, gamePlayers);
     }
 
-    @MessageMapping("/reconnect")
-    public void reConnect(@Payload String userId, SimpMessageHeaderAccessor headerAccessor) {
+    @MessageMapping("/recon/{gameId}")
+    public void reConnect(@DestinationVariable String gameId, @Payload String userId, SimpMessageHeaderAccessor headerAccessor) {
         System.out.println(userId);
         System.out.println("여기여기");
         System.out.println("여길디릳네[리ㅏㄷ네ㅏ래ㅔㅁㄷ장ㅁ재ㅔ");
