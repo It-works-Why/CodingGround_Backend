@@ -101,7 +101,7 @@ public class BattleController {
             LocalDateTime futureTime = currentTime.plusSeconds(10);
             List<Question> questions = battleService.startRound(gameId);
 
-            messagingTemplate.convertAndSend("/topic/public/gameSta rt/" + gameId, futureTime);
+            messagingTemplate.convertAndSend("/topic/public/gameStart/" + gameId, futureTime);
             ScheduledExecutorService scheduler1 = Executors.newScheduledThreadPool(1);
             int round1LimitMinutes = questions.get(0).getQuestionLimitTime();
             long delayInSeconds1 = round1LimitMinutes * 60L + 5L; // 현재 분을 초로 환산 후 5초를 추가합니다.
